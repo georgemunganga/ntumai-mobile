@@ -102,16 +102,21 @@ export default function RoleSelectionScreen() {
         role: selectedRole,
       });
 
-      // Navigate to appropriate dashboard based on role
+      // Navigate to appropriate screen based on role
+      // New users (tasker/vendor) go to onboarding intro
+      // Existing customers go directly to dashboard
       switch (selectedRole) {
         case 'customer':
+          // Customers go straight to dashboard
           router.replace('/(customer)/Home');
           break;
         case 'tasker':
-          router.replace('/(tasker)/DriverDashboard');
+          // New taskers see onboarding intro first
+          router.replace('/(tasker)/OnboardingIntro');
           break;
         case 'vendor':
-          router.replace('/(vendor)/VendorDashboard');
+          // New vendors see onboarding intro first
+          router.replace('/(vendor)/OnboardingIntro');
           break;
       }
     } catch (err: any) {
