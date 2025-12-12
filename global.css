@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply font-ubuntu;
+}
+
+* {
+  font-family: "Ubuntu-Regular", sans-serif;
+}
+
+Text {
+  font-family: "Ubuntu-Regular";
+}
+
+.font-bold {
+  font-family: "Ubuntu-Bold", sans-serif;
+}
+
+.font-light {
+  font-family: "Ubuntu-Light", sans-serif;
+}
+
+.font-medium {
+  font-family: "Ubuntu-Medium", sans-serif;
+}
