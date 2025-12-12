@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'expo-router';
 import { AuthProvider } from './AuthProvider';
 import { OtpProvider } from './OtpProvider';
@@ -17,20 +17,32 @@ interface AppProviderProps {
 export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const router = useRouter();
   const { initializeAuth } = useAuthStore();
+  const [initialized, setInitialized] = useState(false);
+  const [initError, setInitError] = useState<string | null>(null);
 
-  // Initialize authentication on app start
+  // Initialize authentication on app start (only once)
   useEffect(() => {
+    // Prevent multiple initialization attempts
+    if (initialized) return;
+
     const initApp = async () => {
       try {
         await initializeAuth();
-      } catch (error) {
+        setInitialized(true);
+      } catch (error: any) {
         console.error('Failed to initialize app:', error);
-        router.replace('/(auth)/SplashScreen');
+        setInitError(error?.message || 'Initialization failed');
+        setInitialized(true); // Mark as initialized even on error to prevent infinite loop
+        
+        // Redirect to splash screen on error
+        setTimeout(() => {
+          router.replace('/(auth)/SplashScreen');
+        }, 500);
       }
     };
 
     initApp();
-  }, []);
+  }, []); // Empty dependency array - run only once on mount
 
   return (
     <AuthProvider>

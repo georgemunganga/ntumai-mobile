@@ -1,5 +1,5 @@
 // Main store configuration
-export { useAuthStore } from './slices/authSlice';
+export { useAuthStore } from './slices/authSlice.improved';
 export { useUserStore } from './slices/userSlice';
 export { useCartStore } from './slices/cartSlice';
 export { useOrderStore } from './slices/orderSlice';
