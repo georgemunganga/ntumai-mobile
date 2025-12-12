@@ -5,6 +5,7 @@
     "owner": "abdelkaderbzz",
     "version": "1.0.0",
     "orientation": "portrait",
+    "scheme": "ntumai",
     "icon": "./assets/ntumai_logo.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
@@ -20,7 +21,8 @@
         "resizeMode": "contain",
         "backgroundColor": "#ffffff"
       },
-      "bundleIdentifier": "com.dannydc.NTUMAI"
+      "bundleIdentifier": "com.dannydc.NTUMAI",
+      "scheme": "ntumai"
     },
     "android": {
       "icon": "./assets/ntumai_logo.png",
@@ -31,7 +33,8 @@
         "resizeMode": "contain",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.dannydc.NTUMAI"
+      "package": "com.dannydc.NTUMAI",
+      "scheme": "ntumai"
     },
     "plugins": [
       [
