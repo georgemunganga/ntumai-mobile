@@ -208,8 +208,8 @@ export default function OtpStartScreen() {
         <View className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8">
           <Text className="text-sm text-blue-900">
             {contactMethod === 'email'
-              ? 'We'll send a one-time code to your email. No password needed.'
-              : 'We'll send a one-time code via SMS. Make sure your phone number is correct.'}
+              ? "We'll send a one-time code to your email. No password needed."
+              : "We'll send a one-time code via SMS. Make sure your phone number is correct."}
           </Text>
         </View>
 
