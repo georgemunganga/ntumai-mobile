@@ -1,1 +1,142 @@
-import React, { useState } from 'react';\nimport {\n  View,\n  Text,\n  TouchableOpacity,\n  ScrollView,\n  FlatList,\n} from 'react-native';\nimport { useRouter } from 'expo-router';\nimport { useWalletStore } from '../../src/store';\nimport { Feather } from '@expo/vector-icons';\n\nexport default function WalletScreen() {\n  const router = useRouter();\n  const { balance, transactions } = useWalletStore();\n  const [selectedFilter, setSelectedFilter] = useState<'all' | 'credit' | 'debit'>('all');\n\n  const filteredTransactions = transactions.filter(t => {\n    if (selectedFilter === 'all') return true;\n    return selectedFilter === 'credit' ? t.amount > 0 : t.amount < 0;\n  });\n\n  return (\n    <View className=\"flex-1 bg-white\">\n      {/* Header */}\n      <View className=\"px-6 py-4 border-b border-gray-200 flex-row items-center\">\n        <TouchableOpacity onPress={() => router.back()} className=\"mr-4\">\n          <Feather name=\"chevron-left\" size={24} color=\"#1F2937\" />\n        </TouchableOpacity>\n        <Text className=\"text-2xl font-bold text-gray-900\">Wallet</Text>\n      </View>\n\n      <ScrollView className=\"flex-1\">\n        {/* Balance Card */}\n        <View className=\"px-6 py-8\">\n          <View className=\"bg-gradient-to-br from-green-600 to-green-700 rounded-2xl p-8 mb-6\">\n            <Text className=\"text-green-100 text-sm mb-2\">Available Balance</Text>\n            <Text className=\"text-5xl font-bold text-white mb-8\">{balance}K</Text>\n            <View className=\"flex-row items-center justify-between pt-6 border-t border-green-500\">\n              <View>\n                <Text className=\"text-green-100 text-xs mb-1\">Pending</Text>\n                <Text className=\"text-white font-bold\">0K</Text>\n              </View>\n              <View>\n                <Text className=\"text-green-100 text-xs mb-1\">Total Earned</Text>\n                <Text className=\"text-white font-bold\">12,500K</Text>\n              </View>\n              <View>\n                <Text className=\"text-green-100 text-xs mb-1\">Total Spent</Text>\n                <Text className=\"text-white font-bold\">8,200K</Text>\n              </View>\n            </View>\n          </View>\n\n          {/* Action Buttons */}\n          <View className=\"flex-row gap-3\">\n            <TouchableOpacity className=\"flex-1 bg-green-600 rounded-lg py-4\">\n              <View className=\"flex-row items-center justify-center\">\n                <Feather name=\"plus-circle\" size={20} color=\"white\" />\n                <Text className=\"text-white font-bold ml-2\">Add Money</Text>\n              </View>\n            </TouchableOpacity>\n            <TouchableOpacity className=\"flex-1 bg-blue-600 rounded-lg py-4\">\n              <View className=\"flex-row items-center justify-center\">\n                <Feather name=\"send\" size={20} color=\"white\" />\n                <Text className=\"text-white font-bold ml-2\">Send Money</Text>\n              </View>\n            </TouchableOpacity>\n          </View>\n        </View>\n\n        {/* Transaction Filters */}\n        <View className=\"px-6 py-4 border-t border-gray-200\">\n          <View className=\"flex-row gap-2\">\n            {['all', 'credit', 'debit'].map(filter => (\n              <TouchableOpacity\n                key={filter}\n                onPress={() => setSelectedFilter(filter as any)}\n                className={`px-4 py-2 rounded-full ${\n                  selectedFilter === filter ? 'bg-green-600' : 'bg-gray-100'\n                }`}\n              >\n                <Text className={`font-semibold capitalize ${\n                  selectedFilter === filter ? 'text-white' : 'text-gray-700'\n                }`}>\n                  {filter}\n                </Text>\n              </TouchableOpacity>\n            ))}\n          </View>\n        </View>\n\n        {/* Transactions List */}\n        <View className=\"px-6 py-6\">\n          <Text className=\"text-lg font-bold text-gray-900 mb-4\">Recent Transactions</Text>\n          <FlatList\n            data={filteredTransactions}\n            keyExtractor={(item) => item.id}\n            scrollEnabled={false}\n            renderItem={({ item }) => {\n              const isCredit = item.amount > 0;\n              return (\n                <View className=\"flex-row items-center justify-between py-4 border-b border-gray-100\">\n                  <View className=\"flex-row items-center flex-1\">\n                    <View className={`w-12 h-12 rounded-full items-center justify-center mr-4 ${\n                      isCredit ? 'bg-green-100' : 'bg-red-100'\n                    }`}>\n                      <Feather\n                        name={isCredit ? 'arrow-down-left' : 'arrow-up-right'}\n                        size={20}\n                        color={isCredit ? '#16A34A' : '#EF4444'}\n                      />\n                    </View>\n                    <View className=\"flex-1\">\n                      <Text className=\"text-gray-900 font-semibold\">{item.description}</Text>\n                      <Text className=\"text-gray-600 text-xs mt-1\">\n                        {item.timestamp.toLocaleDateString()} at {item.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}\n                      </Text>\n                    </View>\n                  </View>\n                  <View className=\"items-end\">\n                    <Text className={`text-lg font-bold ${\n                      isCredit ? 'text-green-600' : 'text-red-600'\n                    }`}>\n                      {isCredit ? '+' : ''}{item.amount}K\n                    </Text>\n                    <Text className={`text-xs font-semibold ${\n                      item.status === 'completed' ? 'text-green-600' : 'text-yellow-600'\n                    }`}>\n                      {item.status.charAt(0).toUpperCase() + item.status.slice(1)}\n                    </Text>\n                  </View>\n                </View>\n              );\n            }}\n          />\n        </View>\n      </ScrollView>\n    </View>\n  );\n}\n
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  FlatList,
+} from 'react-native';
+import { useRouter } from 'expo-router';
+import { useWalletStore } from '../../src/store';
+import { Feather } from '@expo/vector-icons';
+
+export default function WalletScreen() {
+  const router = useRouter();
+  const { balance, transactions } = useWalletStore();
+  const [selectedFilter, setSelectedFilter] = useState<'all' | 'credit' | 'debit'>('all');
+
+  const filteredTransactions = transactions.filter(t => {
+    if (selectedFilter === 'all') return true;
+    return selectedFilter === 'credit' ? t.amount > 0 : t.amount < 0;
+  });
+
+  return (
+    <View className="flex-1 bg-white">
+      {/* Header */}
+      <View className="px-6 py-4 border-b border-gray-200 flex-row items-center">
+        <TouchableOpacity onPress={() => router.back()} className="mr-4">
+          <Feather name="chevron-left" size={24} color="#1F2937" />
+        </TouchableOpacity>
+        <Text className="text-2xl font-bold text-gray-900">Wallet</Text>
+      </View>
+
+      <ScrollView className="flex-1">
+        {/* Balance Card */}
+        <View className="px-6 py-8">
+          <View className="bg-gradient-to-br from-green-600 to-green-700 rounded-2xl p-8 mb-6">
+            <Text className="text-green-100 text-sm mb-2">Available Balance</Text>
+            <Text className="text-5xl font-bold text-white mb-8">{balance}K</Text>
+            <View className="flex-row items-center justify-between pt-6 border-t border-green-500">
+              <View>
+                <Text className="text-green-100 text-xs mb-1">Pending</Text>
+                <Text className="text-white font-bold">0K</Text>
+              </View>
+              <View>
+                <Text className="text-green-100 text-xs mb-1">Total Earned</Text>
+                <Text className="text-white font-bold">12,500K</Text>
+              </View>
+              <View>
+                <Text className="text-green-100 text-xs mb-1">Total Spent</Text>
+                <Text className="text-white font-bold">8,200K</Text>
+              </View>
+            </View>
+          </View>
+
+          {/* Action Buttons */}
+          <View className="flex-row gap-3">
+            <TouchableOpacity className="flex-1 bg-green-600 rounded-lg py-4">
+              <View className="flex-row items-center justify-center">
+                <Feather name="plus-circle" size={20} color="white" />
+                <Text className="text-white font-bold ml-2">Add Money</Text>
+              </View>
+            </TouchableOpacity>
+            <TouchableOpacity className="flex-1 bg-blue-600 rounded-lg py-4">
+              <View className="flex-row items-center justify-center">
+                <Feather name="send" size={20} color="white" />
+                <Text className="text-white font-bold ml-2">Send Money</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* Transaction Filters */}
+        <View className="px-6 py-4 border-t border-gray-200">
+          <View className="flex-row gap-2">
+            {['all', 'credit', 'debit'].map(filter => (
+              <TouchableOpacity
+                key={filter}
+                onPress={() => setSelectedFilter(filter as any)}
+                className={`px-4 py-2 rounded-full ${
+                  selectedFilter === filter ? 'bg-green-600' : 'bg-gray-100'
+                }`}
+              >
+                <Text className={`font-semibold capitalize ${
+                  selectedFilter === filter ? 'text-white' : 'text-gray-700'
+                }`}>
+                  {filter}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+
+        {/* Transactions List */}
+        <View className="px-6 py-6">
+          <Text className="text-lg font-bold text-gray-900 mb-4">Recent Transactions</Text>
+          <FlatList
+            data={filteredTransactions}
+            keyExtractor={(item) => item.id}
+            scrollEnabled={false}
+            renderItem={({ item }) => {
+              const isCredit = item.amount > 0;
+              return (
+                <View className="flex-row items-center justify-between py-4 border-b border-gray-100">
+                  <View className="flex-row items-center flex-1">
+                    <View className={`w-12 h-12 rounded-full items-center justify-center mr-4 ${
+                      isCredit ? 'bg-green-100' : 'bg-red-100'
+                    }`}>
+                      <Feather
+                        name={isCredit ? 'arrow-down-left' : 'arrow-up-right'}
+                        size={20}
+                        color={isCredit ? '#16A34A' : '#EF4444'}
+                      />
+                    </View>
+                    <View className="flex-1">
+                      <Text className="text-gray-900 font-semibold">{item.description}</Text>
+                      <Text className="text-gray-600 text-xs mt-1">
+                        {item.timestamp.toLocaleDateString()} at {item.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </Text>
+                    </View>
+                  </View>
+                  <View className="items-end">
+                    <Text className={`text-lg font-bold ${
+                      isCredit ? 'text-green-600' : 'text-red-600'
+                    }`}>
+                      {isCredit ? '+' : ''}{item.amount}K
+                    </Text>
+                    <Text className={`text-xs font-semibold ${
+                      item.status === 'completed' ? 'text-green-600' : 'text-yellow-600'
+                    }`}>
+                      {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
+                    </Text>
+                  </View>
+                </View>
+              );
+            }}
+          />
+        </View>
+      </ScrollView>
+    </View>
+  );
+}
+

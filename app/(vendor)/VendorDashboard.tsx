@@ -1,1 +1,221 @@
-import React, { useEffect, useState } from 'react';\nimport {\n  View,\n  Text,\n  TouchableOpacity,\n  ScrollView,\n  Image,\n  FlatList,\n  ActivityIndicator,\n} from 'react-native';\nimport { useRouter } from 'expo-router';\nimport { useAuthStore } from '../../src/store';\nimport { Feather } from '@expo/vector-icons';\n\nexport default function VendorDashboard() {\n  const router = useRouter();\n  const { user } = useAuthStore();\n  const [stats, setStats] = useState({\n    todayOrders: 12,\n    todayRevenue: 450,\n    totalRating: 4.8,\n    completionRate: 98,\n  });\n  const [orders, setOrders] = useState([\n    {\n      id: '1',\n      orderNumber: '#ORD-2024-001',\n      customer: 'John Doe',\n      items: 3,\n      total: 85,\n      status: 'pending',\n      time: '10 mins ago',\n    },\n    {\n      id: '2',\n      orderNumber: '#ORD-2024-002',\n      customer: 'Jane Smith',\n      items: 2,\n      total: 65,\n      status: 'preparing',\n      time: '5 mins ago',\n    },\n    {\n      id: '3',\n      orderNumber: '#ORD-2024-003',\n      customer: 'Bob Johnson',\n      items: 4,\n      total: 120,\n      status: 'ready',\n      time: '2 mins ago',\n    },\n  ]);\n\n  const getStatusColor = (status: string) => {\n    switch (status) {\n      case 'pending':\n        return { bg: 'bg-yellow-100', text: 'text-yellow-700' };\n      case 'preparing':\n        return { bg: 'bg-blue-100', text: 'text-blue-700' };\n      case 'ready':\n        return { bg: 'bg-green-100', text: 'text-green-700' };\n      case 'completed':\n        return { bg: 'bg-gray-100', text: 'text-gray-700' };\n      default:\n        return { bg: 'bg-gray-100', text: 'text-gray-700' };\n    }\n  };\n\n  return (\n    <ScrollView className=\"flex-1 bg-gray-50\">\n      {/* Header */}\n      <View className=\"bg-white px-6 py-6 border-b border-gray-200\">\n        <View className=\"flex-row items-center justify-between mb-4\">\n          <View>\n            <Text className=\"text-sm text-gray-600\">Welcome back</Text>\n            <Text className=\"text-2xl font-bold text-gray-900\">{user?.firstName}</Text>\n          </View>\n          <TouchableOpacity onPress={() => router.push('/(vendor)/Profile')}>\n            <Image\n              source={{ uri: user?.avatar }}\n              className=\"w-12 h-12 rounded-full\"\n            />\n          </TouchableOpacity>\n        </View>\n\n        {/* Status Badge */}\n        <View className=\"bg-green-50 border border-green-200 rounded-lg p-3 flex-row items-center\">\n          <View className=\"w-2 h-2 bg-green-600 rounded-full mr-2\" />\n          <Text className=\"text-green-700 font-semibold\">Online & Accepting Orders</Text>\n        </View>\n      </View>\n\n      {/* Stats Grid */}\n      <View className=\"px-6 py-6\">\n        <Text className=\"text-lg font-bold text-gray-900 mb-4\">Today's Performance</Text>\n        <View className=\"gap-3\">\n          {/* Orders */}\n          <View className=\"bg-white rounded-lg p-4 flex-row items-center border border-gray-200\">\n            <View className=\"w-12 h-12 bg-blue-100 rounded-lg items-center justify-center mr-4\">\n              <Feather name=\"shopping-bag\" size={24} color=\"#2563EB\" />\n            </View>\n            <View className=\"flex-1\">\n              <Text className=\"text-gray-600 text-sm\">Orders</Text>\n              <Text className=\"text-2xl font-bold text-gray-900\">{stats.todayOrders}</Text>\n            </View>\n            <Text className=\"text-green-600 font-bold\">+2</Text>\n          </View>\n\n          {/* Revenue */}\n          <View className=\"bg-white rounded-lg p-4 flex-row items-center border border-gray-200\">\n            <View className=\"w-12 h-12 bg-green-100 rounded-lg items-center justify-center mr-4\">\n              <Feather name=\"dollar-sign\" size={24} color=\"#16A34A\" />\n            </View>\n            <View className=\"flex-1\">\n              <Text className=\"text-gray-600 text-sm\">Revenue</Text>\n              <Text className=\"text-2xl font-bold text-gray-900\">{stats.todayRevenue}K</Text>\n            </View>\n            <Text className=\"text-green-600 font-bold\">+15%</Text>\n          </View>\n\n          {/* Rating */}\n          <View className=\"bg-white rounded-lg p-4 flex-row items-center border border-gray-200\">\n            <View className=\"w-12 h-12 bg-yellow-100 rounded-lg items-center justify-center mr-4\">\n              <Feather name=\"star\" size={24} color=\"#FCD34D\" />\n            </View>\n            <View className=\"flex-1\">\n              <Text className=\"text-gray-600 text-sm\">Rating</Text>\n              <Text className=\"text-2xl font-bold text-gray-900\">{stats.totalRating}</Text>\n            </View>\n            <View className=\"flex-row items-center\">\n              <Feather name=\"star\" size={16} color=\"#FCD34D\" fill=\"#FCD34D\" />\n              <Text className=\"text-gray-600 text-sm ml-1\">(248)</Text>\n            </View>\n          </View>\n        </View>\n      </View>\n\n      {/* Quick Actions */}\n      <View className=\"px-6 py-6\">\n        <Text className=\"text-lg font-bold text-gray-900 mb-4\">Quick Actions</Text>\n        <View className=\"gap-3\">\n          <TouchableOpacity\n            onPress={() => router.push('/(vendor)/ManageProducts')}\n            className=\"bg-white rounded-lg p-4 flex-row items-center border border-gray-200\"\n          >\n            <View className=\"w-12 h-12 bg-purple-100 rounded-lg items-center justify-center mr-4\">\n              <Feather name=\"package\" size={24} color=\"#7C3AED\" />\n            </View>\n            <View className=\"flex-1\">\n              <Text className=\"text-lg font-bold text-gray-900\">Manage Products</Text>\n              <Text className=\"text-gray-600 text-sm\">Add, edit, or remove items</Text>\n            </View>\n            <Feather name=\"chevron-right\" size={20} color=\"#9CA3AF\" />\n          </TouchableOpacity>\n\n          <TouchableOpacity\n            onPress={() => router.push('/(vendor)/Analytics')}\n            className=\"bg-white rounded-lg p-4 flex-row items-center border border-gray-200\"\n          >\n            <View className=\"w-12 h-12 bg-orange-100 rounded-lg items-center justify-center mr-4\">\n              <Feather name=\"bar-chart-2\" size={24} color=\"#EA580C\" />\n            </View>\n            <View className=\"flex-1\">\n              <Text className=\"text-lg font-bold text-gray-900\">Analytics</Text>\n              <Text className=\"text-gray-600 text-sm\">View detailed reports</Text>\n            </View>\n            <Feather name=\"chevron-right\" size={20} color=\"#9CA3AF\" />\n          </TouchableOpacity>\n        </View>\n      </View>\n\n      {/* Recent Orders */}\n      <View className=\"px-6 py-6\">\n        <View className=\"flex-row items-center justify-between mb-4\">\n          <Text className=\"text-lg font-bold text-gray-900\">Recent Orders</Text>\n          <TouchableOpacity onPress={() => router.push('/(vendor)/OrderHistory')}>\n            <Text className=\"text-blue-600 font-semibold\">View all</Text>\n          </TouchableOpacity>\n        </View>\n\n        <FlatList\n          data={orders}\n          keyExtractor={(item) => item.id}\n          scrollEnabled={false}\n          renderItem={({ item }) => {\n            const statusColor = getStatusColor(item.status);\n            return (\n              <TouchableOpacity\n                onPress={() => router.push(`/(vendor)/OrderDetail?orderId=${item.id}`)}\n                className=\"bg-white rounded-lg p-4 mb-3 border border-gray-200\"\n              >\n                <View className=\"flex-row items-center justify-between mb-3\">\n                  <View className=\"flex-1\">\n                    <Text className=\"text-lg font-bold text-gray-900\">{item.orderNumber}</Text>\n                    <Text className=\"text-gray-600 text-sm\">{item.customer}</Text>\n                  </View>\n                  <View className={`px-3 py-1 rounded-full ${statusColor.bg}`}>\n                    <Text className={`text-xs font-bold capitalize ${statusColor.text}`}>\n                      {item.status}\n                    </Text>\n                  </View>\n                </View>\n                <View className=\"flex-row items-center justify-between pt-3 border-t border-gray-200\">\n                  <View className=\"flex-row items-center\">\n                    <Feather name=\"package\" size={14} color=\"#6B7280\" />\n                    <Text className=\"text-gray-600 text-sm ml-2\">{item.items} items</Text>\n                  </View>\n                  <View className=\"flex-row items-center gap-4\">\n                    <Text className=\"text-gray-600 text-sm\">{item.time}</Text>\n                    <Text className=\"text-lg font-bold text-green-600\">{item.total}K</Text>\n                  </View>\n                </View>\n              </TouchableOpacity>\n            );\n          }}\n        />\n      </View>\n    </ScrollView>\n  );\n}\n
+import React, { useEffect, useState } from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  Image,
+  FlatList,
+  ActivityIndicator,
+} from 'react-native';
+import { useRouter } from 'expo-router';
+import { useAuthStore } from '../../src/store';
+import { Feather } from '@expo/vector-icons';
+
+export default function VendorDashboard() {
+  const router = useRouter();
+  const { user } = useAuthStore();
+  const [stats, setStats] = useState({
+    todayOrders: 12,
+    todayRevenue: 450,
+    totalRating: 4.8,
+    completionRate: 98,
+  });
+  const [orders, setOrders] = useState([
+    {
+      id: '1',
+      orderNumber: '#ORD-2024-001',
+      customer: 'John Doe',
+      items: 3,
+      total: 85,
+      status: 'pending',
+      time: '10 mins ago',
+    },
+    {
+      id: '2',
+      orderNumber: '#ORD-2024-002',
+      customer: 'Jane Smith',
+      items: 2,
+      total: 65,
+      status: 'preparing',
+      time: '5 mins ago',
+    },
+    {
+      id: '3',
+      orderNumber: '#ORD-2024-003',
+      customer: 'Bob Johnson',
+      items: 4,
+      total: 120,
+      status: 'ready',
+      time: '2 mins ago',
+    },
+  ]);
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'pending':
+        return { bg: 'bg-yellow-100', text: 'text-yellow-700' };
+      case 'preparing':
+        return { bg: 'bg-blue-100', text: 'text-blue-700' };
+      case 'ready':
+        return { bg: 'bg-green-100', text: 'text-green-700' };
+      case 'completed':
+        return { bg: 'bg-gray-100', text: 'text-gray-700' };
+      default:
+        return { bg: 'bg-gray-100', text: 'text-gray-700' };
+    }
+  };
+
+  return (
+    <ScrollView className="flex-1 bg-gray-50">
+      {/* Header */}
+      <View className="bg-white px-6 py-6 border-b border-gray-200">
+        <View className="flex-row items-center justify-between mb-4">
+          <View>
+            <Text className="text-sm text-gray-600">Welcome back</Text>
+            <Text className="text-2xl font-bold text-gray-900">{user?.firstName}</Text>
+          </View>
+          <TouchableOpacity onPress={() => router.push('/(vendor)/Profile')}>
+            <Image
+              source={{ uri: user?.avatar }}
+              className="w-12 h-12 rounded-full"
+            />
+          </TouchableOpacity>
+        </View>
+
+        {/* Status Badge */}
+        <View className="bg-green-50 border border-green-200 rounded-lg p-3 flex-row items-center">
+          <View className="w-2 h-2 bg-green-600 rounded-full mr-2" />
+          <Text className="text-green-700 font-semibold">Online & Accepting Orders</Text>
+        </View>
+      </View>
+
+      {/* Stats Grid */}
+      <View className="px-6 py-6">
+        <Text className="text-lg font-bold text-gray-900 mb-4">Today's Performance</Text>
+        <View className="gap-3">
+          {/* Orders */}
+          <View className="bg-white rounded-lg p-4 flex-row items-center border border-gray-200">
+            <View className="w-12 h-12 bg-blue-100 rounded-lg items-center justify-center mr-4">
+              <Feather name="shopping-bag" size={24} color="#2563EB" />
+            </View>
+            <View className="flex-1">
+              <Text className="text-gray-600 text-sm">Orders</Text>
+              <Text className="text-2xl font-bold text-gray-900">{stats.todayOrders}</Text>
+            </View>
+            <Text className="text-green-600 font-bold">+2</Text>
+          </View>
+
+          {/* Revenue */}
+          <View className="bg-white rounded-lg p-4 flex-row items-center border border-gray-200">
+            <View className="w-12 h-12 bg-green-100 rounded-lg items-center justify-center mr-4">
+              <Feather name="dollar-sign" size={24} color="#16A34A" />
+            </View>
+            <View className="flex-1">
+              <Text className="text-gray-600 text-sm">Revenue</Text>
+              <Text className="text-2xl font-bold text-gray-900">{stats.todayRevenue}K</Text>
+            </View>
+            <Text className="text-green-600 font-bold">+15%</Text>
+          </View>
+
+          {/* Rating */}
+          <View className="bg-white rounded-lg p-4 flex-row items-center border border-gray-200">
+            <View className="w-12 h-12 bg-yellow-100 rounded-lg items-center justify-center mr-4">
+              <Feather name="star" size={24} color="#FCD34D" />
+            </View>
+            <View className="flex-1">
+              <Text className="text-gray-600 text-sm">Rating</Text>
+              <Text className="text-2xl font-bold text-gray-900">{stats.totalRating}</Text>
+            </View>
+            <View className="flex-row items-center">
+              <Feather name="star" size={16} color="#FCD34D" fill="#FCD34D" />
+              <Text className="text-gray-600 text-sm ml-1">(248)</Text>
+            </View>
+          </View>
+        </View>
+      </View>
+
+      {/* Quick Actions */}
+      <View className="px-6 py-6">
+        <Text className="text-lg font-bold text-gray-900 mb-4">Quick Actions</Text>
+        <View className="gap-3">
+          <TouchableOpacity
+            onPress={() => router.push('/(vendor)/ManageProducts')}
+            className="bg-white rounded-lg p-4 flex-row items-center border border-gray-200"
+          >
+            <View className="w-12 h-12 bg-purple-100 rounded-lg items-center justify-center mr-4">
+              <Feather name="package" size={24} color="#7C3AED" />
+            </View>
+            <View className="flex-1">
+              <Text className="text-lg font-bold text-gray-900">Manage Products</Text>
+              <Text className="text-gray-600 text-sm">Add, edit, or remove items</Text>
+            </View>
+            <Feather name="chevron-right" size={20} color="#9CA3AF" />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => router.push('/(vendor)/Analytics')}
+            className="bg-white rounded-lg p-4 flex-row items-center border border-gray-200"
+          >
+            <View className="w-12 h-12 bg-orange-100 rounded-lg items-center justify-center mr-4">
+              <Feather name="bar-chart-2" size={24} color="#EA580C" />
+            </View>
+            <View className="flex-1">
+              <Text className="text-lg font-bold text-gray-900">Analytics</Text>
+              <Text className="text-gray-600 text-sm">View detailed reports</Text>
+            </View>
+            <Feather name="chevron-right" size={20} color="#9CA3AF" />
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      {/* Recent Orders */}
+      <View className="px-6 py-6">
+        <View className="flex-row items-center justify-between mb-4">
+          <Text className="text-lg font-bold text-gray-900">Recent Orders</Text>
+          <TouchableOpacity onPress={() => router.push('/(vendor)/OrderHistory')}>
+            <Text className="text-blue-600 font-semibold">View all</Text>
+          </TouchableOpacity>
+        </View>
+
+        <FlatList
+          data={orders}
+          keyExtractor={(item) => item.id}
+          scrollEnabled={false}
+          renderItem={({ item }) => {
+            const statusColor = getStatusColor(item.status);
+            return (
+              <TouchableOpacity
+                onPress={() => router.push(`/(vendor)/OrderDetail?orderId=${item.id}`)}
+                className="bg-white rounded-lg p-4 mb-3 border border-gray-200"
+              >
+                <View className="flex-row items-center justify-between mb-3">
+                  <View className="flex-1">
+                    <Text className="text-lg font-bold text-gray-900">{item.orderNumber}</Text>
+                    <Text className="text-gray-600 text-sm">{item.customer}</Text>
+                  </View>
+                  <View className={`px-3 py-1 rounded-full ${statusColor.bg}`}>
+                    <Text className={`text-xs font-bold capitalize ${statusColor.text}`}>
+                      {item.status}
+                    </Text>
+                  </View>
+                </View>
+                <View className="flex-row items-center justify-between pt-3 border-t border-gray-200">
+                  <View className="flex-row items-center">
+                    <Feather name="package" size={14} color="#6B7280" />
+                    <Text className="text-gray-600 text-sm ml-2">{item.items} items</Text>
+                  </View>
+                  <View className="flex-row items-center gap-4">
+                    <Text className="text-gray-600 text-sm">{item.time}</Text>
+                    <Text className="text-lg font-bold text-green-600">{item.total}K</Text>
+                  </View>
+                </View>
+              </TouchableOpacity>
+            );
+          }}
+        />
+      </View>
+    </ScrollView>
+  );
+}
+

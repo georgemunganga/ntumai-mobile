@@ -1,1 +1,116 @@
-import React, { useState } from 'react';\nimport {\n  View,\n  Text,\n  TouchableOpacity,\n  ScrollView,\n  FlatList,\n  Alert,\n} from 'react-native';\nimport { useRouter } from 'expo-router';\nimport { useUserStore } from '../../src/store';\nimport { Feather } from '@expo/vector-icons';\n\nexport default function AddressesScreen() {\n  const router = useRouter();\n  const { addresses } = useUserStore();\n  const [selectedAddressId, setSelectedAddressId] = useState(addresses[0]?.id);\n\n  const handleDeleteAddress = (id: string) => {\n    Alert.alert('Delete Address', 'Are you sure you want to delete this address?', [\n      { text: 'Cancel', onPress: () => {} },\n      {\n        text: 'Delete',\n        onPress: () => {\n          // Delete logic here\n        },\n        style: 'destructive',\n      },\n    ]);\n  };\n\n  return (\n    <View className=\"flex-1 bg-white\">\n      {/* Header */}\n      <View className=\"px-6 py-4 border-b border-gray-200 flex-row items-center\">\n        <TouchableOpacity onPress={() => router.back()} className=\"mr-4\">\n          <Feather name=\"chevron-left\" size={24} color=\"#1F2937\" />\n        </TouchableOpacity>\n        <View className=\"flex-1\">\n          <Text className=\"text-2xl font-bold text-gray-900\">Addresses</Text>\n          <Text className=\"text-gray-600 text-sm\">{addresses.length} saved</Text>\n        </View>\n        <TouchableOpacity\n          onPress={() => router.push('/(shared)/AddAddressScreen')}\n          className=\"bg-green-600 rounded-lg p-3\"\n        >\n          <Feather name=\"plus\" size={20} color=\"white\" />\n        </TouchableOpacity>\n      </View>\n\n      {/* Addresses List */}\n      <FlatList\n        data={addresses}\n        keyExtractor={(item) => item.id}\n        renderItem={({ item }) => (\n          <TouchableOpacity\n            onPress={() => setSelectedAddressId(item.id)}\n            className={`px-6 py-4 border-b border-gray-100 ${\n              selectedAddressId === item.id ? 'bg-green-50' : ''\n            }`}\n          >\n            <View className=\"flex-row items-start justify-between\">\n              <View className=\"flex-row items-start flex-1\">\n                <View className={`w-6 h-6 rounded-full border-2 items-center justify-center mr-4 mt-1 ${\n                  selectedAddressId === item.id\n                    ? 'border-green-600 bg-green-600'\n                    : 'border-gray-300'\n                }`}>\n                  {selectedAddressId === item.id && (\n                    <Feather name=\"check\" size={14} color=\"white\" />\n                  )}\n                </View>\n                <View className=\"flex-1\">\n                  <View className=\"flex-row items-center mb-1\">\n                    <Text className=\"text-lg font-bold text-gray-900 uppercase\">\n                      {item.type}\n                    </Text>\n                    {item.isDefault && (\n                      <View className=\"bg-blue-100 rounded-full px-2 py-1 ml-2\">\n                        <Text className=\"text-blue-700 text-xs font-bold\">Default</Text>\n                      </View>\n                    )}\n                  </View>\n                  <Text className=\"text-gray-900 font-semibold\">\n                    {item.street}\n                  </Text>\n                  <Text className=\"text-gray-600 text-sm\">\n                    {item.city}, {item.state} {item.zipCode}\n                  </Text>\n                  <Text className=\"text-gray-600 text-sm\">\n                    {item.country}\n                  </Text>\n                </View>\n              </View>\n              <View className=\"flex-row gap-2\">\n                <TouchableOpacity\n                  onPress={() => router.push(`/(shared)/EditAddressScreen?addressId=${item.id}`)}\n                  className=\"bg-blue-100 p-2 rounded-lg\"\n                >\n                  <Feather name=\"edit-2\" size={16} color=\"#2563EB\" />\n                </TouchableOpacity>\n                <TouchableOpacity\n                  onPress={() => handleDeleteAddress(item.id)}\n                  className=\"bg-red-100 p-2 rounded-lg\"\n                >\n                  <Feather name=\"trash-2\" size={16} color=\"#EF4444\" />\n                </TouchableOpacity>\n              </View>\n            </View>\n          </TouchableOpacity>\n        )}\n      />\n    </View>\n  );\n}\n
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  FlatList,
+  Alert,
+} from 'react-native';
+import { useRouter } from 'expo-router';
+import { useUserStore } from '../../src/store';
+import { Feather } from '@expo/vector-icons';
+
+export default function AddressesScreen() {
+  const router = useRouter();
+  const { addresses } = useUserStore();
+  const [selectedAddressId, setSelectedAddressId] = useState(addresses[0]?.id);
+
+  const handleDeleteAddress = (id: string) => {
+    Alert.alert('Delete Address', 'Are you sure you want to delete this address?', [
+      { text: 'Cancel', onPress: () => {} },
+      {
+        text: 'Delete',
+        onPress: () => {
+          // Delete logic here
+        },
+        style: 'destructive',
+      },
+    ]);
+  };
+
+  return (
+    <View className="flex-1 bg-white">
+      {/* Header */}
+      <View className="px-6 py-4 border-b border-gray-200 flex-row items-center">
+        <TouchableOpacity onPress={() => router.back()} className="mr-4">
+          <Feather name="chevron-left" size={24} color="#1F2937" />
+        </TouchableOpacity>
+        <View className="flex-1">
+          <Text className="text-2xl font-bold text-gray-900">Addresses</Text>
+          <Text className="text-gray-600 text-sm">{addresses.length} saved</Text>
+        </View>
+        <TouchableOpacity
+          onPress={() => router.push('/(shared)/AddAddressScreen')}
+          className="bg-green-600 rounded-lg p-3"
+        >
+          <Feather name="plus" size={20} color="white" />
+        </TouchableOpacity>
+      </View>
+
+      {/* Addresses List */}
+      <FlatList
+        data={addresses}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <TouchableOpacity
+            onPress={() => setSelectedAddressId(item.id)}
+            className={`px-6 py-4 border-b border-gray-100 ${
+              selectedAddressId === item.id ? 'bg-green-50' : ''
+            }`}
+          >
+            <View className="flex-row items-start justify-between">
+              <View className="flex-row items-start flex-1">
+                <View className={`w-6 h-6 rounded-full border-2 items-center justify-center mr-4 mt-1 ${
+                  selectedAddressId === item.id
+                    ? 'border-green-600 bg-green-600'
+                    : 'border-gray-300'
+                }`}>
+                  {selectedAddressId === item.id && (
+                    <Feather name="check" size={14} color="white" />
+                  )}
+                </View>
+                <View className="flex-1">
+                  <View className="flex-row items-center mb-1">
+                    <Text className="text-lg font-bold text-gray-900 uppercase">
+                      {item.type}
+                    </Text>
+                    {item.isDefault && (
+                      <View className="bg-blue-100 rounded-full px-2 py-1 ml-2">
+                        <Text className="text-blue-700 text-xs font-bold">Default</Text>
+                      </View>
+                    )}
+                  </View>
+                  <Text className="text-gray-900 font-semibold">
+                    {item.street}
+                  </Text>
+                  <Text className="text-gray-600 text-sm">
+                    {item.city}, {item.state} {item.zipCode}
+                  </Text>
+                  <Text className="text-gray-600 text-sm">
+                    {item.country}
+                  </Text>
+                </View>
+              </View>
+              <View className="flex-row gap-2">
+                <TouchableOpacity
+                  onPress={() => router.push(`/(shared)/EditAddressScreen?addressId=${item.id}`)}
+                  className="bg-blue-100 p-2 rounded-lg"
+                >
+                  <Feather name="edit-2" size={16} color="#2563EB" />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => handleDeleteAddress(item.id)}
+                  className="bg-red-100 p-2 rounded-lg"
+                >
+                  <Feather name="trash-2" size={16} color="#EF4444" />
+                </TouchableOpacity>
+              </View>
+            </View>
+          </TouchableOpacity>
+        )}
+      />
+    </View>
+  );
+}
+

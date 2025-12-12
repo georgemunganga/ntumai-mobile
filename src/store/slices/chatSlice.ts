@@ -1,1 +1,152 @@
-// Chat store slice\nimport { create } from 'zustand';\nimport { persist } from 'zustand/middleware';\nimport { chatService, Chat, ChatMessage } from '../../services/chat';\n\ninterface ChatState {\n  chats: Chat[];\n  currentChat: Chat | null;\n  messages: ChatMessage[];\n  typingUsers: string[];\n  unreadCount: number;\n  loading: boolean;\n  error: string | null;\n\n  // Actions\n  loadChats: () => Promise<void>;\n  selectChat: (chatId: string) => Promise<void>;\n  loadMessages: (chatId: string) => Promise<void>;\n  sendMessage: (\n    chatId: string,\n    senderId: string,\n    senderName: string,\n    message: string,\n    attachments?: string[]\n  ) => Promise<void>;\n  receiveMessage: (message: ChatMessage) => void;\n  markAsRead: (chatId: string, messageId: string) => void;\n  markAllAsRead: (chatId: string) => void;\n  sendTypingIndicator: (chatId: string, isTyping: boolean) => void;\n  updateTypingUsers: (chatId: string, users: string[]) => void;\n  deleteChat: (chatId: string) => void;\n  clearError: () => void;\n}\n\nexport const useChatStore = create<ChatState>(\n  persist(\n    (set, get) => ({\n      chats: [],\n      currentChat: null,\n      messages: [],\n      typingUsers: [],\n      unreadCount: 0,\n      loading: false,\n      error: null,\n\n      loadChats: async () => {\n        set({ loading: true, error: null });\n        try {\n          const chats = chatService.getAllChats();\n          const unreadCount = chatService.getTotalUnreadCount();\n          set({ chats, unreadCount, loading: false });\n        } catch (error) {\n          set({\n            error: error instanceof Error ? error.message : 'Failed to load chats',\n            loading: false,\n          });\n        }\n      },\n\n      selectChat: async (chatId: string) => {\n        const chat = chatService.getChat(chatId);\n        if (chat) {\n          set({ currentChat: chat });\n          await get().loadMessages(chatId);\n        }\n      },\n\n      loadMessages: async (chatId: string) => {\n        set({ loading: true, error: null });\n        try {\n          const messages = chatService.getMessages(chatId);\n          chatService.markAllMessagesAsRead(chatId);\n          set({ messages, loading: false });\n        } catch (error) {\n          set({\n            error: error instanceof Error ? error.message : 'Failed to load messages',\n            loading: false,\n          });\n        }\n      },\n\n      sendMessage: async (chatId, senderId, senderName, message, attachments) => {\n        try {\n          const newMessage = await chatService.sendMessage(\n            chatId,\n            senderId,\n            senderName,\n            message,\n            attachments\n          );\n          set((state) => ({\n            messages: [...state.messages, newMessage],\n          }));\n        } catch (error) {\n          set({\n            error: error instanceof Error ? error.message : 'Failed to send message',\n          });\n        }\n      },\n\n      receiveMessage: (message: ChatMessage) => {\n        chatService.receiveMessage(message);\n        set((state) => ({\n          messages:\n            state.currentChat?.id === message.chatId\n              ? [...state.messages, message]\n              : state.messages,\n          unreadCount: state.unreadCount + 1,\n        }));\n      },\n\n      markAsRead: (chatId: string, messageId: string) => {\n        chatService.markMessageAsRead(chatId, messageId);\n        set((state) => ({\n          messages: state.messages.map((m) =>\n            m.id === messageId ? { ...m, isRead: true } : m\n          ),\n        }));\n      },\n\n      markAllAsRead: (chatId: string) => {\n        chatService.markAllMessagesAsRead(chatId);\n        set((state) => ({\n          messages: state.messages.map((m) => ({ ...m, isRead: true })),\n          unreadCount: Math.max(0, state.unreadCount - state.messages.length),\n        }));\n      },\n\n      sendTypingIndicator: (chatId: string, isTyping: boolean) => {\n        chatService.sendTypingIndicator(chatId, isTyping);\n      },\n\n      updateTypingUsers: (chatId: string, users: string[]) => {\n        set({ typingUsers: users });\n      },\n\n      deleteChat: (chatId: string) => {\n        chatService.deleteChat(chatId);\n        set((state) => ({\n          chats: state.chats.filter((c) => c.id !== chatId),\n          currentChat: state.currentChat?.id === chatId ? null : state.currentChat,\n        }));\n      },\n\n      clearError: () => set({ error: null }),\n    }),\n    {\n      name: 'chat-store',\n    }\n  )\n);\n
+// Chat store slice
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+import { chatService, Chat, ChatMessage } from '../../services/chat';
+
+interface ChatState {
+  chats: Chat[];
+  currentChat: Chat | null;
+  messages: ChatMessage[];
+  typingUsers: string[];
+  unreadCount: number;
+  loading: boolean;
+  error: string | null;
+
+  // Actions
+  loadChats: () => Promise<void>;
+  selectChat: (chatId: string) => Promise<void>;
+  loadMessages: (chatId: string) => Promise<void>;
+  sendMessage: (
+    chatId: string,
+    senderId: string,
+    senderName: string,
+    message: string,
+    attachments?: string[]
+  ) => Promise<void>;
+  receiveMessage: (message: ChatMessage) => void;
+  markAsRead: (chatId: string, messageId: string) => void;
+  markAllAsRead: (chatId: string) => void;
+  sendTypingIndicator: (chatId: string, isTyping: boolean) => void;
+  updateTypingUsers: (chatId: string, users: string[]) => void;
+  deleteChat: (chatId: string) => void;
+  clearError: () => void;
+}
+
+export const useChatStore = create<ChatState>(
+  persist(
+    (set, get) => ({
+      chats: [],
+      currentChat: null,
+      messages: [],
+      typingUsers: [],
+      unreadCount: 0,
+      loading: false,
+      error: null,
+
+      loadChats: async () => {
+        set({ loading: true, error: null });
+        try {
+          const chats = chatService.getAllChats();
+          const unreadCount = chatService.getTotalUnreadCount();
+          set({ chats, unreadCount, loading: false });
+        } catch (error) {
+          set({
+            error: error instanceof Error ? error.message : 'Failed to load chats',
+            loading: false,
+          });
+        }
+      },
+
+      selectChat: async (chatId: string) => {
+        const chat = chatService.getChat(chatId);
+        if (chat) {
+          set({ currentChat: chat });
+          await get().loadMessages(chatId);
+        }
+      },
+
+      loadMessages: async (chatId: string) => {
+        set({ loading: true, error: null });
+        try {
+          const messages = chatService.getMessages(chatId);
+          chatService.markAllMessagesAsRead(chatId);
+          set({ messages, loading: false });
+        } catch (error) {
+          set({
+            error: error instanceof Error ? error.message : 'Failed to load messages',
+            loading: false,
+          });
+        }
+      },
+
+      sendMessage: async (chatId, senderId, senderName, message, attachments) => {
+        try {
+          const newMessage = await chatService.sendMessage(
+            chatId,
+            senderId,
+            senderName,
+            message,
+            attachments
+          );
+          set((state) => ({
+            messages: [...state.messages, newMessage],
+          }));
+        } catch (error) {
+          set({
+            error: error instanceof Error ? error.message : 'Failed to send message',
+          });
+        }
+      },
+
+      receiveMessage: (message: ChatMessage) => {
+        chatService.receiveMessage(message);
+        set((state) => ({
+          messages:
+            state.currentChat?.id === message.chatId
+              ? [...state.messages, message]
+              : state.messages,
+          unreadCount: state.unreadCount + 1,
+        }));
+      },
+
+      markAsRead: (chatId: string, messageId: string) => {
+        chatService.markMessageAsRead(chatId, messageId);
+        set((state) => ({
+          messages: state.messages.map((m) =>
+            m.id === messageId ? { ...m, isRead: true } : m
+          ),
+        }));
+      },
+
+      markAllAsRead: (chatId: string) => {
+        chatService.markAllMessagesAsRead(chatId);
+        set((state) => ({
+          messages: state.messages.map((m) => ({ ...m, isRead: true })),
+          unreadCount: Math.max(0, state.unreadCount - state.messages.length),
+        }));
+      },
+
+      sendTypingIndicator: (chatId: string, isTyping: boolean) => {
+        chatService.sendTypingIndicator(chatId, isTyping);
+      },
+
+      updateTypingUsers: (chatId: string, users: string[]) => {
+        set({ typingUsers: users });
+      },
+
+      deleteChat: (chatId: string) => {
+        chatService.deleteChat(chatId);
+        set((state) => ({
+          chats: state.chats.filter((c) => c.id !== chatId),
+          currentChat: state.currentChat?.id === chatId ? null : state.currentChat,
+        }));
+      },
+
+      clearError: () => set({ error: null }),
+    }),
+    {
+      name: 'chat-store',
+    }
+  )
+);
+

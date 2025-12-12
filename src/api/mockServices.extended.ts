@@ -1,1 +1,481 @@
-// Extended mock API services for missing features\nimport { mockData } from './mockData';\n\n// ============ CHAT SERVICE ============\nexport const chatMockService = {\n  async getChats() {\n    return {\n      success: true,\n      data: [\n        {\n          id: 'chat_1',\n          participantId: 'tasker_1',\n          participantName: 'John Driver',\n          participantPhoto: mockData.users.tasker1.photo,\n          lastMessage: 'I\\'m on my way!',\n          lastMessageTime: new Date(Date.now() - 5 * 60000).toISOString(),\n          unreadCount: 2,\n          isActive: true,\n        },\n        {\n          id: 'chat_2',\n          participantId: 'vendor_1',\n          participantName: 'Pizza Palace',\n          participantPhoto: mockData.vendors.vendor1.logo,\n          lastMessage: 'Order confirmed',\n          lastMessageTime: new Date(Date.now() - 30 * 60000).toISOString(),\n          unreadCount: 0,\n          isActive: true,\n        },\n      ],\n    };\n  },\n\n  async getMessages(chatId: string) {\n    return {\n      success: true,\n      data: [\n        {\n          id: 'msg_1',\n          chatId,\n          senderId: 'user_1',\n          senderName: 'You',\n          message: 'Hi, where are you?',\n          timestamp: new Date(Date.now() - 10 * 60000).toISOString(),\n          isRead: true,\n          type: 'text',\n        },\n        {\n          id: 'msg_2',\n          chatId,\n          senderId: 'tasker_1',\n          senderName: 'John Driver',\n          message: 'I\\'m 5 minutes away',\n          timestamp: new Date(Date.now() - 5 * 60000).toISOString(),\n          isRead: true,\n          type: 'text',\n        },\n      ],\n    };\n  },\n\n  async sendMessage(chatId: string, message: string) {\n    return {\n      success: true,\n      data: {\n        id: `msg_${Date.now()}`,\n        chatId,\n        senderId: 'user_1',\n        senderName: 'You',\n        message,\n        timestamp: new Date().toISOString(),\n        isRead: false,\n        type: 'text',\n      },\n    };\n  },\n};\n\n// ============ AUTO-MATCHING SERVICE ============\nexport const matchingMockService = {\n  async findTasker(jobData: any) {\n    return {\n      success: true,\n      data: {\n        taskerId: 'tasker_1',\n        taskerName: 'John Driver',\n        taskerPhoto: mockData.users.tasker1.photo,\n        rating: 4.8,\n        estimatedArrival: 5,\n        estimatedEarnings: 2.5,\n        vehicle: 'Motorcycle',\n      },\n    };\n  },\n\n  async getAvailableTaskers(location: any) {\n    return {\n      success: true,\n      data: [\n        {\n          id: 'tasker_1',\n          name: 'John Driver',\n          photo: mockData.users.tasker1.photo,\n          latitude: location.latitude + 0.01,\n          longitude: location.longitude + 0.01,\n          rating: 4.8,\n          distance: 2.5,\n          badge: 'gold',\n        },\n        {\n          id: 'tasker_2',\n          name: 'Mike Rider',\n          photo: mockData.users.tasker1.photo,\n          latitude: location.latitude - 0.01,\n          longitude: location.longitude - 0.01,\n          rating: 4.5,\n          distance: 3.2,\n          badge: 'silver',\n        },\n      ],\n    };\n  },\n};\n\n// ============ PAYMENT SERVICE ============\nexport const paymentMockService = {\n  async processPayment(paymentData: any) {\n    return {\n      success: true,\n      data: {\n        transactionId: `txn_${Date.now()}`,\n        amount: paymentData.amount,\n        status: 'success',\n        timestamp: new Date().toISOString(),\n        receipt: {\n          id: `receipt_${Date.now()}`,\n          amount: paymentData.amount,\n          method: paymentData.method,\n          timestamp: new Date().toISOString(),\n        },\n      },\n    };\n  },\n\n  async confirmCashPayment(orderId: string, amount: number) {\n    return {\n      success: true,\n      data: {\n        orderId,\n        amount,\n        status: 'confirmed',\n        timestamp: new Date().toISOString(),\n      },\n    };\n  },\n};\n\n// ============ TASKER ONBOARDING SERVICE ============\nexport const onboardingMockService = {\n  async submitApplication(applicationData: any) {\n    return {\n      success: true,\n      data: {\n        applicationId: `app_${Date.now()}`,\n        status: 'APPLIED',\n        message: 'Application submitted successfully',\n      },\n    };\n  },\n\n  async uploadKYCDocument(documentType: string, file: any) {\n    return {\n      success: true,\n      data: {\n        documentId: `doc_${Date.now()}`,\n        type: documentType,\n        status: 'pending_review',\n        uploadedAt: new Date().toISOString(),\n      },\n    };\n  },\n\n  async completeTraining(quizScore: number, testRunResult: string) {\n    return {\n      success: true,\n      data: {\n        status: 'TRAINING_COMPLETED',\n        quizScore,\n        testRunResult,\n        completedAt: new Date().toISOString(),\n      },\n    };\n  },\n\n  async getOnboardingStatus(userId: string) {\n    return {\n      success: true,\n      data: {\n        userId,\n        currentStep: 'KYC_PENDING',\n        completedSteps: ['APPLIED', 'PRE_SCREEN_PASSED'],\n        progress: 40,\n        documents: [\n          { type: 'nrc', status: 'approved' },\n          { type: 'driver_license', status: 'pending' },\n        ],\n      },\n    };\n  },\n};\n\n// ============ PROBATION KPI SERVICE ============\nexport const kpiMockService = {\n  async getProbationKPIs(userId: string) {\n    return {\n      success: true,\n      data: {\n        userId,\n        status: 'PROBATION',\n        daysRemaining: 10,\n        kpis: {\n          acceptanceRate: 92,\n          onTimeRate: 88,\n          completionRate: 99,\n          averageRating: 4.7,\n          incidentRate: 0,\n        },\n        targets: {\n          acceptanceRate: 85,\n          onTimeRate: 90,\n          completionRate: 98,\n          averageRating: 4.7,\n          incidentRate: 1,\n        },\n        alerts: [\n          {\n            type: 'warning',\n            message: 'On-time rate below target',\n            metric: 'onTimeRate',\n          },\n        ],\n      },\n    };\n  },\n\n  async getPerformanceMetrics(userId: string) {\n    return {\n      success: true,\n      data: {\n        userId,\n        totalDeliveries: 145,\n        completedDeliveries: 144,\n        cancelledDeliveries: 1,\n        averageRating: 4.7,\n        totalEarnings: 1250.5,\n        acceptanceRate: 92,\n        onTimeRate: 88,\n        completionRate: 99,\n      },\n    };\n  },\n};\n\n// ============ FLOAT SYSTEM SERVICE ============\nexport const floatMockService = {\n  async getFloatBalance(userId: string) {\n    return {\n      success: true,\n      data: {\n        userId,\n        floatBalance: 25.5,\n        earningsBalance: 150.75,\n        minimumRequired: 10,\n        status: 'active',\n      },\n    };\n  },\n\n  async topUpFloat(amount: number, paymentMethod: string) {\n    return {\n      success: true,\n      data: {\n        transactionId: `topup_${Date.now()}`,\n        amount,\n        newBalance: 25.5 + amount,\n        status: 'completed',\n        timestamp: new Date().toISOString(),\n      },\n    };\n  },\n\n  async requestPayout(amount: number, destination: string) {\n    return {\n      success: true,\n      data: {\n        payoutId: `payout_${Date.now()}`,\n        amount,\n        destination,\n        status: 'pending',\n        requestedAt: new Date().toISOString(),\n        estimatedProcessing: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),\n      },\n    };\n  },\n};\n\n// ============ SHOPPING LIST SERVICE ============\nexport const shoppingListMockService = {\n  async createList(listData: any) {\n    return {\n      success: true,\n      data: {\n        id: `list_${Date.now()}`,\n        name: listData.name,\n        items: listData.items,\n        createdAt: new Date().toISOString(),\n      },\n    };\n  },\n\n  async getLists(userId: string) {\n    return {\n      success: true,\n      data: [\n        {\n          id: 'list_1',\n          name: 'Weekly Groceries',\n          itemCount: 8,\n          lastUsed: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),\n          estimatedCost: 45.5,\n        },\n        {\n          id: 'list_2',\n          name: 'Office Supplies',\n          itemCount: 5,\n          lastUsed: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),\n          estimatedCost: 25.0,\n        },\n      ],\n    };\n  },\n\n  async updateList(listId: string, updates: any) {\n    return {\n      success: true,\n      data: {\n        id: listId,\n        ...updates,\n        updatedAt: new Date().toISOString(),\n      },\n    };\n  },\n};\n\n// ============ REFERRAL SERVICE ============\nexport const referralMockService = {\n  async getReferralCode(userId: string) {\n    return {\n      success: true,\n      data: {\n        userId,\n        referralCode: `NTUMAI${Math.random().toString(36).substr(2, 9).toUpperCase()}`,\n        totalReferrals: 5,\n        totalEarnings: 25.0,\n        pendingEarnings: 5.0,\n      },\n    };\n  },\n\n  async applyReferralCode(code: string) {\n    return {\n      success: true,\n      data: {\n        code,\n        creditAmount: 5.0,\n        message: 'Referral credit applied successfully',\n      },\n    };\n  },\n};\n\n// ============ SUPPORT SERVICE ============\nexport const supportMockService = {\n  async createTicket(ticketData: any) {\n    return {\n      success: true,\n      data: {\n        ticketId: `ticket_${Date.now()}`,\n        subject: ticketData.subject,\n        description: ticketData.description,\n        status: 'open',\n        createdAt: new Date().toISOString(),\n      },\n    };\n  },\n\n  async getTickets(userId: string) {\n    return {\n      success: true,\n      data: [\n        {\n          id: 'ticket_1',\n          subject: 'Payment issue',\n          status: 'open',\n          createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),\n        },\n      ],\n    };\n  },\n\n  async getFAQ() {\n    return {\n      success: true,\n      data: [\n        {\n          id: 'faq_1',\n          question: 'How do I become a tasker?',\n          answer: 'To become a tasker, go to your profile and select \"Become a Tasker\". Complete the KYC process...',\n          category: 'Tasker',\n        },\n        {\n          id: 'faq_2',\n          question: 'How do I track my order?',\n          answer: 'You can track your order in real-time from the order details screen...',\n          category: 'Orders',\n        },\n      ],\n    };\n  },\n};\n\n// ============ BADGE SYSTEM SERVICE ============\nexport const badgeMockService = {\n  async getBadges(userId: string) {\n    return {\n      success: true,\n      data: {\n        userId,\n        currentBadge: 'silver',\n        badges: [\n          { type: 'bronze', earned: true, earnedAt: '2024-01-01' },\n          { type: 'silver', earned: true, earnedAt: '2024-02-01' },\n          { type: 'gold', earned: false, progress: 75 },\n        ],\n      },\n    };\n  },\n};\n\n// ============ RECEIPT SERVICE ============\nexport const receiptMockService = {\n  async generateReceipt(transactionId: string) {\n    return {\n      success: true,\n      data: {\n        receiptId: `receipt_${Date.now()}`,\n        transactionId,\n        items: [\n          { name: 'Item 1', quantity: 2, price: 10.0 },\n          { name: 'Item 2', quantity: 1, price: 15.0 },\n        ],\n        subtotal: 35.0,\n        tax: 3.5,\n        total: 38.5,\n        timestamp: new Date().toISOString(),\n      },\n    };\n  },\n\n  async downloadReceipt(receiptId: string) {\n    return {\n      success: true,\n      data: {\n        receiptId,\n        pdfUrl: `https://example.com/receipts/${receiptId}.pdf`,\n        message: 'Receipt ready for download',\n      },\n    };\n  },\n};\n
+// Extended mock API services for missing features
+import { mockData } from './mockData';
+
+// ============ CHAT SERVICE ============
+export const chatMockService = {
+  async getChats() {
+    return {
+      success: true,
+      data: [
+        {
+          id: 'chat_1',
+          participantId: 'tasker_1',
+          participantName: 'John Driver',
+          participantPhoto: mockData.users.tasker1.photo,
+          lastMessage: 'I\'m on my way!',
+          lastMessageTime: new Date(Date.now() - 5 * 60000).toISOString(),
+          unreadCount: 2,
+          isActive: true,
+        },
+        {
+          id: 'chat_2',
+          participantId: 'vendor_1',
+          participantName: 'Pizza Palace',
+          participantPhoto: mockData.vendors.vendor1.logo,
+          lastMessage: 'Order confirmed',
+          lastMessageTime: new Date(Date.now() - 30 * 60000).toISOString(),
+          unreadCount: 0,
+          isActive: true,
+        },
+      ],
+    };
+  },
+
+  async getMessages(chatId: string) {
+    return {
+      success: true,
+      data: [
+        {
+          id: 'msg_1',
+          chatId,
+          senderId: 'user_1',
+          senderName: 'You',
+          message: 'Hi, where are you?',
+          timestamp: new Date(Date.now() - 10 * 60000).toISOString(),
+          isRead: true,
+          type: 'text',
+        },
+        {
+          id: 'msg_2',
+          chatId,
+          senderId: 'tasker_1',
+          senderName: 'John Driver',
+          message: 'I\'m 5 minutes away',
+          timestamp: new Date(Date.now() - 5 * 60000).toISOString(),
+          isRead: true,
+          type: 'text',
+        },
+      ],
+    };
+  },
+
+  async sendMessage(chatId: string, message: string) {
+    return {
+      success: true,
+      data: {
+        id: `msg_${Date.now()}`,
+        chatId,
+        senderId: 'user_1',
+        senderName: 'You',
+        message,
+        timestamp: new Date().toISOString(),
+        isRead: false,
+        type: 'text',
+      },
+    };
+  },
+};
+
+// ============ AUTO-MATCHING SERVICE ============
+export const matchingMockService = {
+  async findTasker(jobData: any) {
+    return {
+      success: true,
+      data: {
+        taskerId: 'tasker_1',
+        taskerName: 'John Driver',
+        taskerPhoto: mockData.users.tasker1.photo,
+        rating: 4.8,
+        estimatedArrival: 5,
+        estimatedEarnings: 2.5,
+        vehicle: 'Motorcycle',
+      },
+    };
+  },
+
+  async getAvailableTaskers(location: any) {
+    return {
+      success: true,
+      data: [
+        {
+          id: 'tasker_1',
+          name: 'John Driver',
+          photo: mockData.users.tasker1.photo,
+          latitude: location.latitude + 0.01,
+          longitude: location.longitude + 0.01,
+          rating: 4.8,
+          distance: 2.5,
+          badge: 'gold',
+        },
+        {
+          id: 'tasker_2',
+          name: 'Mike Rider',
+          photo: mockData.users.tasker1.photo,
+          latitude: location.latitude - 0.01,
+          longitude: location.longitude - 0.01,
+          rating: 4.5,
+          distance: 3.2,
+          badge: 'silver',
+        },
+      ],
+    };
+  },
+};
+
+// ============ PAYMENT SERVICE ============
+export const paymentMockService = {
+  async processPayment(paymentData: any) {
+    return {
+      success: true,
+      data: {
+        transactionId: `txn_${Date.now()}`,
+        amount: paymentData.amount,
+        status: 'success',
+        timestamp: new Date().toISOString(),
+        receipt: {
+          id: `receipt_${Date.now()}`,
+          amount: paymentData.amount,
+          method: paymentData.method,
+          timestamp: new Date().toISOString(),
+        },
+      },
+    };
+  },
+
+  async confirmCashPayment(orderId: string, amount: number) {
+    return {
+      success: true,
+      data: {
+        orderId,
+        amount,
+        status: 'confirmed',
+        timestamp: new Date().toISOString(),
+      },
+    };
+  },
+};
+
+// ============ TASKER ONBOARDING SERVICE ============
+export const onboardingMockService = {
+  async submitApplication(applicationData: any) {
+    return {
+      success: true,
+      data: {
+        applicationId: `app_${Date.now()}`,
+        status: 'APPLIED',
+        message: 'Application submitted successfully',
+      },
+    };
+  },
+
+  async uploadKYCDocument(documentType: string, file: any) {
+    return {
+      success: true,
+      data: {
+        documentId: `doc_${Date.now()}`,
+        type: documentType,
+        status: 'pending_review',
+        uploadedAt: new Date().toISOString(),
+      },
+    };
+  },
+
+  async completeTraining(quizScore: number, testRunResult: string) {
+    return {
+      success: true,
+      data: {
+        status: 'TRAINING_COMPLETED',
+        quizScore,
+        testRunResult,
+        completedAt: new Date().toISOString(),
+      },
+    };
+  },
+
+  async getOnboardingStatus(userId: string) {
+    return {
+      success: true,
+      data: {
+        userId,
+        currentStep: 'KYC_PENDING',
+        completedSteps: ['APPLIED', 'PRE_SCREEN_PASSED'],
+        progress: 40,
+        documents: [
+          { type: 'nrc', status: 'approved' },
+          { type: 'driver_license', status: 'pending' },
+        ],
+      },
+    };
+  },
+};
+
+// ============ PROBATION KPI SERVICE ============
+export const kpiMockService = {
+  async getProbationKPIs(userId: string) {
+    return {
+      success: true,
+      data: {
+        userId,
+        status: 'PROBATION',
+        daysRemaining: 10,
+        kpis: {
+          acceptanceRate: 92,
+          onTimeRate: 88,
+          completionRate: 99,
+          averageRating: 4.7,
+          incidentRate: 0,
+        },
+        targets: {
+          acceptanceRate: 85,
+          onTimeRate: 90,
+          completionRate: 98,
+          averageRating: 4.7,
+          incidentRate: 1,
+        },
+        alerts: [
+          {
+            type: 'warning',
+            message: 'On-time rate below target',
+            metric: 'onTimeRate',
+          },
+        ],
+      },
+    };
+  },
+
+  async getPerformanceMetrics(userId: string) {
+    return {
+      success: true,
+      data: {
+        userId,
+        totalDeliveries: 145,
+        completedDeliveries: 144,
+        cancelledDeliveries: 1,
+        averageRating: 4.7,
+        totalEarnings: 1250.5,
+        acceptanceRate: 92,
+        onTimeRate: 88,
+        completionRate: 99,
+      },
+    };
+  },
+};
+
+// ============ FLOAT SYSTEM SERVICE ============
+export const floatMockService = {
+  async getFloatBalance(userId: string) {
+    return {
+      success: true,
+      data: {
+        userId,
+        floatBalance: 25.5,
+        earningsBalance: 150.75,
+        minimumRequired: 10,
+        status: 'active',
+      },
+    };
+  },
+
+  async topUpFloat(amount: number, paymentMethod: string) {
+    return {
+      success: true,
+      data: {
+        transactionId: `topup_${Date.now()}`,
+        amount,
+        newBalance: 25.5 + amount,
+        status: 'completed',
+        timestamp: new Date().toISOString(),
+      },
+    };
+  },
+
+  async requestPayout(amount: number, destination: string) {
+    return {
+      success: true,
+      data: {
+        payoutId: `payout_${Date.now()}`,
+        amount,
+        destination,
+        status: 'pending',
+        requestedAt: new Date().toISOString(),
+        estimatedProcessing: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
+      },
+    };
+  },
+};
+
+// ============ SHOPPING LIST SERVICE ============
+export const shoppingListMockService = {
+  async createList(listData: any) {
+    return {
+      success: true,
+      data: {
+        id: `list_${Date.now()}`,
+        name: listData.name,
+        items: listData.items,
+        createdAt: new Date().toISOString(),
+      },
+    };
+  },
+
+  async getLists(userId: string) {
+    return {
+      success: true,
+      data: [
+        {
+          id: 'list_1',
+          name: 'Weekly Groceries',
+          itemCount: 8,
+          lastUsed: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+          estimatedCost: 45.5,
+        },
+        {
+          id: 'list_2',
+          name: 'Office Supplies',
+          itemCount: 5,
+          lastUsed: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+          estimatedCost: 25.0,
+        },
+      ],
+    };
+  },
+
+  async updateList(listId: string, updates: any) {
+    return {
+      success: true,
+      data: {
+        id: listId,
+        ...updates,
+        updatedAt: new Date().toISOString(),
+      },
+    };
+  },
+};
+
+// ============ REFERRAL SERVICE ============
+export const referralMockService = {
+  async getReferralCode(userId: string) {
+    return {
+      success: true,
+      data: {
+        userId,
+        referralCode: `NTUMAI${Math.random().toString(36).substr(2, 9).toUpperCase()}`,
+        totalReferrals: 5,
+        totalEarnings: 25.0,
+        pendingEarnings: 5.0,
+      },
+    };
+  },
+
+  async applyReferralCode(code: string) {
+    return {
+      success: true,
+      data: {
+        code,
+        creditAmount: 5.0,
+        message: 'Referral credit applied successfully',
+      },
+    };
+  },
+};
+
+// ============ SUPPORT SERVICE ============
+export const supportMockService = {
+  async createTicket(ticketData: any) {
+    return {
+      success: true,
+      data: {
+        ticketId: `ticket_${Date.now()}`,
+        subject: ticketData.subject,
+        description: ticketData.description,
+        status: 'open',
+        createdAt: new Date().toISOString(),
+      },
+    };
+  },
+
+  async getTickets(userId: string) {
+    return {
+      success: true,
+      data: [
+        {
+          id: 'ticket_1',
+          subject: 'Payment issue',
+          status: 'open',
+          createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+        },
+      ],
+    };
+  },
+
+  async getFAQ() {
+    return {
+      success: true,
+      data: [
+        {
+          id: 'faq_1',
+          question: 'How do I become a tasker?',
+          answer: 'To become a tasker, go to your profile and select "Become a Tasker". Complete the KYC process...',
+          category: 'Tasker',
+        },
+        {
+          id: 'faq_2',
+          question: 'How do I track my order?',
+          answer: 'You can track your order in real-time from the order details screen...',
+          category: 'Orders',
+        },
+      ],
+    };
+  },
+};
+
+// ============ BADGE SYSTEM SERVICE ============
+export const badgeMockService = {
+  async getBadges(userId: string) {
+    return {
+      success: true,
+      data: {
+        userId,
+        currentBadge: 'silver',
+        badges: [
+          { type: 'bronze', earned: true, earnedAt: '2024-01-01' },
+          { type: 'silver', earned: true, earnedAt: '2024-02-01' },
+          { type: 'gold', earned: false, progress: 75 },
+        ],
+      },
+    };
+  },
+};
+
+// ============ RECEIPT SERVICE ============
+export const receiptMockService = {
+  async generateReceipt(transactionId: string) {
+    return {
+      success: true,
+      data: {
+        receiptId: `receipt_${Date.now()}`,
+        transactionId,
+        items: [
+          { name: 'Item 1', quantity: 2, price: 10.0 },
+          { name: 'Item 2', quantity: 1, price: 15.0 },
+        ],
+        subtotal: 35.0,
+        tax: 3.5,
+        total: 38.5,
+        timestamp: new Date().toISOString(),
+      },
+    };
+  },
+
+  async downloadReceipt(receiptId: string) {
+    return {
+      success: true,
+      data: {
+        receiptId,
+        pdfUrl: `https://example.com/receipts/${receiptId}.pdf`,
+        message: 'Receipt ready for download',
+      },
+    };
+  },
+};
+

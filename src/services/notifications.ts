@@ -1,1 +1,294 @@
-// Push notification service using Firebase Cloud Messaging\nimport * as Notifications from 'expo-notifications';\nimport * as Device from 'expo-device';\nimport Constants from 'expo-constants';\n\ninterface NotificationData {\n  type: 'order' | 'job' | 'message' | 'payment' | 'alert' | 'promotion';\n  title: string;\n  message: string;\n  data?: Record<string, any>;\n  deepLink?: string;\n}\n\nclass NotificationService {\n  private expoPushToken: string | null = null;\n  private notificationListener: any = null;\n  private responseListener: any = null;\n\n  /**\n   * Initialize notification service\n   */\n  async initialize(): Promise<void> {\n    try {\n      // Set notification handler\n      Notifications.setNotificationHandler({\n        handleNotification: async () => ({\n          shouldShowAlert: true,\n          shouldPlaySound: true,\n          shouldSetBadge: true,\n        }),\n      });\n\n      // Request permissions\n      await this.requestPermissions();\n\n      // Get Expo push token\n      this.expoPushToken = await this.getExpoPushToken();\n      console.log('Expo Push Token:', this.expoPushToken);\n    } catch (error) {\n      console.error('Failed to initialize notifications:', error);\n    }\n  }\n\n  /**\n   * Request notification permissions\n   */\n  private async requestPermissions(): Promise<void> {\n    if (Device.isDevice) {\n      const { status: existingStatus } = await Notifications.getPermissionsAsync();\n      let finalStatus = existingStatus;\n\n      if (existingStatus !== 'granted') {\n        const { status } = await Notifications.requestPermissionsAsync();\n        finalStatus = status;\n      }\n\n      if (finalStatus !== 'granted') {\n        console.warn('Failed to get push token for push notification!');\n      }\n    }\n  }\n\n  /**\n   * Get Expo push token\n   */\n  private async getExpoPushToken(): Promise<string> {\n    try {\n      const projectId = Constants.expoConfig?.extra?.eas?.projectId;\n      if (!projectId) {\n        throw new Error('Project ID not found');\n      }\n\n      const token = await Notifications.getExpoPushTokenAsync({\n        projectId,\n      });\n\n      return token.data;\n    } catch (error) {\n      console.error('Failed to get Expo push token:', error);\n      return '';\n    }\n  }\n\n  /**\n   * Get push token\n   */\n  getPushToken(): string | null {\n    return this.expoPushToken;\n  }\n\n  /**\n   * Subscribe to notifications\n   */\n  subscribeToNotifications(callback: (notification: Notifications.Notification) => void): void {\n    this.notificationListener = Notifications.addNotificationReceivedListener(callback);\n  }\n\n  /**\n   * Subscribe to notification responses (when user taps notification)\n   */\n  subscribeToNotificationResponses(\n    callback: (response: Notifications.NotificationResponse) => void\n  ): void {\n    this.responseListener = Notifications.addNotificationResponseReceivedListener(callback);\n  }\n\n  /**\n   * Unsubscribe from notifications\n   */\n  unsubscribeFromNotifications(): void {\n    if (this.notificationListener) {\n      Notifications.removeNotificationSubscription(this.notificationListener);\n    }\n    if (this.responseListener) {\n      Notifications.removeNotificationSubscription(this.responseListener);\n    }\n  }\n\n  /**\n   * Send local notification\n   */\n  async sendLocalNotification(data: NotificationData): Promise<void> {\n    try {\n      await Notifications.scheduleNotificationAsync({\n        content: {\n          title: data.title,\n          body: data.message,\n          data: {\n            type: data.type,\n            ...data.data,\n            deepLink: data.deepLink,\n          },\n          sound: 'default',\n          badge: 1,\n        },\n        trigger: null, // Send immediately\n      });\n    } catch (error) {\n      console.error('Failed to send local notification:', error);\n    }\n  }\n\n  /**\n   * Schedule notification\n   */\n  async scheduleNotification(\n    data: NotificationData,\n    delayInSeconds: number\n  ): Promise<void> {\n    try {\n      await Notifications.scheduleNotificationAsync({\n        content: {\n          title: data.title,\n          body: data.message,\n          data: {\n            type: data.type,\n            ...data.data,\n            deepLink: data.deepLink,\n          },\n          sound: 'default',\n          badge: 1,\n        },\n        trigger: {\n          seconds: delayInSeconds,\n        },\n      });\n    } catch (error) {\n      console.error('Failed to schedule notification:', error);\n    }\n  }\n\n  /**\n   * Cancel all notifications\n   */\n  async cancelAllNotifications(): Promise<void> {\n    try {\n      await Notifications.cancelAllScheduledNotificationsAsync();\n    } catch (error) {\n      console.error('Failed to cancel notifications:', error);\n    }\n  }\n\n  /**\n   * Send job offer notification\n   */\n  async sendJobOfferNotification(\n    jobId: string,\n    pickupLocation: string,\n    dropoffLocation: string,\n    estimatedEarnings: number\n  ): Promise<void> {\n    await this.sendLocalNotification({\n      type: 'job',\n      title: '🚗 New Job Offer!',\n      message: `${pickupLocation} → ${dropoffLocation} • ₭${estimatedEarnings}`,\n      data: {\n        jobId,\n        pickupLocation,\n        dropoffLocation,\n        estimatedEarnings,\n      },\n      deepLink: `ntumai://job/${jobId}`,\n    });\n  }\n\n  /**\n   * Send order status notification\n   */\n  async sendOrderStatusNotification(\n    orderId: string,\n    status: string,\n    message: string\n  ): Promise<void> {\n    await this.sendLocalNotification({\n      type: 'order',\n      title: `Order ${status}`,\n      message,\n      data: {\n        orderId,\n        status,\n      },\n      deepLink: `ntumai://order/${orderId}`,\n    });\n  }\n\n  /**\n   * Send message notification\n   */\n  async sendMessageNotification(\n    chatId: string,\n    senderName: string,\n    message: string\n  ): Promise<void> {\n    await this.sendLocalNotification({\n      type: 'message',\n      title: senderName,\n      message,\n      data: {\n        chatId,\n        senderName,\n      },\n      deepLink: `ntumai://chat/${chatId}`,\n    });\n  }\n\n  /**\n   * Send payment notification\n   */\n  async sendPaymentNotification(\n    amount: number,\n    status: 'success' | 'failed',\n    message: string\n  ): Promise<void> {\n    await this.sendLocalNotification({\n      type: 'payment',\n      title: `Payment ${status === 'success' ? '✅' : '❌'}`,\n      message,\n      data: {\n        amount,\n        status,\n      },\n    });\n  }\n\n  /**\n   * Send alert notification\n   */\n  async sendAlertNotification(title: string, message: string): Promise<void> {\n    await this.sendLocalNotification({\n      type: 'alert',\n      title,\n      message,\n    });\n  }\n\n  /**\n   * Send promotion notification\n   */\n  async sendPromotionNotification(\n    title: string,\n    message: string,\n    deepLink?: string\n  ): Promise<void> {\n    await this.sendLocalNotification({\n      type: 'promotion',\n      title,\n      message,\n      deepLink,\n    });\n  }\n}\n\nexport const notificationService = new NotificationService();\n
+// Push notification service using Firebase Cloud Messaging
+import * as Notifications from 'expo-notifications';
+import * as Device from 'expo-device';
+import Constants from 'expo-constants';
+
+interface NotificationData {
+  type: 'order' | 'job' | 'message' | 'payment' | 'alert' | 'promotion';
+  title: string;
+  message: string;
+  data?: Record<string, any>;
+  deepLink?: string;
+}
+
+class NotificationService {
+  private expoPushToken: string | null = null;
+  private notificationListener: any = null;
+  private responseListener: any = null;
+
+  /**
+   * Initialize notification service
+   */
+  async initialize(): Promise<void> {
+    try {
+      // Set notification handler
+      Notifications.setNotificationHandler({
+        handleNotification: async () => ({
+          shouldShowAlert: true,
+          shouldPlaySound: true,
+          shouldSetBadge: true,
+        }),
+      });
+
+      // Request permissions
+      await this.requestPermissions();
+
+      // Get Expo push token
+      this.expoPushToken = await this.getExpoPushToken();
+      console.log('Expo Push Token:', this.expoPushToken);
+    } catch (error) {
+      console.error('Failed to initialize notifications:', error);
+    }
+  }
+
+  /**
+   * Request notification permissions
+   */
+  private async requestPermissions(): Promise<void> {
+    if (Device.isDevice) {
+      const { status: existingStatus } = await Notifications.getPermissionsAsync();
+      let finalStatus = existingStatus;
+
+      if (existingStatus !== 'granted') {
+        const { status } = await Notifications.requestPermissionsAsync();
+        finalStatus = status;
+      }
+
+      if (finalStatus !== 'granted') {
+        console.warn('Failed to get push token for push notification!');
+      }
+    }
+  }
+
+  /**
+   * Get Expo push token
+   */
+  private async getExpoPushToken(): Promise<string> {
+    try {
+      const projectId = Constants.expoConfig?.extra?.eas?.projectId;
+      if (!projectId) {
+        throw new Error('Project ID not found');
+      }
+
+      const token = await Notifications.getExpoPushTokenAsync({
+        projectId,
+      });
+
+      return token.data;
+    } catch (error) {
+      console.error('Failed to get Expo push token:', error);
+      return '';
+    }
+  }
+
+  /**
+   * Get push token
+   */
+  getPushToken(): string | null {
+    return this.expoPushToken;
+  }
+
+  /**
+   * Subscribe to notifications
+   */
+  subscribeToNotifications(callback: (notification: Notifications.Notification) => void): void {
+    this.notificationListener = Notifications.addNotificationReceivedListener(callback);
+  }
+
+  /**
+   * Subscribe to notification responses (when user taps notification)
+   */
+  subscribeToNotificationResponses(
+    callback: (response: Notifications.NotificationResponse) => void
+  ): void {
+    this.responseListener = Notifications.addNotificationResponseReceivedListener(callback);
+  }
+
+  /**
+   * Unsubscribe from notifications
+   */
+  unsubscribeFromNotifications(): void {
+    if (this.notificationListener) {
+      Notifications.removeNotificationSubscription(this.notificationListener);
+    }
+    if (this.responseListener) {
+      Notifications.removeNotificationSubscription(this.responseListener);
+    }
+  }
+
+  /**
+   * Send local notification
+   */
+  async sendLocalNotification(data: NotificationData): Promise<void> {
+    try {
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: data.title,
+          body: data.message,
+          data: {
+            type: data.type,
+            ...data.data,
+            deepLink: data.deepLink,
+          },
+          sound: 'default',
+          badge: 1,
+        },
+        trigger: null, // Send immediately
+      });
+    } catch (error) {
+      console.error('Failed to send local notification:', error);
+    }
+  }
+
+  /**
+   * Schedule notification
+   */
+  async scheduleNotification(
+    data: NotificationData,
+    delayInSeconds: number
+  ): Promise<void> {
+    try {
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: data.title,
+          body: data.message,
+          data: {
+            type: data.type,
+            ...data.data,
+            deepLink: data.deepLink,
+          },
+          sound: 'default',
+          badge: 1,
+        },
+        trigger: {
+          seconds: delayInSeconds,
+        },
+      });
+    } catch (error) {
+      console.error('Failed to schedule notification:', error);
+    }
+  }
+
+  /**
+   * Cancel all notifications
+   */
+  async cancelAllNotifications(): Promise<void> {
+    try {
+      await Notifications.cancelAllScheduledNotificationsAsync();
+    } catch (error) {
+      console.error('Failed to cancel notifications:', error);
+    }
+  }
+
+  /**
+   * Send job offer notification
+   */
+  async sendJobOfferNotification(
+    jobId: string,
+    pickupLocation: string,
+    dropoffLocation: string,
+    estimatedEarnings: number
+  ): Promise<void> {
+    await this.sendLocalNotification({
+      type: 'job',
+      title: 'ð New Job Offer!',
+      message: `${pickupLocation} â ${dropoffLocation} â¢ â­${estimatedEarnings}`,
+      data: {
+        jobId,
+        pickupLocation,
+        dropoffLocation,
+        estimatedEarnings,
+      },
+      deepLink: `ntumai://job/${jobId}`,
+    });
+  }
+
+  /**
+   * Send order status notification
+   */
+  async sendOrderStatusNotification(
+    orderId: string,
+    status: string,
+    message: string
+  ): Promise<void> {
+    await this.sendLocalNotification({
+      type: 'order',
+      title: `Order ${status}`,
+      message,
+      data: {
+        orderId,
+        status,
+      },
+      deepLink: `ntumai://order/${orderId}`,
+    });
+  }
+
+  /**
+   * Send message notification
+   */
+  async sendMessageNotification(
+    chatId: string,
+    senderName: string,
+    message: string
+  ): Promise<void> {
+    await this.sendLocalNotification({
+      type: 'message',
+      title: senderName,
+      message,
+      data: {
+        chatId,
+        senderName,
+      },
+      deepLink: `ntumai://chat/${chatId}`,
+    });
+  }
+
+  /**
+   * Send payment notification
+   */
+  async sendPaymentNotification(
+    amount: number,
+    status: 'success' | 'failed',
+    message: string
+  ): Promise<void> {
+    await this.sendLocalNotification({
+      type: 'payment',
+      title: `Payment ${status === 'success' ? 'â' : 'â'}`,
+      message,
+      data: {
+        amount,
+        status,
+      },
+    });
+  }
+
+  /**
+   * Send alert notification
+   */
+  async sendAlertNotification(title: string, message: string): Promise<void> {
+    await this.sendLocalNotification({
+      type: 'alert',
+      title,
+      message,
+    });
+  }
+
+  /**
+   * Send promotion notification
+   */
+  async sendPromotionNotification(
+    title: string,
+    message: string,
+    deepLink?: string
+  ): Promise<void> {
+    await this.sendLocalNotification({
+      type: 'promotion',
+      title,
+      message,
+      deepLink,
+    });
+  }
+}
+
+export const notificationService = new NotificationService();
+

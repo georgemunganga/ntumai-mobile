@@ -1,1 +1,167 @@
-import React, { useState } from 'react';\nimport {\n  View,\n  Text,\n  TouchableOpacity,\n  ScrollView,\n  TextInput,\n  Image,\n  ActivityIndicator,\n  Alert,\n} from 'react-native';\nimport { useRouter } from 'expo-router';\nimport { useAuthStore } from '../../src/store';\nimport { Feather } from '@expo/vector-icons';\n\nexport default function EditProfileScreen() {\n  const router = useRouter();\n  const { user, updateProfile } = useAuthStore();\n  const [isLoading, setIsLoading] = useState(false);\n  const [formData, setFormData] = useState({\n    firstName: user?.firstName || '',\n    lastName: user?.lastName || '',\n    email: user?.email || '',\n    phone: user?.phone || '',\n    bio: user?.bio || '',\n  });\n\n  const handleSave = async () => {\n    if (!formData.firstName || !formData.lastName || !formData.email) {\n      Alert.alert('Error', 'Please fill in all required fields');\n      return;\n    }\n\n    setIsLoading(true);\n    try {\n      await updateProfile(formData);\n      Alert.alert('Success', 'Profile updated successfully');\n      router.back();\n    } catch (error: any) {\n      Alert.alert('Error', error.message || 'Failed to update profile');\n    } finally {\n      setIsLoading(false);\n    }\n  };\n\n  return (\n    <View className=\"flex-1 bg-white\">\n      {/* Header */}\n      <View className=\"px-6 py-4 border-b border-gray-200 flex-row items-center\">\n        <TouchableOpacity onPress={() => router.back()} className=\"mr-4\">\n          <Feather name=\"chevron-left\" size={24} color=\"#1F2937\" />\n        </TouchableOpacity>\n        <Text className=\"text-2xl font-bold text-gray-900\">Edit Profile</Text>\n      </View>\n\n      <ScrollView className=\"flex-1\">\n        {/* Profile Picture */}\n        <View className=\"px-6 py-8 items-center border-b border-gray-200\">\n          <View className=\"relative mb-4\">\n            <Image\n              source={{ uri: user?.avatar }}\n              className=\"w-24 h-24 rounded-full\"\n            />\n            <TouchableOpacity className=\"absolute bottom-0 right-0 bg-green-600 rounded-full p-3\">\n              <Feather name=\"camera\" size={16} color=\"white\" />\n            </TouchableOpacity>\n          </View>\n          <Text className=\"text-gray-600 text-sm\">Tap to change photo</Text>\n        </View>\n\n        {/* Form Fields */}\n        <View className=\"px-6 py-6\">\n          {/* First Name */}\n          <View className=\"mb-6\">\n            <Text className=\"text-sm font-semibold text-gray-700 mb-2\">First Name *</Text>\n            <TextInput\n              className=\"border border-gray-300 rounded-lg px-4 py-3\"\n              placeholder=\"First name\"\n              value={formData.firstName}\n              onChangeText={(text) => setFormData(prev => ({ ...prev, firstName: text }))}\n              placeholderTextColor=\"#9CA3AF\"\n            />\n          </View>\n\n          {/* Last Name */}\n          <View className=\"mb-6\">\n            <Text className=\"text-sm font-semibold text-gray-700 mb-2\">Last Name *</Text>\n            <TextInput\n              className=\"border border-gray-300 rounded-lg px-4 py-3\"\n              placeholder=\"Last name\"\n              value={formData.lastName}\n              onChangeText={(text) => setFormData(prev => ({ ...prev, lastName: text }))}\n              placeholderTextColor=\"#9CA3AF\"\n            />\n          </View>\n\n          {/* Email */}\n          <View className=\"mb-6\">\n            <Text className=\"text-sm font-semibold text-gray-700 mb-2\">Email *</Text>\n            <TextInput\n              className=\"border border-gray-300 rounded-lg px-4 py-3\"\n              placeholder=\"Email address\"\n              value={formData.email}\n              onChangeText={(text) => setFormData(prev => ({ ...prev, email: text }))}\n              keyboardType=\"email-address\"\n              placeholderTextColor=\"#9CA3AF\"\n            />\n          </View>\n\n          {/* Phone */}\n          <View className=\"mb-6\">\n            <Text className=\"text-sm font-semibold text-gray-700 mb-2\">Phone</Text>\n            <TextInput\n              className=\"border border-gray-300 rounded-lg px-4 py-3\"\n              placeholder=\"Phone number\"\n              value={formData.phone}\n              onChangeText={(text) => setFormData(prev => ({ ...prev, phone: text }))}\n              keyboardType=\"phone-pad\"\n              placeholderTextColor=\"#9CA3AF\"\n            />\n          </View>\n\n          {/* Bio */}\n          <View className=\"mb-8\">\n            <Text className=\"text-sm font-semibold text-gray-700 mb-2\">Bio</Text>\n            <TextInput\n              className=\"border border-gray-300 rounded-lg px-4 py-3 h-24\"\n              placeholder=\"Tell us about yourself\"\n              value={formData.bio}\n              onChangeText={(text) => setFormData(prev => ({ ...prev, bio: text }))}\n              multiline\n              placeholderTextColor=\"#9CA3AF\"\n            />\n          </View>\n        </View>\n      </ScrollView>\n\n      {/* Action Buttons */}\n      <View className=\"px-6 py-6 border-t border-gray-200 gap-3\">\n        <TouchableOpacity\n          onPress={handleSave}\n          disabled={isLoading}\n          className={`rounded-lg py-4 flex-row items-center justify-center ${\n            isLoading ? 'bg-gray-300' : 'bg-green-600'\n          }`}\n        >\n          {isLoading ? (\n            <ActivityIndicator color=\"white\" />\n          ) : (\n            <>\n              <Feather name=\"save\" size={20} color=\"white\" />\n              <Text className=\"text-white font-bold text-lg ml-2\">Save Changes</Text>\n            </>\n          )}\n        </TouchableOpacity>\n\n        <TouchableOpacity\n          onPress={() => router.back()}\n          className=\"bg-gray-100 rounded-lg py-4\"\n        >\n          <Text className=\"text-gray-900 text-center font-bold text-lg\">Cancel</Text>\n        </TouchableOpacity>\n      </View>\n    </View>\n  );\n}\n
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  TextInput,
+  Image,
+  ActivityIndicator,
+  Alert,
+} from 'react-native';
+import { useRouter } from 'expo-router';
+import { useAuthStore } from '../../src/store';
+import { Feather } from '@expo/vector-icons';
+
+export default function EditProfileScreen() {
+  const router = useRouter();
+  const { user, updateProfile } = useAuthStore();
+  const [isLoading, setIsLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    firstName: user?.firstName || '',
+    lastName: user?.lastName || '',
+    email: user?.email || '',
+    phone: user?.phone || '',
+    bio: user?.bio || '',
+  });
+
+  const handleSave = async () => {
+    if (!formData.firstName || !formData.lastName || !formData.email) {
+      Alert.alert('Error', 'Please fill in all required fields');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      await updateProfile(formData);
+      Alert.alert('Success', 'Profile updated successfully');
+      router.back();
+    } catch (error: any) {
+      Alert.alert('Error', error.message || 'Failed to update profile');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <View className="flex-1 bg-white">
+      {/* Header */}
+      <View className="px-6 py-4 border-b border-gray-200 flex-row items-center">
+        <TouchableOpacity onPress={() => router.back()} className="mr-4">
+          <Feather name="chevron-left" size={24} color="#1F2937" />
+        </TouchableOpacity>
+        <Text className="text-2xl font-bold text-gray-900">Edit Profile</Text>
+      </View>
+
+      <ScrollView className="flex-1">
+        {/* Profile Picture */}
+        <View className="px-6 py-8 items-center border-b border-gray-200">
+          <View className="relative mb-4">
+            <Image
+              source={{ uri: user?.avatar }}
+              className="w-24 h-24 rounded-full"
+            />
+            <TouchableOpacity className="absolute bottom-0 right-0 bg-green-600 rounded-full p-3">
+              <Feather name="camera" size={16} color="white" />
+            </TouchableOpacity>
+          </View>
+          <Text className="text-gray-600 text-sm">Tap to change photo</Text>
+        </View>
+
+        {/* Form Fields */}
+        <View className="px-6 py-6">
+          {/* First Name */}
+          <View className="mb-6">
+            <Text className="text-sm font-semibold text-gray-700 mb-2">First Name *</Text>
+            <TextInput
+              className="border border-gray-300 rounded-lg px-4 py-3"
+              placeholder="First name"
+              value={formData.firstName}
+              onChangeText={(text) => setFormData(prev => ({ ...prev, firstName: text }))}
+              placeholderTextColor="#9CA3AF"
+            />
+          </View>
+
+          {/* Last Name */}
+          <View className="mb-6">
+            <Text className="text-sm font-semibold text-gray-700 mb-2">Last Name *</Text>
+            <TextInput
+              className="border border-gray-300 rounded-lg px-4 py-3"
+              placeholder="Last name"
+              value={formData.lastName}
+              onChangeText={(text) => setFormData(prev => ({ ...prev, lastName: text }))}
+              placeholderTextColor="#9CA3AF"
+            />
+          </View>
+
+          {/* Email */}
+          <View className="mb-6">
+            <Text className="text-sm font-semibold text-gray-700 mb-2">Email *</Text>
+            <TextInput
+              className="border border-gray-300 rounded-lg px-4 py-3"
+              placeholder="Email address"
+              value={formData.email}
+              onChangeText={(text) => setFormData(prev => ({ ...prev, email: text }))}
+              keyboardType="email-address"
+              placeholderTextColor="#9CA3AF"
+            />
+          </View>
+
+          {/* Phone */}
+          <View className="mb-6">
+            <Text className="text-sm font-semibold text-gray-700 mb-2">Phone</Text>
+            <TextInput
+              className="border border-gray-300 rounded-lg px-4 py-3"
+              placeholder="Phone number"
+              value={formData.phone}
+              onChangeText={(text) => setFormData(prev => ({ ...prev, phone: text }))}
+              keyboardType="phone-pad"
+              placeholderTextColor="#9CA3AF"
+            />
+          </View>
+
+          {/* Bio */}
+          <View className="mb-8">
+            <Text className="text-sm font-semibold text-gray-700 mb-2">Bio</Text>
+            <TextInput
+              className="border border-gray-300 rounded-lg px-4 py-3 h-24"
+              placeholder="Tell us about yourself"
+              value={formData.bio}
+              onChangeText={(text) => setFormData(prev => ({ ...prev, bio: text }))}
+              multiline
+              placeholderTextColor="#9CA3AF"
+            />
+          </View>
+        </View>
+      </ScrollView>
+
+      {/* Action Buttons */}
+      <View className="px-6 py-6 border-t border-gray-200 gap-3">
+        <TouchableOpacity
+          onPress={handleSave}
+          disabled={isLoading}
+          className={`rounded-lg py-4 flex-row items-center justify-center ${
+            isLoading ? 'bg-gray-300' : 'bg-green-600'
+          }`}
+        >
+          {isLoading ? (
+            <ActivityIndicator color="white" />
+          ) : (
+            <>
+              <Feather name="save" size={20} color="white" />
+              <Text className="text-white font-bold text-lg ml-2">Save Changes</Text>
+            </>
+          )}
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() => router.back()}
+          className="bg-gray-100 rounded-lg py-4"
+        >
+          <Text className="text-gray-900 text-center font-bold text-lg">Cancel</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+}
+

@@ -1,1 +1,172 @@
-import React, { useEffect, useState } from 'react';\nimport {\n  View,\n  Text,\n  TouchableOpacity,\n  ScrollView,\n  FlatList,\n  ActivityIndicator,\n  RefreshControl,\n} from 'react-native';\nimport { useRouter } from 'expo-router';\nimport { useAuthStore, useDriverStore } from '../../src/store';\nimport { Feather } from '@expo/vector-icons';\n\nexport default function AvailableJobsScreen() {\n  const router = useRouter();\n  const { user } = useAuthStore();\n  const { availableOrders, fetchAvailableJobs, isLoading } = useDriverStore();\n  const [refreshing, setRefreshing] = useState(false);\n  const [filterType, setFilterType] = useState<'all' | 'delivery' | 'task'>('all');\n\n  useEffect(() => {\n    if (user?.id) {\n      fetchAvailableJobs(user.id, 0, 0);\n    }\n  }, [user]);\n\n  const handleRefresh = async () => {\n    setRefreshing(true);\n    if (user?.id) {\n      await fetchAvailableJobs(user.id, 0, 0);\n    }\n    setRefreshing(false);\n  };\n\n  const filteredJobs = availableOrders.filter(job => {\n    if (filterType === 'all') return true;\n    return job.type === filterType;\n  });\n\n  return (\n    <View className=\"flex-1 bg-white\">\n      {/* Header */}\n      <View className=\"px-6 py-4 border-b border-gray-200 flex-row items-center\">\n        <TouchableOpacity onPress={() => router.back()} className=\"mr-4\">\n          <Feather name=\"chevron-left\" size={24} color=\"#1F2937\" />\n        </TouchableOpacity>\n        <View className=\"flex-1\">\n          <Text className=\"text-2xl font-bold text-gray-900\">Available Jobs</Text>\n          <Text className=\"text-gray-600 text-sm\">{filteredJobs.length} jobs available</Text>\n        </View>\n      </View>\n\n      {/* Filter Tabs */}\n      <View className=\"bg-white flex-row border-b border-gray-200 px-6\">\n        {[\n          { id: 'all', label: 'All Jobs' },\n          { id: 'delivery', label: 'Deliveries' },\n          { id: 'task', label: 'Tasks' },\n        ].map(tab => (\n          <TouchableOpacity\n            key={tab.id}\n            onPress={() => setFilterType(tab.id as any)}\n            className={`py-4 px-4 border-b-2 ${\n              filterType === tab.id ? 'border-green-600' : 'border-transparent'\n            }`}\n          >\n            <Text className={`font-semibold ${\n              filterType === tab.id ? 'text-green-600' : 'text-gray-600'\n            }`}>\n              {tab.label}\n            </Text>\n          </TouchableOpacity>\n        ))}\n      </View>\n\n      {/* Jobs List */}\n      {isLoading && !refreshing ? (\n        <View className=\"flex-1 items-center justify-center\">\n          <ActivityIndicator size=\"large\" color=\"#16A34A\" />\n        </View>\n      ) : filteredJobs.length > 0 ? (\n        <FlatList\n          data={filteredJobs}\n          keyExtractor={(item) => item.id}\n          refreshControl={\n            <RefreshControl\n              refreshing={refreshing}\n              onRefresh={handleRefresh}\n              colors={['#16A34A']}\n            />\n          }\n          renderItem={({ item }) => (\n            <TouchableOpacity\n              onPress={() => router.push(`/(tasker)/JobDetail?jobId=${item.id}`)}\n              className=\"px-6 py-4 border-b border-gray-100\"\n            >\n              <View className=\"flex-row items-start justify-between mb-3\">\n                <View className=\"flex-1\">\n                  <View className=\"flex-row items-center mb-2\">\n                    <Text className=\"text-lg font-bold text-gray-900 flex-1\">{item.title}</Text>\n                    <View className={`px-3 py-1 rounded-full ${\n                      item.type === 'delivery' ? 'bg-blue-100' : 'bg-purple-100'\n                    }`}>\n                      <Text className={`text-xs font-bold ${\n                        item.type === 'delivery' ? 'text-blue-700' : 'text-purple-700'\n                      }`}>\n                        {item.type.toUpperCase()}\n                      </Text>\n                    </View>\n                  </View>\n                  <Text className=\"text-gray-600 text-sm line-clamp-2\">\n                    {item.description}\n                  </Text>\n                </View>\n              </View>\n\n              {/* Location and Details */}\n              <View className=\"bg-gray-50 rounded-lg p-3 mb-3\">\n                <View className=\"flex-row items-center mb-2\">\n                  <Feather name=\"map-pin\" size={14} color=\"#6B7280\" />\n                  <Text className=\"text-gray-600 text-xs ml-2 flex-1\">\n                    {item.pickupLocation}\n                  </Text>\n                </View>\n                <View className=\"flex-row items-center\">\n                  <Feather name=\"arrow-down\" size={14} color=\"#9CA3AF\" />\n                  <Text className=\"text-gray-600 text-xs ml-2 flex-1\">\n                    {item.dropoffLocation}\n                  </Text>\n                </View>\n              </View>\n\n              {/* Footer */}\n              <View className=\"flex-row items-center justify-between\">\n                <View className=\"flex-row items-center gap-4\">\n                  <View className=\"flex-row items-center\">\n                    <Feather name=\"clock\" size={14} color=\"#6B7280\" />\n                    <Text className=\"text-gray-600 text-xs ml-1\">{item.estimatedTime}</Text>\n                  </View>\n                  <View className=\"flex-row items-center\">\n                    <Feather name=\"navigation\" size={14} color=\"#6B7280\" />\n                    <Text className=\"text-gray-600 text-xs ml-1\">{item.distance || '2.5 km'}</Text>\n                  </View>\n                </View>\n                <View className=\"items-end\">\n                  <Text className=\"text-2xl font-bold text-green-600\">{item.estimatedPay}K</Text>\n                  <Text className=\"text-gray-600 text-xs\">Est. earnings</Text>\n                </View>\n              </View>\n            </TouchableOpacity>\n          )}\n        />\n      ) : (\n        <View className=\"flex-1 items-center justify-center\">\n          <Feather name=\"inbox\" size={64} color=\"#D1D5DB\" />\n          <Text className=\"text-2xl font-bold text-gray-900 mt-4\">No jobs available</Text>\n          <Text className=\"text-gray-600 text-center mt-2 px-6\">\n            Check back soon or adjust your location to see more opportunities\n          </Text>\n          <TouchableOpacity\n            onPress={handleRefresh}\n            className=\"bg-green-600 rounded-lg px-8 py-3 mt-6\"\n          >\n            <Text className=\"text-white font-bold\">Refresh</Text>\n          </TouchableOpacity>\n        </View>\n      )}\n    </View>\n  );\n}\n
+import React, { useEffect, useState } from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  FlatList,
+  ActivityIndicator,
+  RefreshControl,
+} from 'react-native';
+import { useRouter } from 'expo-router';
+import { useAuthStore, useDriverStore } from '../../src/store';
+import { Feather } from '@expo/vector-icons';
+
+export default function AvailableJobsScreen() {
+  const router = useRouter();
+  const { user } = useAuthStore();
+  const { availableOrders, fetchAvailableJobs, isLoading } = useDriverStore();
+  const [refreshing, setRefreshing] = useState(false);
+  const [filterType, setFilterType] = useState<'all' | 'delivery' | 'task'>('all');
+
+  useEffect(() => {
+    if (user?.id) {
+      fetchAvailableJobs(user.id, 0, 0);
+    }
+  }, [user]);
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    if (user?.id) {
+      await fetchAvailableJobs(user.id, 0, 0);
+    }
+    setRefreshing(false);
+  };
+
+  const filteredJobs = availableOrders.filter(job => {
+    if (filterType === 'all') return true;
+    return job.type === filterType;
+  });
+
+  return (
+    <View className="flex-1 bg-white">
+      {/* Header */}
+      <View className="px-6 py-4 border-b border-gray-200 flex-row items-center">
+        <TouchableOpacity onPress={() => router.back()} className="mr-4">
+          <Feather name="chevron-left" size={24} color="#1F2937" />
+        </TouchableOpacity>
+        <View className="flex-1">
+          <Text className="text-2xl font-bold text-gray-900">Available Jobs</Text>
+          <Text className="text-gray-600 text-sm">{filteredJobs.length} jobs available</Text>
+        </View>
+      </View>
+
+      {/* Filter Tabs */}
+      <View className="bg-white flex-row border-b border-gray-200 px-6">
+        {[
+          { id: 'all', label: 'All Jobs' },
+          { id: 'delivery', label: 'Deliveries' },
+          { id: 'task', label: 'Tasks' },
+        ].map(tab => (
+          <TouchableOpacity
+            key={tab.id}
+            onPress={() => setFilterType(tab.id as any)}
+            className={`py-4 px-4 border-b-2 ${
+              filterType === tab.id ? 'border-green-600' : 'border-transparent'
+            }`}
+          >
+            <Text className={`font-semibold ${
+              filterType === tab.id ? 'text-green-600' : 'text-gray-600'
+            }`}>
+              {tab.label}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+
+      {/* Jobs List */}
+      {isLoading && !refreshing ? (
+        <View className="flex-1 items-center justify-center">
+          <ActivityIndicator size="large" color="#16A34A" />
+        </View>
+      ) : filteredJobs.length > 0 ? (
+        <FlatList
+          data={filteredJobs}
+          keyExtractor={(item) => item.id}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={handleRefresh}
+              colors={['#16A34A']}
+            />
+          }
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              onPress={() => router.push(`/(tasker)/JobDetail?jobId=${item.id}`)}
+              className="px-6 py-4 border-b border-gray-100"
+            >
+              <View className="flex-row items-start justify-between mb-3">
+                <View className="flex-1">
+                  <View className="flex-row items-center mb-2">
+                    <Text className="text-lg font-bold text-gray-900 flex-1">{item.title}</Text>
+                    <View className={`px-3 py-1 rounded-full ${
+                      item.type === 'delivery' ? 'bg-blue-100' : 'bg-purple-100'
+                    }`}>
+                      <Text className={`text-xs font-bold ${
+                        item.type === 'delivery' ? 'text-blue-700' : 'text-purple-700'
+                      }`}>
+                        {item.type.toUpperCase()}
+                      </Text>
+                    </View>
+                  </View>
+                  <Text className="text-gray-600 text-sm line-clamp-2">
+                    {item.description}
+                  </Text>
+                </View>
+              </View>
+
+              {/* Location and Details */}
+              <View className="bg-gray-50 rounded-lg p-3 mb-3">
+                <View className="flex-row items-center mb-2">
+                  <Feather name="map-pin" size={14} color="#6B7280" />
+                  <Text className="text-gray-600 text-xs ml-2 flex-1">
+                    {item.pickupLocation}
+                  </Text>
+                </View>
+                <View className="flex-row items-center">
+                  <Feather name="arrow-down" size={14} color="#9CA3AF" />
+                  <Text className="text-gray-600 text-xs ml-2 flex-1">
+                    {item.dropoffLocation}
+                  </Text>
+                </View>
+              </View>
+
+              {/* Footer */}
+              <View className="flex-row items-center justify-between">
+                <View className="flex-row items-center gap-4">
+                  <View className="flex-row items-center">
+                    <Feather name="clock" size={14} color="#6B7280" />
+                    <Text className="text-gray-600 text-xs ml-1">{item.estimatedTime}</Text>
+                  </View>
+                  <View className="flex-row items-center">
+                    <Feather name="navigation" size={14} color="#6B7280" />
+                    <Text className="text-gray-600 text-xs ml-1">{item.distance || '2.5 km'}</Text>
+                  </View>
+                </View>
+                <View className="items-end">
+                  <Text className="text-2xl font-bold text-green-600">{item.estimatedPay}K</Text>
+                  <Text className="text-gray-600 text-xs">Est. earnings</Text>
+                </View>
+              </View>
+            </TouchableOpacity>
+          )}
+        />
+      ) : (
+        <View className="flex-1 items-center justify-center">
+          <Feather name="inbox" size={64} color="#D1D5DB" />
+          <Text className="text-2xl font-bold text-gray-900 mt-4">No jobs available</Text>
+          <Text className="text-gray-600 text-center mt-2 px-6">
+            Check back soon or adjust your location to see more opportunities
+          </Text>
+          <TouchableOpacity
+            onPress={handleRefresh}
+            className="bg-green-600 rounded-lg px-8 py-3 mt-6"
+          >
+            <Text className="text-white font-bold">Refresh</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+    </View>
+  );
+}
+

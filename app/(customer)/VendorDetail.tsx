@@ -1,1 +1,192 @@
-import React, { useEffect, useState } from 'react';\nimport {\n  View,\n  Text,\n  TouchableOpacity,\n  ScrollView,\n  Image,\n  FlatList,\n  ActivityIndicator,\n} from 'react-native';\nimport { useRouter, useLocalSearchParams } from 'expo-router';\nimport { useMarketplaceStore, useCartStore } from '../../src/store';\nimport { Feather } from '@expo/vector-icons';\n\nexport default function VendorDetail() {\n  const router = useRouter();\n  const { vendorId } = useLocalSearchParams();\n  const { selectedVendor, getVendorDetail, fetchProducts, products, fetchCategories, categories, isLoading } = useMarketplaceStore();\n  const { addItem } = useCartStore();\n  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);\n\n  useEffect(() => {\n    if (vendorId) {\n      getVendorDetail(vendorId as string);\n      fetchProducts(vendorId as string);\n      fetchCategories(vendorId as string);\n    }\n  }, [vendorId]);\n\n  const handleAddToCart = (product: any) => {\n    addItem({\n      product,\n      quantity: 1,\n      specialInstructions: '',\n    });\n    // Show toast or confirmation\n    alert('Added to cart!');\n  };\n\n  const filteredProducts = selectedCategory\n    ? products.filter(p => p.category === selectedCategory)\n    : products;\n\n  if (isLoading || !selectedVendor) {\n    return (\n      <View className=\"flex-1 items-center justify-center bg-white\">\n        <ActivityIndicator size=\"large\" color=\"#16A34A\" />\n      </View>\n    );\n  }\n\n  return (\n    <View className=\"flex-1 bg-white\">\n      {/* Header */}\n      <View className=\"absolute top-0 left-0 right-0 z-10 flex-row items-center justify-between px-6 py-4 bg-white/90 border-b border-gray-200\">\n        <TouchableOpacity onPress={() => router.back()}>\n          <Feather name=\"chevron-left\" size={24} color=\"#1F2937\" />\n        </TouchableOpacity>\n        <TouchableOpacity onPress={() => router.push('/(customer)/Cart')}>\n          <Feather name=\"shopping-cart\" size={24} color=\"#1F2937\" />\n        </TouchableOpacity>\n      </View>\n\n      <ScrollView className=\"flex-1 pt-16\">\n        {/* Vendor Header Image */}\n        <Image\n          source={{ uri: selectedVendor.logo }}\n          className=\"w-full h-48\"\n        />\n\n        {/* Vendor Info */}\n        <View className=\"px-6 py-6 border-b border-gray-200\">\n          <Text className=\"text-3xl font-bold text-gray-900 mb-2\">{selectedVendor.name}</Text>\n          <Text className=\"text-gray-600 mb-4\">{selectedVendor.description}</Text>\n\n          {/* Rating and Info */}\n          <View className=\"flex-row items-center justify-between mb-4\">\n            <View className=\"flex-row items-center\">\n              <Feather name=\"star\" size={18} color=\"#FCD34D\" fill=\"#FCD34D\" />\n              <Text className=\"text-gray-900 font-bold ml-2\">{selectedVendor.rating}</Text>\n              <Text className=\"text-gray-600 text-sm ml-1\">({selectedVendor.reviewCount})</Text>\n            </View>\n            <View className=\"flex-row items-center gap-4\">\n              <View className=\"flex-row items-center\">\n                <Feather name=\"clock\" size={16} color=\"#6B7280\" />\n                <Text className=\"text-gray-600 text-sm ml-1\">{selectedVendor.deliveryTime}</Text>\n              </View>\n              <View className=\"flex-row items-center\">\n                <Feather name=\"truck\" size={16} color=\"#6B7280\" />\n                <Text className=\"text-gray-600 text-sm ml-1\">{selectedVendor.deliveryFee}K</Text>\n              </View>\n            </View>\n          </View>\n\n          {/* Status */}\n          <View className=\"flex-row items-center justify-between\">\n            <Text className={`font-semibold ${\n              selectedVendor.isOpen ? 'text-green-600' : 'text-red-600'\n            }`}>\n              {selectedVendor.isOpen ? '✓ Open Now' : '✗ Closed'}\n            </Text>\n            <Text className=\"text-gray-600 text-sm\">Min order: {selectedVendor.minimumOrder}K</Text>\n          </View>\n        </View>\n\n        {/* Categories */}\n        {categories.length > 0 && (\n          <View className=\"px-6 py-4 border-b border-gray-200\">\n            <Text className=\"text-sm font-semibold text-gray-700 mb-3\">Categories</Text>\n            <ScrollView horizontal showsHorizontalScrollIndicator={false} className=\"gap-2\">\n              <TouchableOpacity\n                onPress={() => setSelectedCategory(null)}\n                className={`px-4 py-2 rounded-full ${\n                  selectedCategory === null\n                    ? 'bg-green-600'\n                    : 'bg-gray-100'\n                }`}\n              >\n                <Text className={`font-semibold ${\n                  selectedCategory === null ? 'text-white' : 'text-gray-700'\n                }`}>\n                  All\n                </Text>\n              </TouchableOpacity>\n              {categories.map(cat => (\n                <TouchableOpacity\n                  key={cat.id}\n                  onPress={() => setSelectedCategory(cat.name)}\n                  className={`px-4 py-2 rounded-full ${\n                    selectedCategory === cat.name\n                      ? 'bg-green-600'\n                      : 'bg-gray-100'\n                  }`}\n                >\n                  <Text className={`font-semibold ${\n                    selectedCategory === cat.name ? 'text-white' : 'text-gray-700'\n                  }`}>\n                    {cat.name}\n                  </Text>\n                </TouchableOpacity>\n              ))}\n            </ScrollView>\n          </View>\n        )}\n\n        {/* Products */}\n        <View className=\"px-6 py-6\">\n          {filteredProducts.length > 0 ? (\n            <FlatList\n              data={filteredProducts}\n              keyExtractor={(item) => item.id}\n              scrollEnabled={false}\n              renderItem={({ item }) => (\n                <View className=\"bg-white rounded-xl border border-gray-200 p-4 mb-4\">\n                  <View className=\"flex-row\">\n                    <Image\n                      source={{ uri: item.image }}\n                      className=\"w-24 h-24 rounded-lg mr-4\"\n                    />\n                    <View className=\"flex-1\">\n                      <Text className=\"text-lg font-bold text-gray-900 mb-1\">{item.name}</Text>\n                      <Text className=\"text-gray-600 text-sm mb-2 line-clamp-2\">{item.description}</Text>\n                      <View className=\"flex-row items-center justify-between\">\n                        <Text className=\"text-xl font-bold text-green-600\">{item.price}K</Text>\n                        <View className=\"flex-row items-center\">\n                          <Feather name=\"star\" size={14} color=\"#FCD34D\" fill=\"#FCD34D\" />\n                          <Text className=\"text-xs text-gray-600 ml-1\">{item.rating}</Text>\n                        </View>\n                      </View>\n                    </View>\n                  </View>\n                  <TouchableOpacity\n                    onPress={() => handleAddToCart(item)}\n                    className=\"bg-green-600 rounded-lg py-3 mt-4\"\n                  >\n                    <Text className=\"text-white text-center font-bold\">Add to Cart</Text>\n                  </TouchableOpacity>\n                </View>\n              )}\n            />\n          ) : (\n            <View className=\"items-center justify-center py-12\">\n              <Feather name=\"inbox\" size={48} color=\"#D1D5DB\" />\n              <Text className=\"text-gray-600 text-center mt-4\">No products available</Text>\n            </View>\n          )}\n        </View>\n      </ScrollView>\n    </View>\n  );\n}\n
+import React, { useEffect, useState } from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  Image,
+  FlatList,
+  ActivityIndicator,
+} from 'react-native';
+import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useMarketplaceStore, useCartStore } from '../../src/store';
+import { Feather } from '@expo/vector-icons';
+
+export default function VendorDetail() {
+  const router = useRouter();
+  const { vendorId } = useLocalSearchParams();
+  const { selectedVendor, getVendorDetail, fetchProducts, products, fetchCategories, categories, isLoading } = useMarketplaceStore();
+  const { addItem } = useCartStore();
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (vendorId) {
+      getVendorDetail(vendorId as string);
+      fetchProducts(vendorId as string);
+      fetchCategories(vendorId as string);
+    }
+  }, [vendorId]);
+
+  const handleAddToCart = (product: any) => {
+    addItem({
+      product,
+      quantity: 1,
+      specialInstructions: '',
+    });
+    // Show toast or confirmation
+    alert('Added to cart!');
+  };
+
+  const filteredProducts = selectedCategory
+    ? products.filter(p => p.category === selectedCategory)
+    : products;
+
+  if (isLoading || !selectedVendor) {
+    return (
+      <View className="flex-1 items-center justify-center bg-white">
+        <ActivityIndicator size="large" color="#16A34A" />
+      </View>
+    );
+  }
+
+  return (
+    <View className="flex-1 bg-white">
+      {/* Header */}
+      <View className="absolute top-0 left-0 right-0 z-10 flex-row items-center justify-between px-6 py-4 bg-white/90 border-b border-gray-200">
+        <TouchableOpacity onPress={() => router.back()}>
+          <Feather name="chevron-left" size={24} color="#1F2937" />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => router.push('/(customer)/Cart')}>
+          <Feather name="shopping-cart" size={24} color="#1F2937" />
+        </TouchableOpacity>
+      </View>
+
+      <ScrollView className="flex-1 pt-16">
+        {/* Vendor Header Image */}
+        <Image
+          source={{ uri: selectedVendor.logo }}
+          className="w-full h-48"
+        />
+
+        {/* Vendor Info */}
+        <View className="px-6 py-6 border-b border-gray-200">
+          <Text className="text-3xl font-bold text-gray-900 mb-2">{selectedVendor.name}</Text>
+          <Text className="text-gray-600 mb-4">{selectedVendor.description}</Text>
+
+          {/* Rating and Info */}
+          <View className="flex-row items-center justify-between mb-4">
+            <View className="flex-row items-center">
+              <Feather name="star" size={18} color="#FCD34D" fill="#FCD34D" />
+              <Text className="text-gray-900 font-bold ml-2">{selectedVendor.rating}</Text>
+              <Text className="text-gray-600 text-sm ml-1">({selectedVendor.reviewCount})</Text>
+            </View>
+            <View className="flex-row items-center gap-4">
+              <View className="flex-row items-center">
+                <Feather name="clock" size={16} color="#6B7280" />
+                <Text className="text-gray-600 text-sm ml-1">{selectedVendor.deliveryTime}</Text>
+              </View>
+              <View className="flex-row items-center">
+                <Feather name="truck" size={16} color="#6B7280" />
+                <Text className="text-gray-600 text-sm ml-1">{selectedVendor.deliveryFee}K</Text>
+              </View>
+            </View>
+          </View>
+
+          {/* Status */}
+          <View className="flex-row items-center justify-between">
+            <Text className={`font-semibold ${
+              selectedVendor.isOpen ? 'text-green-600' : 'text-red-600'
+            }`}>
+              {selectedVendor.isOpen ? 'â Open Now' : 'â Closed'}
+            </Text>
+            <Text className="text-gray-600 text-sm">Min order: {selectedVendor.minimumOrder}K</Text>
+          </View>
+        </View>
+
+        {/* Categories */}
+        {categories.length > 0 && (
+          <View className="px-6 py-4 border-b border-gray-200">
+            <Text className="text-sm font-semibold text-gray-700 mb-3">Categories</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} className="gap-2">
+              <TouchableOpacity
+                onPress={() => setSelectedCategory(null)}
+                className={`px-4 py-2 rounded-full ${
+                  selectedCategory === null
+                    ? 'bg-green-600'
+                    : 'bg-gray-100'
+                }`}
+              >
+                <Text className={`font-semibold ${
+                  selectedCategory === null ? 'text-white' : 'text-gray-700'
+                }`}>
+                  All
+                </Text>
+              </TouchableOpacity>
+              {categories.map(cat => (
+                <TouchableOpacity
+                  key={cat.id}
+                  onPress={() => setSelectedCategory(cat.name)}
+                  className={`px-4 py-2 rounded-full ${
+                    selectedCategory === cat.name
+                      ? 'bg-green-600'
+                      : 'bg-gray-100'
+                  }`}
+                >
+                  <Text className={`font-semibold ${
+                    selectedCategory === cat.name ? 'text-white' : 'text-gray-700'
+                  }`}>
+                    {cat.name}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+        )}
+
+        {/* Products */}
+        <View className="px-6 py-6">
+          {filteredProducts.length > 0 ? (
+            <FlatList
+              data={filteredProducts}
+              keyExtractor={(item) => item.id}
+              scrollEnabled={false}
+              renderItem={({ item }) => (
+                <View className="bg-white rounded-xl border border-gray-200 p-4 mb-4">
+                  <View className="flex-row">
+                    <Image
+                      source={{ uri: item.image }}
+                      className="w-24 h-24 rounded-lg mr-4"
+                    />
+                    <View className="flex-1">
+                      <Text className="text-lg font-bold text-gray-900 mb-1">{item.name}</Text>
+                      <Text className="text-gray-600 text-sm mb-2 line-clamp-2">{item.description}</Text>
+                      <View className="flex-row items-center justify-between">
+                        <Text className="text-xl font-bold text-green-600">{item.price}K</Text>
+                        <View className="flex-row items-center">
+                          <Feather name="star" size={14} color="#FCD34D" fill="#FCD34D" />
+                          <Text className="text-xs text-gray-600 ml-1">{item.rating}</Text>
+                        </View>
+                      </View>
+                    </View>
+                  </View>
+                  <TouchableOpacity
+                    onPress={() => handleAddToCart(item)}
+                    className="bg-green-600 rounded-lg py-3 mt-4"
+                  >
+                    <Text className="text-white text-center font-bold">Add to Cart</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+            />
+          ) : (
+            <View className="items-center justify-center py-12">
+              <Feather name="inbox" size={48} color="#D1D5DB" />
+              <Text className="text-gray-600 text-center mt-4">No products available</Text>
+            </View>
+          )}
+        </View>
+      </ScrollView>
+    </View>
+  );
+}
+

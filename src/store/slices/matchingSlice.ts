@@ -1,1 +1,104 @@
-// Matching store slice for auto-matching\nimport { create } from 'zustand';\nimport { matchingMockService } from '../../api/mockServices.extended';\n\ninterface MatchingState {\n  isMatching: boolean;\n  matchedTasker: any | null;\n  availableTaskers: any[];\n  estimatedWaitTime: string;\n  estimatedEarnings: number;\n  estimatedArrival: number;\n  matchingError: string | null;\n  matchingProgress: number; // 0-100\n\n  // Actions\n  startMatching: (jobData: any) => Promise<void>;\n  cancelMatching: () => void;\n  updateMatchingProgress: (progress: number) => void;\n  setMatchedTasker: (tasker: any) => void;\n  getAvailableTaskers: (location: any) => Promise<void>;\n  clearMatching: () => void;\n}\n\nexport const useMatchingStore = create<MatchingState>((set) => ({\n  isMatching: false,\n  matchedTasker: null,\n  availableTaskers: [],\n  estimatedWaitTime: '2-3 minutes',\n  estimatedEarnings: 0,\n  estimatedArrival: 0,\n  matchingError: null,\n  matchingProgress: 0,\n\n  startMatching: async (jobData: any) => {\n    set({ isMatching: true, matchingError: null, matchingProgress: 0 });\n\n    try {\n      // Simulate matching progress\n      set({ matchingProgress: 25 });\n      await new Promise((resolve) => setTimeout(resolve, 500));\n\n      set({ matchingProgress: 50 });\n      await new Promise((resolve) => setTimeout(resolve, 500));\n\n      // Get matched tasker\n      const response = await matchingMockService.findTasker(jobData);\n      if (response.success) {\n        set({\n          matchedTasker: response.data,\n          estimatedEarnings: response.data.estimatedEarnings,\n          estimatedArrival: response.data.estimatedArrival,\n          matchingProgress: 100,\n        });\n      }\n\n      set({ isMatching: false });\n    } catch (error) {\n      set({\n        matchingError: error instanceof Error ? error.message : 'Matching failed',\n        isMatching: false,\n      });\n    }\n  },\n\n  cancelMatching: () => {\n    set({\n      isMatching: false,\n      matchedTasker: null,\n      matchingProgress: 0,\n    });\n  },\n\n  updateMatchingProgress: (progress: number) => {\n    set({ matchingProgress: Math.min(progress, 100) });\n  },\n\n  setMatchedTasker: (tasker: any) => {\n    set({ matchedTasker: tasker });\n  },\n\n  getAvailableTaskers: async (location: any) => {\n    try {\n      const response = await matchingMockService.getAvailableTaskers(location);\n      if (response.success) {\n        set({ availableTaskers: response.data });\n      }\n    } catch (error) {\n      set({\n        matchingError: error instanceof Error ? error.message : 'Failed to get taskers',\n      });\n    }\n  },\n\n  clearMatching: () => {\n    set({\n      isMatching: false,\n      matchedTasker: null,\n      availableTaskers: [],\n      matchingProgress: 0,\n      matchingError: null,\n    });\n  },\n}));\n
+// Matching store slice for auto-matching
+import { create } from 'zustand';
+import { matchingMockService } from '../../api/mockServices.extended';
+
+interface MatchingState {
+  isMatching: boolean;
+  matchedTasker: any | null;
+  availableTaskers: any[];
+  estimatedWaitTime: string;
+  estimatedEarnings: number;
+  estimatedArrival: number;
+  matchingError: string | null;
+  matchingProgress: number; // 0-100
+
+  // Actions
+  startMatching: (jobData: any) => Promise<void>;
+  cancelMatching: () => void;
+  updateMatchingProgress: (progress: number) => void;
+  setMatchedTasker: (tasker: any) => void;
+  getAvailableTaskers: (location: any) => Promise<void>;
+  clearMatching: () => void;
+}
+
+export const useMatchingStore = create<MatchingState>((set) => ({
+  isMatching: false,
+  matchedTasker: null,
+  availableTaskers: [],
+  estimatedWaitTime: '2-3 minutes',
+  estimatedEarnings: 0,
+  estimatedArrival: 0,
+  matchingError: null,
+  matchingProgress: 0,
+
+  startMatching: async (jobData: any) => {
+    set({ isMatching: true, matchingError: null, matchingProgress: 0 });
+
+    try {
+      // Simulate matching progress
+      set({ matchingProgress: 25 });
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      set({ matchingProgress: 50 });
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      // Get matched tasker
+      const response = await matchingMockService.findTasker(jobData);
+      if (response.success) {
+        set({
+          matchedTasker: response.data,
+          estimatedEarnings: response.data.estimatedEarnings,
+          estimatedArrival: response.data.estimatedArrival,
+          matchingProgress: 100,
+        });
+      }
+
+      set({ isMatching: false });
+    } catch (error) {
+      set({
+        matchingError: error instanceof Error ? error.message : 'Matching failed',
+        isMatching: false,
+      });
+    }
+  },
+
+  cancelMatching: () => {
+    set({
+      isMatching: false,
+      matchedTasker: null,
+      matchingProgress: 0,
+    });
+  },
+
+  updateMatchingProgress: (progress: number) => {
+    set({ matchingProgress: Math.min(progress, 100) });
+  },
+
+  setMatchedTasker: (tasker: any) => {
+    set({ matchedTasker: tasker });
+  },
+
+  getAvailableTaskers: async (location: any) => {
+    try {
+      const response = await matchingMockService.getAvailableTaskers(location);
+      if (response.success) {
+        set({ availableTaskers: response.data });
+      }
+    } catch (error) {
+      set({
+        matchingError: error instanceof Error ? error.message : 'Failed to get taskers',
+      });
+    }
+  },
+
+  clearMatching: () => {
+    set({
+      isMatching: false,
+      matchedTasker: null,
+      availableTaskers: [],
+      matchingProgress: 0,
+      matchingError: null,
+    });
+  },
+}));
+

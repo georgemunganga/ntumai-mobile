@@ -1,1 +1,194 @@
-import React, { useState } from 'react';\nimport {\n  View,\n  Text,\n  TouchableOpacity,\n  ScrollView,\n  FlatList,\n  Image,\n  Alert,\n} from 'react-native';\nimport { useRouter } from 'expo-router';\nimport { Feather } from '@expo/vector-icons';\n\nexport default function ManageProductsScreen() {\n  const router = useRouter();\n  const [products, setProducts] = useState([\n    {\n      id: '1',\n      name: 'Burger Deluxe',\n      price: 25,\n      image: 'https://via.placeholder.com/100',\n      category: 'Burgers',\n      inStock: true,\n      rating: 4.8,\n      orders: 245,\n    },\n    {\n      id: '2',\n      name: 'Fried Chicken',\n      price: 20,\n      image: 'https://via.placeholder.com/100',\n      category: 'Chicken',\n      inStock: true,\n      rating: 4.6,\n      orders: 189,\n    },\n    {\n      id: '3',\n      name: 'Pizza Margherita',\n      price: 30,\n      image: 'https://via.placeholder.com/100',\n      category: 'Pizza',\n      inStock: false,\n      rating: 4.9,\n      orders: 312,\n    },\n  ]);\n  const [filterCategory, setFilterCategory] = useState('all');\n\n  const categories = ['all', 'Burgers', 'Chicken', 'Pizza', 'Drinks'];\n\n  const filteredProducts = filterCategory === 'all'\n    ? products\n    : products.filter(p => p.category === filterCategory);\n\n  const handleToggleStock = (id: string) => {\n    setProducts(products.map(p =>\n      p.id === id ? { ...p, inStock: !p.inStock } : p\n    ));\n  };\n\n  const handleDeleteProduct = (id: string) => {\n    Alert.alert('Delete Product', 'Are you sure you want to delete this product?', [\n      { text: 'Cancel', onPress: () => {} },\n      {\n        text: 'Delete',\n        onPress: () => setProducts(products.filter(p => p.id !== id)),\n        style: 'destructive',\n      },\n    ]);\n  };\n\n  return (\n    <View className=\"flex-1 bg-white\">\n      {/* Header */}\n      <View className=\"px-6 py-4 border-b border-gray-200 flex-row items-center\">\n        <TouchableOpacity onPress={() => router.back()} className=\"mr-4\">\n          <Feather name=\"chevron-left\" size={24} color=\"#1F2937\" />\n        </TouchableOpacity>\n        <View className=\"flex-1\">\n          <Text className=\"text-2xl font-bold text-gray-900\">Products</Text>\n          <Text className=\"text-gray-600 text-sm\">{filteredProducts.length} items</Text>\n        </View>\n        <TouchableOpacity\n          onPress={() => router.push('/(vendor)/AddProductScreen')}\n          className=\"bg-green-600 rounded-lg p-3\"\n        >\n          <Feather name=\"plus\" size={20} color=\"white\" />\n        </TouchableOpacity>\n      </View>\n\n      {/* Category Filter */}\n      <View className=\"bg-white border-b border-gray-200 px-6 py-4\">\n        <ScrollView horizontal showsHorizontalScrollIndicator={false} className=\"gap-2\">\n          {categories.map(cat => (\n            <TouchableOpacity\n              key={cat}\n              onPress={() => setFilterCategory(cat)}\n              className={`px-4 py-2 rounded-full ${\n                filterCategory === cat\n                  ? 'bg-green-600'\n                  : 'bg-gray-100'\n              }`}\n            >\n              <Text className={`font-semibold capitalize ${\n                filterCategory === cat ? 'text-white' : 'text-gray-700'\n              }`}>\n                {cat}\n              </Text>\n            </TouchableOpacity>\n          ))}\n        </ScrollView>\n      </View>\n\n      {/* Products List */}\n      <FlatList\n        data={filteredProducts}\n        keyExtractor={(item) => item.id}\n        renderItem={({ item }) => (\n          <View className=\"px-6 py-4 border-b border-gray-100\">\n            <View className=\"flex-row items-start\">\n              {/* Product Image */}\n              <Image\n                source={{ uri: item.image }}\n                className=\"w-20 h-20 rounded-lg mr-4 bg-gray-200\"\n              />\n\n              {/* Product Info */}\n              <View className=\"flex-1\">\n                <View className=\"flex-row items-start justify-between mb-2\">\n                  <View className=\"flex-1\">\n                    <Text className=\"text-lg font-bold text-gray-900\">{item.name}</Text>\n                    <Text className=\"text-gray-600 text-sm\">{item.category}</Text>\n                  </View>\n                  <Text className=\"text-2xl font-bold text-green-600\">{item.price}K</Text>\n                </View>\n\n                {/* Stats */}\n                <View className=\"flex-row items-center gap-4 mb-3\">\n                  <View className=\"flex-row items-center\">\n                    <Feather name=\"star\" size={14} color=\"#FCD34D\" fill=\"#FCD34D\" />\n                    <Text className=\"text-gray-700 text-xs ml-1\">{item.rating}</Text>\n                  </View>\n                  <View className=\"flex-row items-center\">\n                    <Feather name=\"shopping-bag\" size={14} color=\"#6B7280\" />\n                    <Text className=\"text-gray-600 text-xs ml-1\">{item.orders} orders</Text>\n                  </View>\n                </View>\n\n                {/* Stock Toggle */}\n                <View className=\"flex-row items-center justify-between\">\n                  <TouchableOpacity\n                    onPress={() => handleToggleStock(item.id)}\n                    className={`flex-1 py-2 rounded-lg mr-2 flex-row items-center justify-center ${\n                      item.inStock ? 'bg-green-100' : 'bg-red-100'\n                    }`}\n                  >\n                    <Feather\n                      name={item.inStock ? 'check-circle' : 'x-circle'}\n                      size={16}\n                      color={item.inStock ? '#16A34A' : '#EF4444'}\n                    />\n                    <Text className={`text-xs font-bold ml-1 ${\n                      item.inStock ? 'text-green-700' : 'text-red-700'\n                    }`}>\n                      {item.inStock ? 'In Stock' : 'Out of Stock'}\n                    </Text>\n                  </TouchableOpacity>\n\n                  {/* Edit Button */}\n                  <TouchableOpacity\n                    onPress={() => router.push(`/(vendor)/EditProductScreen?productId=${item.id}`)}\n                    className=\"bg-blue-100 py-2 px-3 rounded-lg mr-2\"\n                  >\n                    <Feather name=\"edit-2\" size={16} color=\"#2563EB\" />\n                  </TouchableOpacity>\n\n                  {/* Delete Button */}\n                  <TouchableOpacity\n                    onPress={() => handleDeleteProduct(item.id)}\n                    className=\"bg-red-100 py-2 px-3 rounded-lg\"\n                  >\n                    <Feather name=\"trash-2\" size={16} color=\"#EF4444\" />\n                  </TouchableOpacity>\n                </View>\n              </View>\n            </View>\n          </View>\n        )}\n      />\n    </View>\n  );\n}\n
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  FlatList,
+  Image,
+  Alert,
+} from 'react-native';
+import { useRouter } from 'expo-router';
+import { Feather } from '@expo/vector-icons';
+
+export default function ManageProductsScreen() {
+  const router = useRouter();
+  const [products, setProducts] = useState([
+    {
+      id: '1',
+      name: 'Burger Deluxe',
+      price: 25,
+      image: 'https://via.placeholder.com/100',
+      category: 'Burgers',
+      inStock: true,
+      rating: 4.8,
+      orders: 245,
+    },
+    {
+      id: '2',
+      name: 'Fried Chicken',
+      price: 20,
+      image: 'https://via.placeholder.com/100',
+      category: 'Chicken',
+      inStock: true,
+      rating: 4.6,
+      orders: 189,
+    },
+    {
+      id: '3',
+      name: 'Pizza Margherita',
+      price: 30,
+      image: 'https://via.placeholder.com/100',
+      category: 'Pizza',
+      inStock: false,
+      rating: 4.9,
+      orders: 312,
+    },
+  ]);
+  const [filterCategory, setFilterCategory] = useState('all');
+
+  const categories = ['all', 'Burgers', 'Chicken', 'Pizza', 'Drinks'];
+
+  const filteredProducts = filterCategory === 'all'
+    ? products
+    : products.filter(p => p.category === filterCategory);
+
+  const handleToggleStock = (id: string) => {
+    setProducts(products.map(p =>
+      p.id === id ? { ...p, inStock: !p.inStock } : p
+    ));
+  };
+
+  const handleDeleteProduct = (id: string) => {
+    Alert.alert('Delete Product', 'Are you sure you want to delete this product?', [
+      { text: 'Cancel', onPress: () => {} },
+      {
+        text: 'Delete',
+        onPress: () => setProducts(products.filter(p => p.id !== id)),
+        style: 'destructive',
+      },
+    ]);
+  };
+
+  return (
+    <View className="flex-1 bg-white">
+      {/* Header */}
+      <View className="px-6 py-4 border-b border-gray-200 flex-row items-center">
+        <TouchableOpacity onPress={() => router.back()} className="mr-4">
+          <Feather name="chevron-left" size={24} color="#1F2937" />
+        </TouchableOpacity>
+        <View className="flex-1">
+          <Text className="text-2xl font-bold text-gray-900">Products</Text>
+          <Text className="text-gray-600 text-sm">{filteredProducts.length} items</Text>
+        </View>
+        <TouchableOpacity
+          onPress={() => router.push('/(vendor)/AddProductScreen')}
+          className="bg-green-600 rounded-lg p-3"
+        >
+          <Feather name="plus" size={20} color="white" />
+        </TouchableOpacity>
+      </View>
+
+      {/* Category Filter */}
+      <View className="bg-white border-b border-gray-200 px-6 py-4">
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} className="gap-2">
+          {categories.map(cat => (
+            <TouchableOpacity
+              key={cat}
+              onPress={() => setFilterCategory(cat)}
+              className={`px-4 py-2 rounded-full ${
+                filterCategory === cat
+                  ? 'bg-green-600'
+                  : 'bg-gray-100'
+              }`}
+            >
+              <Text className={`font-semibold capitalize ${
+                filterCategory === cat ? 'text-white' : 'text-gray-700'
+              }`}>
+                {cat}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </View>
+
+      {/* Products List */}
+      <FlatList
+        data={filteredProducts}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <View className="px-6 py-4 border-b border-gray-100">
+            <View className="flex-row items-start">
+              {/* Product Image */}
+              <Image
+                source={{ uri: item.image }}
+                className="w-20 h-20 rounded-lg mr-4 bg-gray-200"
+              />
+
+              {/* Product Info */}
+              <View className="flex-1">
+                <View className="flex-row items-start justify-between mb-2">
+                  <View className="flex-1">
+                    <Text className="text-lg font-bold text-gray-900">{item.name}</Text>
+                    <Text className="text-gray-600 text-sm">{item.category}</Text>
+                  </View>
+                  <Text className="text-2xl font-bold text-green-600">{item.price}K</Text>
+                </View>
+
+                {/* Stats */}
+                <View className="flex-row items-center gap-4 mb-3">
+                  <View className="flex-row items-center">
+                    <Feather name="star" size={14} color="#FCD34D" fill="#FCD34D" />
+                    <Text className="text-gray-700 text-xs ml-1">{item.rating}</Text>
+                  </View>
+                  <View className="flex-row items-center">
+                    <Feather name="shopping-bag" size={14} color="#6B7280" />
+                    <Text className="text-gray-600 text-xs ml-1">{item.orders} orders</Text>
+                  </View>
+                </View>
+
+                {/* Stock Toggle */}
+                <View className="flex-row items-center justify-between">
+                  <TouchableOpacity
+                    onPress={() => handleToggleStock(item.id)}
+                    className={`flex-1 py-2 rounded-lg mr-2 flex-row items-center justify-center ${
+                      item.inStock ? 'bg-green-100' : 'bg-red-100'
+                    }`}
+                  >
+                    <Feather
+                      name={item.inStock ? 'check-circle' : 'x-circle'}
+                      size={16}
+                      color={item.inStock ? '#16A34A' : '#EF4444'}
+                    />
+                    <Text className={`text-xs font-bold ml-1 ${
+                      item.inStock ? 'text-green-700' : 'text-red-700'
+                    }`}>
+                      {item.inStock ? 'In Stock' : 'Out of Stock'}
+                    </Text>
+                  </TouchableOpacity>
+
+                  {/* Edit Button */}
+                  <TouchableOpacity
+                    onPress={() => router.push(`/(vendor)/EditProductScreen?productId=${item.id}`)}
+                    className="bg-blue-100 py-2 px-3 rounded-lg mr-2"
+                  >
+                    <Feather name="edit-2" size={16} color="#2563EB" />
+                  </TouchableOpacity>
+
+                  {/* Delete Button */}
+                  <TouchableOpacity
+                    onPress={() => handleDeleteProduct(item.id)}
+                    className="bg-red-100 py-2 px-3 rounded-lg"
+                  >
+                    <Feather name="trash-2" size={16} color="#EF4444" />
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </View>
+        )}
+      />
+    </View>
+  );
+}
+

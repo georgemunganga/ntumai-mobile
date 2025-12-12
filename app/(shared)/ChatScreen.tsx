@@ -1,1 +1,167 @@
-import React, { useState, useEffect, useRef } from 'react';\nimport {\n  View,\n  Text,\n  ScrollView,\n  TextInput,\n  TouchableOpacity,\n  KeyboardAvoidingView,\n  Platform,\n  Image,\n  ActivityIndicator,\n} from 'react-native';\nimport { useChatStore } from '../../src/store/slices/chatSlice';\nimport { useRoute } from '@react-navigation/native';\n\ninterface ChatScreenProps {\n  route: any;\n}\n\nexport default function ChatScreen({ route }: ChatScreenProps) {\n  const { chatId, participantName, participantPhoto } = route.params;\n  const [message, setMessage] = useState('');\n  const [isTyping, setIsTyping] = useState(false);\n  const scrollViewRef = useRef<ScrollView>(null);\n\n  const {\n    currentChat,\n    messages,\n    typingUsers,\n    loading,\n    selectChat,\n    loadMessages,\n    sendMessage,\n    sendTypingIndicator,\n  } = useChatStore();\n\n  useEffect(() => {\n    selectChat(chatId);\n  }, [chatId]);\n\n  useEffect(() => {\n    scrollViewRef.current?.scrollToEnd({ animated: true });\n  }, [messages]);\n\n  const handleSendMessage = async () => {\n    if (message.trim()) {\n      await sendMessage(chatId, 'user_1', 'You', message.trim());\n      setMessage('');\n      setIsTyping(false);\n      sendTypingIndicator(chatId, false);\n    }\n  };\n\n  const handleTyping = (text: string) => {\n    setMessage(text);\n    if (!isTyping && text.length > 0) {\n      setIsTyping(true);\n      sendTypingIndicator(chatId, true);\n    } else if (isTyping && text.length === 0) {\n      setIsTyping(false);\n      sendTypingIndicator(chatId, false);\n    }\n  };\n\n  if (loading) {\n    return (\n      <View className=\"flex-1 justify-center items-center bg-white\">\n        <ActivityIndicator size=\"large\" color=\"#FF6B35\" />\n      </View>\n    );\n  }\n\n  return (\n    <KeyboardAvoidingView\n      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}\n      className=\"flex-1 bg-white\"\n    >\n      {/* Header */}\n      <View className=\"bg-white border-b border-gray-200 px-4 py-3 flex-row items-center\">\n        {participantPhoto && (\n          <Image\n            source={{ uri: participantPhoto }}\n            className=\"w-10 h-10 rounded-full mr-3\"\n          />\n        )}\n        <View className=\"flex-1\">\n          <Text className=\"text-lg font-bold text-gray-900\">{participantName}</Text>\n          <Text className=\"text-sm text-gray-500\">Active now</Text>\n        </View>\n      </View>\n\n      {/* Messages */}\n      <ScrollView\n        ref={scrollViewRef}\n        className=\"flex-1 px-4 py-3\"\n        showsVerticalScrollIndicator={false}\n      >\n        {messages.map((msg) => (\n          <View\n            key={msg.id}\n            className={`mb-3 flex-row ${msg.senderId === 'user_1' ? 'justify-end' : 'justify-start'}`}\n          >\n            <View\n              className={`max-w-xs px-4 py-2 rounded-lg ${\n                msg.senderId === 'user_1'\n                  ? 'bg-blue-500'\n                  : 'bg-gray-200'\n              }`}\n            >\n              <Text\n                className={`text-base ${\n                  msg.senderId === 'user_1'\n                    ? 'text-white'\n                    : 'text-gray-900'\n                }`}\n              >\n                {msg.message}\n              </Text>\n              <Text\n                className={`text-xs mt-1 ${\n                  msg.senderId === 'user_1'\n                    ? 'text-blue-100'\n                    : 'text-gray-500'\n                }`}\n              >\n                {new Date(msg.timestamp).toLocaleTimeString([], {\n                  hour: '2-digit',\n                  minute: '2-digit',\n                })}\n              </Text>\n            </View>\n          </View>\n        ))}\n\n        {/* Typing Indicator */}\n        {typingUsers.length > 0 && (\n          <View className=\"mb-3 flex-row justify-start\">\n            <View className=\"bg-gray-300 px-4 py-2 rounded-lg\">\n              <Text className=\"text-gray-600\">Typing...</Text>\n            </View>\n          </View>\n        )}\n      </ScrollView>\n\n      {/* Input */}\n      <View className=\"border-t border-gray-200 px-4 py-3 flex-row items-center bg-white\">\n        <TextInput\n          value={message}\n          onChangeText={handleTyping}\n          placeholder=\"Type a message...\"\n          className=\"flex-1 bg-gray-100 rounded-full px-4 py-2 text-gray-900 mr-2\"\n          placeholderTextColor=\"#999\"\n        />\n        <TouchableOpacity\n          onPress={handleSendMessage}\n          disabled={!message.trim()}\n          className={`w-10 h-10 rounded-full items-center justify-center ${\n            message.trim() ? 'bg-blue-500' : 'bg-gray-300'\n          }`}\n        >\n          <Text className=\"text-white text-lg\">→</Text>\n        </TouchableOpacity>\n      </View>\n    </KeyboardAvoidingView>\n  );\n}\n
+import React, { useState, useEffect, useRef } from 'react';
+import {
+  View,
+  Text,
+  ScrollView,
+  TextInput,
+  TouchableOpacity,
+  KeyboardAvoidingView,
+  Platform,
+  Image,
+  ActivityIndicator,
+} from 'react-native';
+import { useChatStore } from '../../src/store/slices/chatSlice';
+import { useRoute } from '@react-navigation/native';
+
+interface ChatScreenProps {
+  route: any;
+}
+
+export default function ChatScreen({ route }: ChatScreenProps) {
+  const { chatId, participantName, participantPhoto } = route.params;
+  const [message, setMessage] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
+  const scrollViewRef = useRef<ScrollView>(null);
+
+  const {
+    currentChat,
+    messages,
+    typingUsers,
+    loading,
+    selectChat,
+    loadMessages,
+    sendMessage,
+    sendTypingIndicator,
+  } = useChatStore();
+
+  useEffect(() => {
+    selectChat(chatId);
+  }, [chatId]);
+
+  useEffect(() => {
+    scrollViewRef.current?.scrollToEnd({ animated: true });
+  }, [messages]);
+
+  const handleSendMessage = async () => {
+    if (message.trim()) {
+      await sendMessage(chatId, 'user_1', 'You', message.trim());
+      setMessage('');
+      setIsTyping(false);
+      sendTypingIndicator(chatId, false);
+    }
+  };
+
+  const handleTyping = (text: string) => {
+    setMessage(text);
+    if (!isTyping && text.length > 0) {
+      setIsTyping(true);
+      sendTypingIndicator(chatId, true);
+    } else if (isTyping && text.length === 0) {
+      setIsTyping(false);
+      sendTypingIndicator(chatId, false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <View className="flex-1 justify-center items-center bg-white">
+        <ActivityIndicator size="large" color="#FF6B35" />
+      </View>
+    );
+  }
+
+  return (
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      className="flex-1 bg-white"
+    >
+      {/* Header */}
+      <View className="bg-white border-b border-gray-200 px-4 py-3 flex-row items-center">
+        {participantPhoto && (
+          <Image
+            source={{ uri: participantPhoto }}
+            className="w-10 h-10 rounded-full mr-3"
+          />
+        )}
+        <View className="flex-1">
+          <Text className="text-lg font-bold text-gray-900">{participantName}</Text>
+          <Text className="text-sm text-gray-500">Active now</Text>
+        </View>
+      </View>
+
+      {/* Messages */}
+      <ScrollView
+        ref={scrollViewRef}
+        className="flex-1 px-4 py-3"
+        showsVerticalScrollIndicator={false}
+      >
+        {messages.map((msg) => (
+          <View
+            key={msg.id}
+            className={`mb-3 flex-row ${msg.senderId === 'user_1' ? 'justify-end' : 'justify-start'}`}
+          >
+            <View
+              className={`max-w-xs px-4 py-2 rounded-lg ${
+                msg.senderId === 'user_1'
+                  ? 'bg-blue-500'
+                  : 'bg-gray-200'
+              }`}
+            >
+              <Text
+                className={`text-base ${
+                  msg.senderId === 'user_1'
+                    ? 'text-white'
+                    : 'text-gray-900'
+                }`}
+              >
+                {msg.message}
+              </Text>
+              <Text
+                className={`text-xs mt-1 ${
+                  msg.senderId === 'user_1'
+                    ? 'text-blue-100'
+                    : 'text-gray-500'
+                }`}
+              >
+                {new Date(msg.timestamp).toLocaleTimeString([], {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })}
+              </Text>
+            </View>
+          </View>
+        ))}
+
+        {/* Typing Indicator */}
+        {typingUsers.length > 0 && (
+          <View className="mb-3 flex-row justify-start">
+            <View className="bg-gray-300 px-4 py-2 rounded-lg">
+              <Text className="text-gray-600">Typing...</Text>
+            </View>
+          </View>
+        )}
+      </ScrollView>
+
+      {/* Input */}
+      <View className="border-t border-gray-200 px-4 py-3 flex-row items-center bg-white">
+        <TextInput
+          value={message}
+          onChangeText={handleTyping}
+          placeholder="Type a message..."
+          className="flex-1 bg-gray-100 rounded-full px-4 py-2 text-gray-900 mr-2"
+          placeholderTextColor="#999"
+        />
+        <TouchableOpacity
+          onPress={handleSendMessage}
+          disabled={!message.trim()}
+          className={`w-10 h-10 rounded-full items-center justify-center ${
+            message.trim() ? 'bg-blue-500' : 'bg-gray-300'
+          }`}
+        >
+          <Text className="text-white text-lg">â</Text>
+        </TouchableOpacity>
+      </View>
+    </KeyboardAvoidingView>
+  );
+}
+

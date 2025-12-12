@@ -1,1 +1,382 @@
-import React, { useState } from 'react';\nimport {\n  View,\n  Text,\n  TouchableOpacity,\n  ScrollView,\n  TextInput,\n  ActivityIndicator,\n  Alert,\n} from 'react-native';\nimport { useRouter } from 'expo-router';\nimport { useDeliveryStore, useUserStore } from '../../src/store';\nimport { Feather } from '@expo/vector-icons';\n\ntype DeliveryStep = 'location' | 'details' | 'pricing' | 'confirmation';\n\nexport default function SendParcelScreen() {\n  const router = useRouter();\n  const { createDelivery, isLoading } = useDeliveryStore();\n  const { addresses } = useUserStore();\n\n  const [step, setStep] = useState<DeliveryStep>('location');\n  const [pickupAddress, setPickupAddress] = useState(addresses[0]?.id || '');\n  const [dropoffLocation, setDropoffLocation] = useState('');\n  const [parcelDetails, setParcelDetails] = useState({\n    description: '',\n    weight: '',\n    size: 'medium' as 'small' | 'medium' | 'large',\n    fragile: false,\n  });\n  const [recipientInfo, setRecipientInfo] = useState({\n    name: '',\n    phone: '',\n  });\n  const [estimatedPrice, setEstimatedPrice] = useState(0);\n\n  const handleCalculatePrice = () => {\n    if (!dropoffLocation.trim()) {\n      Alert.alert('Error', 'Please enter dropoff location');\n      return;\n    }\n    // Mock price calculation\n    const basePrice = 25;\n    const sizeMultiplier = { small: 1, medium: 1.5, large: 2 }[parcelDetails.size];\n    const fragileMultiplier = parcelDetails.fragile ? 1.2 : 1;\n    const calculatedPrice = Math.round(basePrice * sizeMultiplier * fragileMultiplier);\n    setEstimatedPrice(calculatedPrice);\n    setStep('pricing');\n  };\n\n  const handleCreateDelivery = async () => {\n    if (!recipientInfo.name || !recipientInfo.phone) {\n      Alert.alert('Error', 'Please fill in recipient information');\n      return;\n    }\n\n    try {\n      const delivery = await createDelivery({\n        pickupAddressId: pickupAddress,\n        dropoffLocation,\n        parcelDetails,\n        recipientInfo,\n        estimatedPrice,\n      });\n\n      if (delivery) {\n        router.replace(`/(customer)/DeliveryTracking?deliveryId=${delivery.id}`);\n      }\n    } catch (error: any) {\n      Alert.alert('Error', error.message);\n    }\n  };\n\n  // Step 1: Location Selection\n  if (step === 'location') {\n    return (\n      <ScrollView className=\"flex-1 bg-white\">\n        <View className=\"px-6 py-8\">\n          {/* Header */}\n          <View className=\"mb-8\">\n            <TouchableOpacity onPress={() => router.back()} className=\"mb-4\">\n              <Feather name=\"chevron-left\" size={24} color=\"#1F2937\" />\n            </TouchableOpacity>\n            <View className=\"flex-row items-center mb-4\">\n              <View className=\"w-8 h-8 bg-green-600 rounded-full items-center justify-center mr-3\">\n                <Text className=\"text-white font-bold text-sm\">1</Text>\n              </View>\n              <Text className=\"text-sm font-semibold text-gray-600\">Pickup Location</Text>\n            </View>\n            <Text className=\"text-3xl font-bold text-gray-900\">Where are you sending from?</Text>\n          </View>\n\n          {/* Pickup Address Selection */}\n          <View className=\"mb-8\">\n            <Text className=\"text-sm font-semibold text-gray-700 mb-3\">Select Pickup Address</Text>\n            {addresses.map(address => (\n              <TouchableOpacity\n                key={address.id}\n                onPress={() => setPickupAddress(address.id)}\n                className={`border-2 rounded-lg p-4 mb-3 flex-row items-center ${\n                  pickupAddress === address.id\n                    ? 'border-green-600 bg-green-50'\n                    : 'border-gray-200'\n                }`}\n              >\n                <Feather\n                  name=\"map-pin\"\n                  size={24}\n                  color={pickupAddress === address.id ? '#16A34A' : '#9CA3AF'}\n                  className=\"mr-4\"\n                />\n                <View className=\"flex-1\">\n                  <Text className=\"text-lg font-semibold text-gray-900\">\n                    {address.type.toUpperCase()}\n                  </Text>\n                  <Text className=\"text-gray-600 text-sm\">\n                    {address.street}, {address.city}\n                  </Text>\n                </View>\n                {pickupAddress === address.id && (\n                  <Feather name=\"check-circle\" size={24} color=\"#16A34A\" />\n                )}\n              </TouchableOpacity>\n            ))}\n          </View>\n\n          {/* Dropoff Location */}\n          <View className=\"mb-8\">\n            <Text className=\"text-sm font-semibold text-gray-700 mb-2\">Dropoff Location</Text>\n            <TextInput\n              className=\"border border-gray-300 rounded-lg px-4 py-3\"\n              placeholder=\"Enter full address or location name\"\n              value={dropoffLocation}\n              onChangeText={setDropoffLocation}\n              placeholderTextColor=\"#9CA3AF\"\n            />\n          </View>\n\n          <TouchableOpacity\n            onPress={() => setStep('details')}\n            disabled={!pickupAddress || !dropoffLocation.trim()}\n            className={`rounded-lg py-4 ${\n              !pickupAddress || !dropoffLocation.trim() ? 'bg-gray-300' : 'bg-green-600'\n            }`}\n          >\n            <Text className=\"text-white text-center font-bold text-lg\">Continue</Text>\n          </TouchableOpacity>\n        </View>\n      </ScrollView>\n    );\n  }\n\n  // Step 2: Parcel Details\n  if (step === 'details') {\n    return (\n      <ScrollView className=\"flex-1 bg-white\">\n        <View className=\"px-6 py-8\">\n          {/* Header */}\n          <View className=\"mb-8\">\n            <TouchableOpacity onPress={() => setStep('location')} className=\"mb-4\">\n              <Feather name=\"chevron-left\" size={24} color=\"#1F2937\" />\n            </TouchableOpacity>\n            <View className=\"flex-row items-center mb-4\">\n              <View className=\"w-8 h-8 bg-green-600 rounded-full items-center justify-center mr-3\">\n                <Text className=\"text-white font-bold text-sm\">2</Text>\n              </View>\n              <Text className=\"text-sm font-semibold text-gray-600\">Parcel Details</Text>\n            </View>\n            <Text className=\"text-3xl font-bold text-gray-900\">What are you sending?</Text>\n          </View>\n\n          {/* Description */}\n          <View className=\"mb-6\">\n            <Text className=\"text-sm font-semibold text-gray-700 mb-2\">What's in the parcel?</Text>\n            <TextInput\n              className=\"border border-gray-300 rounded-lg px-4 py-3 h-24\"\n              placeholder=\"e.g., Documents, Electronics, Clothing\"\n              value={parcelDetails.description}\n              onChangeText={(text) => setParcelDetails(prev => ({ ...prev, description: text }))}\n              multiline\n              placeholderTextColor=\"#9CA3AF\"\n            />\n          </View>\n\n          {/* Size Selection */}\n          <View className=\"mb-6\">\n            <Text className=\"text-sm font-semibold text-gray-700 mb-3\">Parcel Size</Text>\n            <View className=\"gap-3\">\n              {['small', 'medium', 'large'].map(size => (\n                <TouchableOpacity\n                  key={size}\n                  onPress={() => setParcelDetails(prev => ({ ...prev, size: size as any }))}\n                  className={`border-2 rounded-lg p-4 flex-row items-center ${\n                    parcelDetails.size === size\n                      ? 'border-green-600 bg-green-50'\n                      : 'border-gray-200'\n                  }`}\n                >\n                  <View className=\"flex-1\">\n                    <Text className=\"text-lg font-semibold text-gray-900 capitalize\">{size}</Text>\n                    <Text className=\"text-gray-600 text-sm\">\n                      {size === 'small' && 'Up to 2kg'}\n                      {size === 'medium' && '2-5kg'}\n                      {size === 'large' && '5-10kg'}\n                    </Text>\n                  </View>\n                  {parcelDetails.size === size && (\n                    <Feather name=\"check-circle\" size={24} color=\"#16A34A\" />\n                  )}\n                </TouchableOpacity>\n              ))}\n            </View>\n          </View>\n\n          {/* Fragile Option */}\n          <TouchableOpacity\n            onPress={() => setParcelDetails(prev => ({ ...prev, fragile: !prev.fragile }))}\n            className=\"border border-gray-300 rounded-lg p-4 mb-8 flex-row items-center\"\n          >\n            <View className={`w-6 h-6 rounded border-2 items-center justify-center mr-3 ${\n              parcelDetails.fragile ? 'bg-green-600 border-green-600' : 'border-gray-300'\n            }`}>\n              {parcelDetails.fragile && (\n                <Feather name=\"check\" size={16} color=\"white\" />\n              )}\n            </View>\n            <View className=\"flex-1\">\n              <Text className=\"text-lg font-semibold text-gray-900\">Fragile Items</Text>\n              <Text className=\"text-gray-600 text-sm\">Requires extra care (20% surcharge)</Text>\n            </View>\n          </TouchableOpacity>\n\n          <TouchableOpacity\n            onPress={() => setStep('pricing')}\n            className=\"bg-green-600 rounded-lg py-4\"\n          >\n            <Text className=\"text-white text-center font-bold text-lg\">Continue</Text>\n          </TouchableOpacity>\n        </View>\n      </ScrollView>\n    );\n  }\n\n  // Step 3: Pricing\n  if (step === 'pricing') {\n    return (\n      <ScrollView className=\"flex-1 bg-white\">\n        <View className=\"px-6 py-8\">\n          {/* Header */}\n          <View className=\"mb-8\">\n            <TouchableOpacity onPress={() => setStep('details')} className=\"mb-4\">\n              <Feather name=\"chevron-left\" size={24} color=\"#1F2937\" />\n            </TouchableOpacity>\n            <View className=\"flex-row items-center mb-4\">\n              <View className=\"w-8 h-8 bg-green-600 rounded-full items-center justify-center mr-3\">\n                <Text className=\"text-white font-bold text-sm\">3</Text>\n              </View>\n              <Text className=\"text-sm font-semibold text-gray-600\">Pricing</Text>\n            </View>\n            <Text className=\"text-3xl font-bold text-gray-900\">Confirm Delivery Price</Text>\n          </View>\n\n          {/* Pricing Breakdown */}\n          <View className=\"bg-gray-50 rounded-lg p-6 mb-8\">\n            <View className=\"flex-row items-center justify-between mb-4 pb-4 border-b border-gray-200\">\n              <Text className=\"text-gray-600\">Base Price</Text>\n              <Text className=\"text-gray-900 font-semibold\">25K</Text>\n            </View>\n            <View className=\"flex-row items-center justify-between mb-4 pb-4 border-b border-gray-200\">\n              <Text className=\"text-gray-600\">Size Multiplier ({parcelDetails.size})</Text>\n              <Text className=\"text-gray-900 font-semibold\">\n                {parcelDetails.size === 'small' ? '1x' : parcelDetails.size === 'medium' ? '1.5x' : '2x'}\n              </Text>\n            </View>\n            {parcelDetails.fragile && (\n              <View className=\"flex-row items-center justify-between mb-4 pb-4 border-b border-gray-200\">\n                <Text className=\"text-gray-600\">Fragile Surcharge</Text>\n                <Text className=\"text-gray-900 font-semibold\">+20%</Text>\n              </View>\n            )}\n            <View className=\"flex-row items-center justify-between\">\n              <Text className=\"text-lg font-bold text-gray-900\">Total</Text>\n              <Text className=\"text-3xl font-bold text-green-600\">{estimatedPrice}K</Text>\n            </View>\n          </View>\n\n          {/* Info Box */}\n          <View className=\"bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8\">\n            <Text className=\"text-blue-900 font-semibold mb-2\">💡 Delivery Time</Text>\n            <Text className=\"text-blue-800 text-sm\">\n              Estimated delivery: 30-60 minutes from confirmation\n            </Text>\n          </View>\n\n          <TouchableOpacity\n            onPress={() => setStep('confirmation')}\n            className=\"bg-green-600 rounded-lg py-4\"\n          >\n            <Text className=\"text-white text-center font-bold text-lg\">Continue</Text>\n          </TouchableOpacity>\n        </View>\n      </ScrollView>\n    );\n  }\n\n  // Step 4: Confirmation\n  return (\n    <ScrollView className=\"flex-1 bg-white\">\n      <View className=\"px-6 py-8\">\n        {/* Header */}\n        <View className=\"mb-8\">\n          <TouchableOpacity onPress={() => setStep('pricing')} className=\"mb-4\">\n            <Feather name=\"chevron-left\" size={24} color=\"#1F2937\" />\n          </TouchableOpacity>\n          <View className=\"flex-row items-center mb-4\">\n            <View className=\"w-8 h-8 bg-green-600 rounded-full items-center justify-center mr-3\">\n              <Text className=\"text-white font-bold text-sm\">4</Text>\n            </View>\n            <Text className=\"text-sm font-semibold text-gray-600\">Recipient Info</Text>\n          </View>\n          <Text className=\"text-3xl font-bold text-gray-900\">Who's receiving this?</Text>\n        </View>\n\n        {/* Recipient Info Form */}\n        <View className=\"mb-8\">\n          <Text className=\"text-sm font-semibold text-gray-700 mb-2\">Recipient Name</Text>\n          <TextInput\n            className=\"border border-gray-300 rounded-lg px-4 py-3 mb-4\"\n            placeholder=\"Full name\"\n            value={recipientInfo.name}\n            onChangeText={(text) => setRecipientInfo(prev => ({ ...prev, name: text }))}\n            placeholderTextColor=\"#9CA3AF\"\n          />\n\n          <Text className=\"text-sm font-semibold text-gray-700 mb-2\">Recipient Phone</Text>\n          <TextInput\n            className=\"border border-gray-300 rounded-lg px-4 py-3\"\n            placeholder=\"Phone number\"\n            value={recipientInfo.phone}\n            onChangeText={(text) => setRecipientInfo(prev => ({ ...prev, phone: text }))}\n            keyboardType=\"phone-pad\"\n            placeholderTextColor=\"#9CA3AF\"\n          />\n        </View>\n\n        {/* Summary */}\n        <View className=\"bg-gray-50 rounded-lg p-6 mb-8\">\n          <Text className=\"text-lg font-bold text-gray-900 mb-4\">Delivery Summary</Text>\n          <View className=\"gap-3\">\n            <View>\n              <Text className=\"text-gray-600 text-sm\">From</Text>\n              <Text className=\"text-gray-900 font-semibold\">Your Location</Text>\n            </View>\n            <View>\n              <Text className=\"text-gray-600 text-sm\">To</Text>\n              <Text className=\"text-gray-900 font-semibold\">{dropoffLocation}</Text>\n            </View>\n            <View className=\"border-t border-gray-200 pt-3\">\n              <Text className=\"text-gray-600 text-sm\">Total Cost</Text>\n              <Text className=\"text-2xl font-bold text-green-600\">{estimatedPrice}K</Text>\n            </View>\n          </View>\n        </View>\n\n        <TouchableOpacity\n          onPress={handleCreateDelivery}\n          disabled={isLoading || !recipientInfo.name || !recipientInfo.phone}\n          className={`rounded-lg py-4 flex-row items-center justify-center ${\n            isLoading || !recipientInfo.name || !recipientInfo.phone ? 'bg-gray-300' : 'bg-green-600'\n          }`}\n        >\n          {isLoading ? (\n            <ActivityIndicator color=\"white\" />\n          ) : (\n            <Text className=\"text-white text-center font-bold text-lg\">Confirm & Pay {estimatedPrice}K</Text>\n          )}\n        </TouchableOpacity>\n      </View>\n    </ScrollView>\n  );\n}\n
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  TextInput,
+  ActivityIndicator,
+  Alert,
+} from 'react-native';
+import { useRouter } from 'expo-router';
+import { useDeliveryStore, useUserStore } from '../../src/store';
+import { Feather } from '@expo/vector-icons';
+
+type DeliveryStep = 'location' | 'details' | 'pricing' | 'confirmation';
+
+export default function SendParcelScreen() {
+  const router = useRouter();
+  const { createDelivery, isLoading } = useDeliveryStore();
+  const { addresses } = useUserStore();
+
+  const [step, setStep] = useState<DeliveryStep>('location');
+  const [pickupAddress, setPickupAddress] = useState(addresses[0]?.id || '');
+  const [dropoffLocation, setDropoffLocation] = useState('');
+  const [parcelDetails, setParcelDetails] = useState({
+    description: '',
+    weight: '',
+    size: 'medium' as 'small' | 'medium' | 'large',
+    fragile: false,
+  });
+  const [recipientInfo, setRecipientInfo] = useState({
+    name: '',
+    phone: '',
+  });
+  const [estimatedPrice, setEstimatedPrice] = useState(0);
+
+  const handleCalculatePrice = () => {
+    if (!dropoffLocation.trim()) {
+      Alert.alert('Error', 'Please enter dropoff location');
+      return;
+    }
+    // Mock price calculation
+    const basePrice = 25;
+    const sizeMultiplier = { small: 1, medium: 1.5, large: 2 }[parcelDetails.size];
+    const fragileMultiplier = parcelDetails.fragile ? 1.2 : 1;
+    const calculatedPrice = Math.round(basePrice * sizeMultiplier * fragileMultiplier);
+    setEstimatedPrice(calculatedPrice);
+    setStep('pricing');
+  };
+
+  const handleCreateDelivery = async () => {
+    if (!recipientInfo.name || !recipientInfo.phone) {
+      Alert.alert('Error', 'Please fill in recipient information');
+      return;
+    }
+
+    try {
+      const delivery = await createDelivery({
+        pickupAddressId: pickupAddress,
+        dropoffLocation,
+        parcelDetails,
+        recipientInfo,
+        estimatedPrice,
+      });
+
+      if (delivery) {
+        router.replace(`/(customer)/DeliveryTracking?deliveryId=${delivery.id}`);
+      }
+    } catch (error: any) {
+      Alert.alert('Error', error.message);
+    }
+  };
+
+  // Step 1: Location Selection
+  if (step === 'location') {
+    return (
+      <ScrollView className="flex-1 bg-white">
+        <View className="px-6 py-8">
+          {/* Header */}
+          <View className="mb-8">
+            <TouchableOpacity onPress={() => router.back()} className="mb-4">
+              <Feather name="chevron-left" size={24} color="#1F2937" />
+            </TouchableOpacity>
+            <View className="flex-row items-center mb-4">
+              <View className="w-8 h-8 bg-green-600 rounded-full items-center justify-center mr-3">
+                <Text className="text-white font-bold text-sm">1</Text>
+              </View>
+              <Text className="text-sm font-semibold text-gray-600">Pickup Location</Text>
+            </View>
+            <Text className="text-3xl font-bold text-gray-900">Where are you sending from?</Text>
+          </View>
+
+          {/* Pickup Address Selection */}
+          <View className="mb-8">
+            <Text className="text-sm font-semibold text-gray-700 mb-3">Select Pickup Address</Text>
+            {addresses.map(address => (
+              <TouchableOpacity
+                key={address.id}
+                onPress={() => setPickupAddress(address.id)}
+                className={`border-2 rounded-lg p-4 mb-3 flex-row items-center ${
+                  pickupAddress === address.id
+                    ? 'border-green-600 bg-green-50'
+                    : 'border-gray-200'
+                }`}
+              >
+                <Feather
+                  name="map-pin"
+                  size={24}
+                  color={pickupAddress === address.id ? '#16A34A' : '#9CA3AF'}
+                  className="mr-4"
+                />
+                <View className="flex-1">
+                  <Text className="text-lg font-semibold text-gray-900">
+                    {address.type.toUpperCase()}
+                  </Text>
+                  <Text className="text-gray-600 text-sm">
+                    {address.street}, {address.city}
+                  </Text>
+                </View>
+                {pickupAddress === address.id && (
+                  <Feather name="check-circle" size={24} color="#16A34A" />
+                )}
+              </TouchableOpacity>
+            ))}
+          </View>
+
+          {/* Dropoff Location */}
+          <View className="mb-8">
+            <Text className="text-sm font-semibold text-gray-700 mb-2">Dropoff Location</Text>
+            <TextInput
+              className="border border-gray-300 rounded-lg px-4 py-3"
+              placeholder="Enter full address or location name"
+              value={dropoffLocation}
+              onChangeText={setDropoffLocation}
+              placeholderTextColor="#9CA3AF"
+            />
+          </View>
+
+          <TouchableOpacity
+            onPress={() => setStep('details')}
+            disabled={!pickupAddress || !dropoffLocation.trim()}
+            className={`rounded-lg py-4 ${
+              !pickupAddress || !dropoffLocation.trim() ? 'bg-gray-300' : 'bg-green-600'
+            }`}
+          >
+            <Text className="text-white text-center font-bold text-lg">Continue</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    );
+  }
+
+  // Step 2: Parcel Details
+  if (step === 'details') {
+    return (
+      <ScrollView className="flex-1 bg-white">
+        <View className="px-6 py-8">
+          {/* Header */}
+          <View className="mb-8">
+            <TouchableOpacity onPress={() => setStep('location')} className="mb-4">
+              <Feather name="chevron-left" size={24} color="#1F2937" />
+            </TouchableOpacity>
+            <View className="flex-row items-center mb-4">
+              <View className="w-8 h-8 bg-green-600 rounded-full items-center justify-center mr-3">
+                <Text className="text-white font-bold text-sm">2</Text>
+              </View>
+              <Text className="text-sm font-semibold text-gray-600">Parcel Details</Text>
+            </View>
+            <Text className="text-3xl font-bold text-gray-900">What are you sending?</Text>
+          </View>
+
+          {/* Description */}
+          <View className="mb-6">
+            <Text className="text-sm font-semibold text-gray-700 mb-2">What's in the parcel?</Text>
+            <TextInput
+              className="border border-gray-300 rounded-lg px-4 py-3 h-24"
+              placeholder="e.g., Documents, Electronics, Clothing"
+              value={parcelDetails.description}
+              onChangeText={(text) => setParcelDetails(prev => ({ ...prev, description: text }))}
+              multiline
+              placeholderTextColor="#9CA3AF"
+            />
+          </View>
+
+          {/* Size Selection */}
+          <View className="mb-6">
+            <Text className="text-sm font-semibold text-gray-700 mb-3">Parcel Size</Text>
+            <View className="gap-3">
+              {['small', 'medium', 'large'].map(size => (
+                <TouchableOpacity
+                  key={size}
+                  onPress={() => setParcelDetails(prev => ({ ...prev, size: size as any }))}
+                  className={`border-2 rounded-lg p-4 flex-row items-center ${
+                    parcelDetails.size === size
+                      ? 'border-green-600 bg-green-50'
+                      : 'border-gray-200'
+                  }`}
+                >
+                  <View className="flex-1">
+                    <Text className="text-lg font-semibold text-gray-900 capitalize">{size}</Text>
+                    <Text className="text-gray-600 text-sm">
+                      {size === 'small' && 'Up to 2kg'}
+                      {size === 'medium' && '2-5kg'}
+                      {size === 'large' && '5-10kg'}
+                    </Text>
+                  </View>
+                  {parcelDetails.size === size && (
+                    <Feather name="check-circle" size={24} color="#16A34A" />
+                  )}
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+
+          {/* Fragile Option */}
+          <TouchableOpacity
+            onPress={() => setParcelDetails(prev => ({ ...prev, fragile: !prev.fragile }))}
+            className="border border-gray-300 rounded-lg p-4 mb-8 flex-row items-center"
+          >
+            <View className={`w-6 h-6 rounded border-2 items-center justify-center mr-3 ${
+              parcelDetails.fragile ? 'bg-green-600 border-green-600' : 'border-gray-300'
+            }`}>
+              {parcelDetails.fragile && (
+                <Feather name="check" size={16} color="white" />
+              )}
+            </View>
+            <View className="flex-1">
+              <Text className="text-lg font-semibold text-gray-900">Fragile Items</Text>
+              <Text className="text-gray-600 text-sm">Requires extra care (20% surcharge)</Text>
+            </View>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => setStep('pricing')}
+            className="bg-green-600 rounded-lg py-4"
+          >
+            <Text className="text-white text-center font-bold text-lg">Continue</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    );
+  }
+
+  // Step 3: Pricing
+  if (step === 'pricing') {
+    return (
+      <ScrollView className="flex-1 bg-white">
+        <View className="px-6 py-8">
+          {/* Header */}
+          <View className="mb-8">
+            <TouchableOpacity onPress={() => setStep('details')} className="mb-4">
+              <Feather name="chevron-left" size={24} color="#1F2937" />
+            </TouchableOpacity>
+            <View className="flex-row items-center mb-4">
+              <View className="w-8 h-8 bg-green-600 rounded-full items-center justify-center mr-3">
+                <Text className="text-white font-bold text-sm">3</Text>
+              </View>
+              <Text className="text-sm font-semibold text-gray-600">Pricing</Text>
+            </View>
+            <Text className="text-3xl font-bold text-gray-900">Confirm Delivery Price</Text>
+          </View>
+
+          {/* Pricing Breakdown */}
+          <View className="bg-gray-50 rounded-lg p-6 mb-8">
+            <View className="flex-row items-center justify-between mb-4 pb-4 border-b border-gray-200">
+              <Text className="text-gray-600">Base Price</Text>
+              <Text className="text-gray-900 font-semibold">25K</Text>
+            </View>
+            <View className="flex-row items-center justify-between mb-4 pb-4 border-b border-gray-200">
+              <Text className="text-gray-600">Size Multiplier ({parcelDetails.size})</Text>
+              <Text className="text-gray-900 font-semibold">
+                {parcelDetails.size === 'small' ? '1x' : parcelDetails.size === 'medium' ? '1.5x' : '2x'}
+              </Text>
+            </View>
+            {parcelDetails.fragile && (
+              <View className="flex-row items-center justify-between mb-4 pb-4 border-b border-gray-200">
+                <Text className="text-gray-600">Fragile Surcharge</Text>
+                <Text className="text-gray-900 font-semibold">+20%</Text>
+              </View>
+            )}
+            <View className="flex-row items-center justify-between">
+              <Text className="text-lg font-bold text-gray-900">Total</Text>
+              <Text className="text-3xl font-bold text-green-600">{estimatedPrice}K</Text>
+            </View>
+          </View>
+
+          {/* Info Box */}
+          <View className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8">
+            <Text className="text-blue-900 font-semibold mb-2">ð¡ Delivery Time</Text>
+            <Text className="text-blue-800 text-sm">
+              Estimated delivery: 30-60 minutes from confirmation
+            </Text>
+          </View>
+
+          <TouchableOpacity
+            onPress={() => setStep('confirmation')}
+            className="bg-green-600 rounded-lg py-4"
+          >
+            <Text className="text-white text-center font-bold text-lg">Continue</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    );
+  }
+
+  // Step 4: Confirmation
+  return (
+    <ScrollView className="flex-1 bg-white">
+      <View className="px-6 py-8">
+        {/* Header */}
+        <View className="mb-8">
+          <TouchableOpacity onPress={() => setStep('pricing')} className="mb-4">
+            <Feather name="chevron-left" size={24} color="#1F2937" />
+          </TouchableOpacity>
+          <View className="flex-row items-center mb-4">
+            <View className="w-8 h-8 bg-green-600 rounded-full items-center justify-center mr-3">
+              <Text className="text-white font-bold text-sm">4</Text>
+            </View>
+            <Text className="text-sm font-semibold text-gray-600">Recipient Info</Text>
+          </View>
+          <Text className="text-3xl font-bold text-gray-900">Who's receiving this?</Text>
+        </View>
+
+        {/* Recipient Info Form */}
+        <View className="mb-8">
+          <Text className="text-sm font-semibold text-gray-700 mb-2">Recipient Name</Text>
+          <TextInput
+            className="border border-gray-300 rounded-lg px-4 py-3 mb-4"
+            placeholder="Full name"
+            value={recipientInfo.name}
+            onChangeText={(text) => setRecipientInfo(prev => ({ ...prev, name: text }))}
+            placeholderTextColor="#9CA3AF"
+          />
+
+          <Text className="text-sm font-semibold text-gray-700 mb-2">Recipient Phone</Text>
+          <TextInput
+            className="border border-gray-300 rounded-lg px-4 py-3"
+            placeholder="Phone number"
+            value={recipientInfo.phone}
+            onChangeText={(text) => setRecipientInfo(prev => ({ ...prev, phone: text }))}
+            keyboardType="phone-pad"
+            placeholderTextColor="#9CA3AF"
+          />
+        </View>
+
+        {/* Summary */}
+        <View className="bg-gray-50 rounded-lg p-6 mb-8">
+          <Text className="text-lg font-bold text-gray-900 mb-4">Delivery Summary</Text>
+          <View className="gap-3">
+            <View>
+              <Text className="text-gray-600 text-sm">From</Text>
+              <Text className="text-gray-900 font-semibold">Your Location</Text>
+            </View>
+            <View>
+              <Text className="text-gray-600 text-sm">To</Text>
+              <Text className="text-gray-900 font-semibold">{dropoffLocation}</Text>
+            </View>
+            <View className="border-t border-gray-200 pt-3">
+              <Text className="text-gray-600 text-sm">Total Cost</Text>
+              <Text className="text-2xl font-bold text-green-600">{estimatedPrice}K</Text>
+            </View>
+          </View>
+        </View>
+
+        <TouchableOpacity
+          onPress={handleCreateDelivery}
+          disabled={isLoading || !recipientInfo.name || !recipientInfo.phone}
+          className={`rounded-lg py-4 flex-row items-center justify-center ${
+            isLoading || !recipientInfo.name || !recipientInfo.phone ? 'bg-gray-300' : 'bg-green-600'
+          }`}
+        >
+          {isLoading ? (
+            <ActivityIndicator color="white" />
+          ) : (
+            <Text className="text-white text-center font-bold text-lg">Confirm & Pay {estimatedPrice}K</Text>
+          )}
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
+  );
+}
+

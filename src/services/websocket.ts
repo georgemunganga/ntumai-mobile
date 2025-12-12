@@ -1,1 +1,244 @@
-// Real-time communication service using Socket.io\nimport { io, Socket } from 'socket.io-client';\nimport { API_CONFIG } from '../api/config';\n\ninterface WebSocketEvents {\n  'location-update': (data: { taskerId: string; latitude: number; longitude: number; timestamp: string }) => void;\n  'message': (data: { chatId: string; senderId: string; message: string; timestamp: string }) => void;\n  'job-offer': (data: { jobId: string; pickupLocation: string; dropoffLocation: string; estimatedEarnings: number; expiresIn: number }) => void;\n  'order-status': (data: { orderId: string; status: string; timestamp: string }) => void;\n  'notification': (data: { id: string; type: string; title: string; message: string; timestamp: string }) => void;\n  'typing': (data: { chatId: string; userId: string; isTyping: boolean }) => void;\n  'call-incoming': (data: { callId: string; callerId: string; callerName: string; callerPhoto: string }) => void;\n  'call-ended': (data: { callId: string; duration: number }) => void;\n}\n\nclass WebSocketService {\n  private socket: Socket | null = null;\n  private isConnected = false;\n  private reconnectAttempts = 0;\n  private maxReconnectAttempts = 5;\n  private reconnectDelay = 3000;\n\n  /**\n   * Initialize WebSocket connection\n   */\n  connect(userId: string, token: string): Promise<void> {\n    return new Promise((resolve, reject) => {\n      try {\n        this.socket = io(API_CONFIG.WEBSOCKET_URL, {\n          auth: {\n            token,\n            userId,\n          },\n          reconnection: true,\n          reconnectionDelay: this.reconnectDelay,\n          reconnectionDelayMax: 10000,\n          reconnectionAttempts: this.maxReconnectAttempts,\n          transports: ['websocket', 'polling'],\n        });\n\n        this.socket.on('connect', () => {\n          this.isConnected = true;\n          this.reconnectAttempts = 0;\n          console.log('WebSocket connected');\n          resolve();\n        });\n\n        this.socket.on('disconnect', () => {\n          this.isConnected = false;\n          console.log('WebSocket disconnected');\n        });\n\n        this.socket.on('connect_error', (error) => {\n          console.error('WebSocket connection error:', error);\n          if (this.reconnectAttempts === 0) {\n            reject(error);\n          }\n        });\n\n        this.socket.on('error', (error) => {\n          console.error('WebSocket error:', error);\n        });\n      } catch (error) {\n        reject(error);\n      }\n    });\n  }\n\n  /**\n   * Disconnect WebSocket\n   */\n  disconnect(): void {\n    if (this.socket) {\n      this.socket.disconnect();\n      this.isConnected = false;\n    }\n  }\n\n  /**\n   * Check if connected\n   */\n  isConnectedStatus(): boolean {\n    return this.isConnected;\n  }\n\n  /**\n   * Subscribe to location updates\n   */\n  onLocationUpdate(callback: WebSocketEvents['location-update']): void {\n    if (this.socket) {\n      this.socket.on('location-update', callback);\n    }\n  }\n\n  /**\n   * Subscribe to messages\n   */\n  onMessage(callback: WebSocketEvents['message']): void {\n    if (this.socket) {\n      this.socket.on('message', callback);\n    }\n  }\n\n  /**\n   * Subscribe to job offers\n   */\n  onJobOffer(callback: WebSocketEvents['job-offer']): void {\n    if (this.socket) {\n      this.socket.on('job-offer', callback);\n    }\n  }\n\n  /**\n   * Subscribe to order status updates\n   */\n  onOrderStatus(callback: WebSocketEvents['order-status']): void {\n    if (this.socket) {\n      this.socket.on('order-status', callback);\n    }\n  }\n\n  /**\n   * Subscribe to notifications\n   */\n  onNotification(callback: WebSocketEvents['notification']): void {\n    if (this.socket) {\n      this.socket.on('notification', callback);\n    }\n  }\n\n  /**\n   * Subscribe to typing indicators\n   */\n  onTyping(callback: WebSocketEvents['typing']): void {\n    if (this.socket) {\n      this.socket.on('typing', callback);\n    }\n  }\n\n  /**\n   * Subscribe to incoming calls\n   */\n  onCallIncoming(callback: WebSocketEvents['call-incoming']): void {\n    if (this.socket) {\n      this.socket.on('call-incoming', callback);\n    }\n  }\n\n  /**\n   * Subscribe to call ended\n   */\n  onCallEnded(callback: WebSocketEvents['call-ended']): void {\n    if (this.socket) {\n      this.socket.on('call-ended', callback);\n    }\n  }\n\n  /**\n   * Emit location update\n   */\n  emitLocationUpdate(latitude: number, longitude: number): void {\n    if (this.socket && this.isConnected) {\n      this.socket.emit('location-update', {\n        latitude,\n        longitude,\n        timestamp: new Date().toISOString(),\n      });\n    }\n  }\n\n  /**\n   * Emit message\n   */\n  emitMessage(chatId: string, message: string, attachments?: string[]): void {\n    if (this.socket && this.isConnected) {\n      this.socket.emit('message', {\n        chatId,\n        message,\n        attachments,\n        timestamp: new Date().toISOString(),\n      });\n    }\n  }\n\n  /**\n   * Emit typing indicator\n   */\n  emitTyping(chatId: string, isTyping: boolean): void {\n    if (this.socket && this.isConnected) {\n      this.socket.emit('typing', {\n        chatId,\n        isTyping,\n      });\n    }\n  }\n\n  /**\n   * Accept job offer\n   */\n  acceptJobOffer(jobId: string): void {\n    if (this.socket && this.isConnected) {\n      this.socket.emit('job-accept', { jobId });\n    }\n  }\n\n  /**\n   * Reject job offer\n   */\n  rejectJobOffer(jobId: string): void {\n    if (this.socket && this.isConnected) {\n      this.socket.emit('job-reject', { jobId });\n    }\n  }\n\n  /**\n   * Initiate call\n   */\n  initiateCall(recipientId: string): void {\n    if (this.socket && this.isConnected) {\n      this.socket.emit('call-initiate', { recipientId });\n    }\n  }\n\n  /**\n   * End call\n   */\n  endCall(callId: string): void {\n    if (this.socket && this.isConnected) {\n      this.socket.emit('call-end', { callId });\n    }\n  }\n\n  /**\n   * Unsubscribe from event\n   */\n  off(event: string): void {\n    if (this.socket) {\n      this.socket.off(event);\n    }\n  }\n}\n\nexport const websocketService = new WebSocketService();\n
+// Real-time communication service using Socket.io
+import { io, Socket } from 'socket.io-client';
+import { API_CONFIG } from '../api/config';
+
+interface WebSocketEvents {
+  'location-update': (data: { taskerId: string; latitude: number; longitude: number; timestamp: string }) => void;
+  'message': (data: { chatId: string; senderId: string; message: string; timestamp: string }) => void;
+  'job-offer': (data: { jobId: string; pickupLocation: string; dropoffLocation: string; estimatedEarnings: number; expiresIn: number }) => void;
+  'order-status': (data: { orderId: string; status: string; timestamp: string }) => void;
+  'notification': (data: { id: string; type: string; title: string; message: string; timestamp: string }) => void;
+  'typing': (data: { chatId: string; userId: string; isTyping: boolean }) => void;
+  'call-incoming': (data: { callId: string; callerId: string; callerName: string; callerPhoto: string }) => void;
+  'call-ended': (data: { callId: string; duration: number }) => void;
+}
+
+class WebSocketService {
+  private socket: Socket | null = null;
+  private isConnected = false;
+  private reconnectAttempts = 0;
+  private maxReconnectAttempts = 5;
+  private reconnectDelay = 3000;
+
+  /**
+   * Initialize WebSocket connection
+   */
+  connect(userId: string, token: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      try {
+        this.socket = io(API_CONFIG.WEBSOCKET_URL, {
+          auth: {
+            token,
+            userId,
+          },
+          reconnection: true,
+          reconnectionDelay: this.reconnectDelay,
+          reconnectionDelayMax: 10000,
+          reconnectionAttempts: this.maxReconnectAttempts,
+          transports: ['websocket', 'polling'],
+        });
+
+        this.socket.on('connect', () => {
+          this.isConnected = true;
+          this.reconnectAttempts = 0;
+          console.log('WebSocket connected');
+          resolve();
+        });
+
+        this.socket.on('disconnect', () => {
+          this.isConnected = false;
+          console.log('WebSocket disconnected');
+        });
+
+        this.socket.on('connect_error', (error) => {
+          console.error('WebSocket connection error:', error);
+          if (this.reconnectAttempts === 0) {
+            reject(error);
+          }
+        });
+
+        this.socket.on('error', (error) => {
+          console.error('WebSocket error:', error);
+        });
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
+
+  /**
+   * Disconnect WebSocket
+   */
+  disconnect(): void {
+    if (this.socket) {
+      this.socket.disconnect();
+      this.isConnected = false;
+    }
+  }
+
+  /**
+   * Check if connected
+   */
+  isConnectedStatus(): boolean {
+    return this.isConnected;
+  }
+
+  /**
+   * Subscribe to location updates
+   */
+  onLocationUpdate(callback: WebSocketEvents['location-update']): void {
+    if (this.socket) {
+      this.socket.on('location-update', callback);
+    }
+  }
+
+  /**
+   * Subscribe to messages
+   */
+  onMessage(callback: WebSocketEvents['message']): void {
+    if (this.socket) {
+      this.socket.on('message', callback);
+    }
+  }
+
+  /**
+   * Subscribe to job offers
+   */
+  onJobOffer(callback: WebSocketEvents['job-offer']): void {
+    if (this.socket) {
+      this.socket.on('job-offer', callback);
+    }
+  }
+
+  /**
+   * Subscribe to order status updates
+   */
+  onOrderStatus(callback: WebSocketEvents['order-status']): void {
+    if (this.socket) {
+      this.socket.on('order-status', callback);
+    }
+  }
+
+  /**
+   * Subscribe to notifications
+   */
+  onNotification(callback: WebSocketEvents['notification']): void {
+    if (this.socket) {
+      this.socket.on('notification', callback);
+    }
+  }
+
+  /**
+   * Subscribe to typing indicators
+   */
+  onTyping(callback: WebSocketEvents['typing']): void {
+    if (this.socket) {
+      this.socket.on('typing', callback);
+    }
+  }
+
+  /**
+   * Subscribe to incoming calls
+   */
+  onCallIncoming(callback: WebSocketEvents['call-incoming']): void {
+    if (this.socket) {
+      this.socket.on('call-incoming', callback);
+    }
+  }
+
+  /**
+   * Subscribe to call ended
+   */
+  onCallEnded(callback: WebSocketEvents['call-ended']): void {
+    if (this.socket) {
+      this.socket.on('call-ended', callback);
+    }
+  }
+
+  /**
+   * Emit location update
+   */
+  emitLocationUpdate(latitude: number, longitude: number): void {
+    if (this.socket && this.isConnected) {
+      this.socket.emit('location-update', {
+        latitude,
+        longitude,
+        timestamp: new Date().toISOString(),
+      });
+    }
+  }
+
+  /**
+   * Emit message
+   */
+  emitMessage(chatId: string, message: string, attachments?: string[]): void {
+    if (this.socket && this.isConnected) {
+      this.socket.emit('message', {
+        chatId,
+        message,
+        attachments,
+        timestamp: new Date().toISOString(),
+      });
+    }
+  }
+
+  /**
+   * Emit typing indicator
+   */
+  emitTyping(chatId: string, isTyping: boolean): void {
+    if (this.socket && this.isConnected) {
+      this.socket.emit('typing', {
+        chatId,
+        isTyping,
+      });
+    }
+  }
+
+  /**
+   * Accept job offer
+   */
+  acceptJobOffer(jobId: string): void {
+    if (this.socket && this.isConnected) {
+      this.socket.emit('job-accept', { jobId });
+    }
+  }
+
+  /**
+   * Reject job offer
+   */
+  rejectJobOffer(jobId: string): void {
+    if (this.socket && this.isConnected) {
+      this.socket.emit('job-reject', { jobId });
+    }
+  }
+
+  /**
+   * Initiate call
+   */
+  initiateCall(recipientId: string): void {
+    if (this.socket && this.isConnected) {
+      this.socket.emit('call-initiate', { recipientId });
+    }
+  }
+
+  /**
+   * End call
+   */
+  endCall(callId: string): void {
+    if (this.socket && this.isConnected) {
+      this.socket.emit('call-end', { callId });
+    }
+  }
+
+  /**
+   * Unsubscribe from event
+   */
+  off(event: string): void {
+    if (this.socket) {
+      this.socket.off(event);
+    }
+  }
+}
+
+export const websocketService = new WebSocketService();
+

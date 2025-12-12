@@ -1,2 +1,228 @@
 import React, { useEffect, useState } from 'react';
-import {\n  View,\n  Text,\n  TouchableOpacity,\n  ScrollView,\n  TextInput,\n  FlatList,\n  Image,\n  ActivityIndicator,\n} from 'react-native';\nimport { useRouter } from 'expo-router';\nimport { useMarketplaceStore } from '../../src/store';\nimport { Feather } from '@expo/vector-icons';\n\nexport default function Marketplace() {\n  const router = useRouter();\n  const { fetchVendors, vendors, isLoading, searchProducts, searchResults, setSearchQuery, searchQuery } = useMarketplaceStore();\n  const [activeTab, setActiveTab] = useState<'all' | 'favorites'>('all');\n\n  useEffect(() => {\n    fetchVendors();\n  }, []);\n\n  const handleVendorPress = (vendorId: string) => {\n    router.push(`/(customer)/VendorDetail?vendorId=${vendorId}`);\n  };\n\n  const handleSearch = (text: string) => {\n    setSearchQuery(text);\n    if (text.trim()) {\n      searchProducts(text);\n    }\n  };\n\n  const displayVendors = searchQuery.trim() ? [] : vendors;\n  const displayProducts = searchQuery.trim() ? searchResults : [];\n\n  return (\n    <View className=\"flex-1 bg-gray-50\">\n      {/* Header */}\n      <View className=\"bg-white px-6 py-4 border-b border-gray-200\">\n        <TouchableOpacity\n          onPress={() => router.back()}\n          className=\"mb-4\"\n        >\n          <Feather name=\"chevron-left\" size={24} color=\"#1F2937\" />\n        </TouchableOpacity>\n        <Text className=\"text-3xl font-bold text-gray-900 mb-4\">Marketplace</Text>\n\n        {/* Search Bar */}\n        <View className=\"flex-row items-center bg-gray-100 rounded-lg px-4 py-3\">\n          <Feather name=\"search\" size={20} color=\"#9CA3AF\" />\n          <TextInput\n            className=\"flex-1 ml-3 text-base\"\n            placeholder=\"Search restaurants, food...\"\n            value={searchQuery}\n            onChangeText={handleSearch}\n            placeholderTextColor=\"#9CA3AF\"\n          />\n          {searchQuery.trim() && (\n            <TouchableOpacity onPress={() => handleSearch('')}>\n              <Feather name=\"x\" size={20} color=\"#9CA3AF\" />\n            </TouchableOpacity>\n          )}\n        </View>\n      </View>\n\n      {/* Tabs */}\n      <View className=\"bg-white flex-row border-b border-gray-200\">\n        <TouchableOpacity\n          onPress={() => setActiveTab('all')}\n          className={`flex-1 py-4 border-b-2 ${\n            activeTab === 'all' ? 'border-green-600' : 'border-transparent'\n          }`}\n        >\n          <Text className={`text-center font-semibold ${\n            activeTab === 'all' ? 'text-green-600' : 'text-gray-600'\n          }`}>\n            All Vendors\n          </Text>\n        </TouchableOpacity>\n        <TouchableOpacity\n          onPress={() => setActiveTab('favorites')}\n          className={`flex-1 py-4 border-b-2 ${\n            activeTab === 'favorites' ? 'border-green-600' : 'border-transparent'\n          }`}\n        >\n          <Text className={`text-center font-semibold ${\n            activeTab === 'favorites' ? 'text-green-600' : 'text-gray-600'\n          }`}>\n            Favorites\n          </Text>\n        </TouchableOpacity>\n      </View>\n\n      {/* Content */}\n      {isLoading ? (\n        <View className=\"flex-1 items-center justify-center\">\n          <ActivityIndicator size=\"large\" color=\"#16A34A\" />\n        </View>\n      ) : (\n        <ScrollView className=\"flex-1\">\n          {/* Search Results */}\n          {searchQuery.trim() && displayProducts.length > 0 && (\n            <View className=\"px-6 py-6\">\n              <Text className=\"text-lg font-bold text-gray-900 mb-4\">\n                Search Results ({displayProducts.length})\n              </Text>\n              <FlatList\n                data={displayProducts}\n                keyExtractor={(item) => item.id}\n                scrollEnabled={false}\n                renderItem={({ item }) => (\n                  <TouchableOpacity\n                    onPress={() => router.push(`/(customer)/ProductDetail?productId=${item.id}`)}\n                    className=\"bg-white rounded-xl p-4 mb-3 flex-row border border-gray-200\"\n                  >\n                    <Image\n                      source={{ uri: item.image }}\n                      className=\"w-20 h-20 rounded-lg mr-4\"\n                    />\n                    <View className=\"flex-1\">\n                      <Text className=\"text-lg font-semibold text-gray-900 mb-1\">{item.name}</Text>\n                      <Text className=\"text-gray-600 text-sm mb-2 line-clamp-2\">{item.description}</Text>\n                      <View className=\"flex-row items-center justify-between\">\n                        <Text className=\"text-lg font-bold text-green-600\">{item.price}K</Text>\n                        <View className=\"flex-row items-center\">\n                          <Feather name=\"star\" size={14} color=\"#FCD34D\" fill=\"#FCD34D\" />\n                          <Text className=\"text-xs text-gray-600 ml-1\">{item.rating}</Text>\n                        </View>\n                      </View>\n                    </View>\n                  </TouchableOpacity>\n                )}\n              />\n            </View>\n          )}\n\n          {/* No Search Results */}\n          {searchQuery.trim() && displayProducts.length === 0 && (\n            <View className=\"flex-1 items-center justify-center py-12\">\n              <Feather name=\"search\" size={48} color=\"#D1D5DB\" />\n              <Text className=\"text-gray-600 text-center mt-4\">No products found</Text>\n            </View>\n          )}\n\n          {/* Vendors List */}\n          {!searchQuery.trim() && activeTab === 'all' && (\n            <View className=\"px-6 py-6\">\n              {displayVendors.length > 0 ? (\n                <FlatList\n                  data={displayVendors}\n                  keyExtractor={(item) => item.id}\n                  scrollEnabled={false}\n                  renderItem={({ item }) => (\n                    <TouchableOpacity\n                      onPress={() => handleVendorPress(item.id)}\n                      className=\"bg-white rounded-xl overflow-hidden mb-4 border border-gray-200\"\n                    >\n                      {/* Vendor Header Image */}\n                      <Image\n                        source={{ uri: item.logo }}\n                        className=\"w-full h-40\"\n                      />\n\n                      {/* Vendor Info */}\n                      <View className=\"p-4\">\n                        <View className=\"flex-row items-start justify-between mb-2\">\n                          <View className=\"flex-1\">\n                            <Text className=\"text-xl font-bold text-gray-900\">{item.name}</Text>\n                            <Text className=\"text-gray-600 text-sm mt-1\">{item.description}</Text>\n                          </View>\n                        </View>\n\n                        {/* Rating and Info */}\n                        <View className=\"flex-row items-center justify-between mt-3 pt-3 border-t border-gray-200\">\n                          <View className=\"flex-row items-center\">\n                            <Feather name=\"star\" size={16} color=\"#FCD34D\" fill=\"#FCD34D\" />\n                            <Text className=\"text-gray-700 font-semibold ml-1\">{item.rating}</Text>\n                            <Text className=\"text-gray-600 text-sm ml-1\">({item.reviewCount})</Text>\n                          </View>\n                          <View className=\"flex-row items-center gap-3\">\n                            <View className=\"flex-row items-center\">\n                              <Feather name=\"clock\" size={14} color=\"#6B7280\" />\n                              <Text className=\"text-gray-600 text-xs ml-1\">{item.deliveryTime}</Text>\n                            </View>\n                            <View className=\"flex-row items-center\">\n                              <Feather name=\"truck\" size={14} color=\"#6B7280\" />\n                              <Text className=\"text-gray-600 text-xs ml-1\">{item.deliveryFee}K</Text>\n                            </View>\n                          </View>\n                        </View>\n\n                        {/* Status */}\n                        <View className=\"mt-3\">\n                          <Text className={`text-sm font-semibold ${\n                            item.isOpen ? 'text-green-600' : 'text-red-600'\n                          }`}>\n                            {item.isOpen ? '✓ Open Now' : '✗ Closed'}\n                          </Text>\n                        </View>\n                      </View>\n                    </TouchableOpacity>\n                  )}\n                />\n              ) : (\n                <View className=\"items-center justify-center py-12\">\n                  <Feather name=\"inbox\" size={48} color=\"#D1D5DB\" />\n                  <Text className=\"text-gray-600 text-center mt-4\">No vendors available</Text>\n                </View>\n              )}\n            </View>\n          )}\n\n          {/* Favorites Tab */}\n          {activeTab === 'favorites' && (\n            <View className=\"flex-1 items-center justify-center py-12\">\n              <Feather name=\"heart\" size={48} color=\"#D1D5DB\" />\n              <Text className=\"text-gray-600 text-center mt-4\">No favorite vendors yet</Text>\n            </View>\n          )}\n        </ScrollView>\n      )}\n    </View>\n  );\n}\n
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  TextInput,
+  FlatList,
+  Image,
+  ActivityIndicator,
+} from 'react-native';
+import { useRouter } from 'expo-router';
+import { useMarketplaceStore } from '../../src/store';
+import { Feather } from '@expo/vector-icons';
+
+export default function Marketplace() {
+  const router = useRouter();
+  const { fetchVendors, vendors, isLoading, searchProducts, searchResults, setSearchQuery, searchQuery } = useMarketplaceStore();
+  const [activeTab, setActiveTab] = useState<'all' | 'favorites'>('all');
+
+  useEffect(() => {
+    fetchVendors();
+  }, []);
+
+  const handleVendorPress = (vendorId: string) => {
+    router.push(`/(customer)/VendorDetail?vendorId=${vendorId}`);
+  };
+
+  const handleSearch = (text: string) => {
+    setSearchQuery(text);
+    if (text.trim()) {
+      searchProducts(text);
+    }
+  };
+
+  const displayVendors = searchQuery.trim() ? [] : vendors;
+  const displayProducts = searchQuery.trim() ? searchResults : [];
+
+  return (
+    <View className="flex-1 bg-gray-50">
+      {/* Header */}
+      <View className="bg-white px-6 py-4 border-b border-gray-200">
+        <TouchableOpacity
+          onPress={() => router.back()}
+          className="mb-4"
+        >
+          <Feather name="chevron-left" size={24} color="#1F2937" />
+        </TouchableOpacity>
+        <Text className="text-3xl font-bold text-gray-900 mb-4">Marketplace</Text>
+
+        {/* Search Bar */}
+        <View className="flex-row items-center bg-gray-100 rounded-lg px-4 py-3">
+          <Feather name="search" size={20} color="#9CA3AF" />
+          <TextInput
+            className="flex-1 ml-3 text-base"
+            placeholder="Search restaurants, food..."
+            value={searchQuery}
+            onChangeText={handleSearch}
+            placeholderTextColor="#9CA3AF"
+          />
+          {searchQuery.trim() && (
+            <TouchableOpacity onPress={() => handleSearch('')}>
+              <Feather name="x" size={20} color="#9CA3AF" />
+            </TouchableOpacity>
+          )}
+        </View>
+      </View>
+
+      {/* Tabs */}
+      <View className="bg-white flex-row border-b border-gray-200">
+        <TouchableOpacity
+          onPress={() => setActiveTab('all')}
+          className={`flex-1 py-4 border-b-2 ${
+            activeTab === 'all' ? 'border-green-600' : 'border-transparent'
+          }`}
+        >
+          <Text className={`text-center font-semibold ${
+            activeTab === 'all' ? 'text-green-600' : 'text-gray-600'
+          }`}>
+            All Vendors
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => setActiveTab('favorites')}
+          className={`flex-1 py-4 border-b-2 ${
+            activeTab === 'favorites' ? 'border-green-600' : 'border-transparent'
+          }`}
+        >
+          <Text className={`text-center font-semibold ${
+            activeTab === 'favorites' ? 'text-green-600' : 'text-gray-600'
+          }`}>
+            Favorites
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Content */}
+      {isLoading ? (
+        <View className="flex-1 items-center justify-center">
+          <ActivityIndicator size="large" color="#16A34A" />
+        </View>
+      ) : (
+        <ScrollView className="flex-1">
+          {/* Search Results */}
+          {searchQuery.trim() && displayProducts.length > 0 && (
+            <View className="px-6 py-6">
+              <Text className="text-lg font-bold text-gray-900 mb-4">
+                Search Results ({displayProducts.length})
+              </Text>
+              <FlatList
+                data={displayProducts}
+                keyExtractor={(item) => item.id}
+                scrollEnabled={false}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    onPress={() => router.push(`/(customer)/ProductDetail?productId=${item.id}`)}
+                    className="bg-white rounded-xl p-4 mb-3 flex-row border border-gray-200"
+                  >
+                    <Image
+                      source={{ uri: item.image }}
+                      className="w-20 h-20 rounded-lg mr-4"
+                    />
+                    <View className="flex-1">
+                      <Text className="text-lg font-semibold text-gray-900 mb-1">{item.name}</Text>
+                      <Text className="text-gray-600 text-sm mb-2 line-clamp-2">{item.description}</Text>
+                      <View className="flex-row items-center justify-between">
+                        <Text className="text-lg font-bold text-green-600">{item.price}K</Text>
+                        <View className="flex-row items-center">
+                          <Feather name="star" size={14} color="#FCD34D" fill="#FCD34D" />
+                          <Text className="text-xs text-gray-600 ml-1">{item.rating}</Text>
+                        </View>
+                      </View>
+                    </View>
+                  </TouchableOpacity>
+                )}
+              />
+            </View>
+          )}
+
+          {/* No Search Results */}
+          {searchQuery.trim() && displayProducts.length === 0 && (
+            <View className="flex-1 items-center justify-center py-12">
+              <Feather name="search" size={48} color="#D1D5DB" />
+              <Text className="text-gray-600 text-center mt-4">No products found</Text>
+            </View>
+          )}
+
+          {/* Vendors List */}
+          {!searchQuery.trim() && activeTab === 'all' && (
+            <View className="px-6 py-6">
+              {displayVendors.length > 0 ? (
+                <FlatList
+                  data={displayVendors}
+                  keyExtractor={(item) => item.id}
+                  scrollEnabled={false}
+                  renderItem={({ item }) => (
+                    <TouchableOpacity
+                      onPress={() => handleVendorPress(item.id)}
+                      className="bg-white rounded-xl overflow-hidden mb-4 border border-gray-200"
+                    >
+                      {/* Vendor Header Image */}
+                      <Image
+                        source={{ uri: item.logo }}
+                        className="w-full h-40"
+                      />
+
+                      {/* Vendor Info */}
+                      <View className="p-4">
+                        <View className="flex-row items-start justify-between mb-2">
+                          <View className="flex-1">
+                            <Text className="text-xl font-bold text-gray-900">{item.name}</Text>
+                            <Text className="text-gray-600 text-sm mt-1">{item.description}</Text>
+                          </View>
+                        </View>
+
+                        {/* Rating and Info */}
+                        <View className="flex-row items-center justify-between mt-3 pt-3 border-t border-gray-200">
+                          <View className="flex-row items-center">
+                            <Feather name="star" size={16} color="#FCD34D" fill="#FCD34D" />
+                            <Text className="text-gray-700 font-semibold ml-1">{item.rating}</Text>
+                            <Text className="text-gray-600 text-sm ml-1">({item.reviewCount})</Text>
+                          </View>
+                          <View className="flex-row items-center gap-3">
+                            <View className="flex-row items-center">
+                              <Feather name="clock" size={14} color="#6B7280" />
+                              <Text className="text-gray-600 text-xs ml-1">{item.deliveryTime}</Text>
+                            </View>
+                            <View className="flex-row items-center">
+                              <Feather name="truck" size={14} color="#6B7280" />
+                              <Text className="text-gray-600 text-xs ml-1">{item.deliveryFee}K</Text>
+                            </View>
+                          </View>
+                        </View>
+
+                        {/* Status */}
+                        <View className="mt-3">
+                          <Text className={`text-sm font-semibold ${
+                            item.isOpen ? 'text-green-600' : 'text-red-600'
+                          }`}>
+                            {item.isOpen ? 'â Open Now' : 'â Closed'}
+                          </Text>
+                        </View>
+                      </View>
+                    </TouchableOpacity>
+                  )}
+                />
+              ) : (
+                <View className="items-center justify-center py-12">
+                  <Feather name="inbox" size={48} color="#D1D5DB" />
+                  <Text className="text-gray-600 text-center mt-4">No vendors available</Text>
+                </View>
+              )}
+            </View>
+          )}
+
+          {/* Favorites Tab */}
+          {activeTab === 'favorites' && (
+            <View className="flex-1 items-center justify-center py-12">
+              <Feather name="heart" size={48} color="#D1D5DB" />
+              <Text className="text-gray-600 text-center mt-4">No favorite vendors yet</Text>
+            </View>
+          )}
+        </ScrollView>
+      )}
+    </View>
+  );
+}
+

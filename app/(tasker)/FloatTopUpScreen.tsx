@@ -1,1 +1,255 @@
-import React, { useState, useEffect } from 'react';\nimport {\n  View,\n  Text,\n  ScrollView,\n  TouchableOpacity,\n  TextInput,\n  Alert,\n  ActivityIndicator,\n} from 'react-native';\nimport { useRouter } from 'expo-router';\nimport { Ionicons } from '@expo/vector-icons';\nimport { floatMockService } from '../../src/api/mockServices.extended';\n\nconst PRESET_AMOUNTS = [10, 25, 50, 100];\n\nexport default function FloatTopUpScreen() {\n  const router = useRouter();\n  const [floatBalance, setFloatBalance] = useState<any>(null);\n  const [selectedAmount, setSelectedAmount] = useState<number | null>(null);\n  const [customAmount, setCustomAmount] = useState('');\n  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string | null>(null);\n  const [loading, setLoading] = useState(true);\n  const [processing, setProcessing] = useState(false);\n\n  const paymentMethods = [\n    { id: 'card', name: 'Debit/Credit Card', icon: 'card' },\n    { id: 'mobile_money', name: 'Mobile Money', icon: 'phone-portrait' },\n    { id: 'bank', name: 'Bank Transfer', icon: 'business' },\n  ];\n\n  useEffect(() => {\n    loadFloatBalance();\n  }, []);\n\n  const loadFloatBalance = async () => {\n    try {\n      const response = await floatMockService.getFloatBalance('tasker_1');\n      if (response.success) {\n        setFloatBalance(response.data);\n      }\n    } catch (error) {\n      Alert.alert('Error', 'Failed to load float balance');\n    } finally {\n      setLoading(false);\n    }\n  };\n\n  const getTopUpAmount = (): number | null => {\n    if (selectedAmount) return selectedAmount;\n    if (customAmount.trim()) return parseFloat(customAmount);\n    return null;\n  };\n\n  const handleTopUp = async () => {\n    const amount = getTopUpAmount();\n\n    if (!amount || amount <= 0) {\n      Alert.alert('Error', 'Please select or enter a valid amount');\n      return;\n    }\n\n    if (!selectedPaymentMethod) {\n      Alert.alert('Error', 'Please select a payment method');\n      return;\n    }\n\n    setProcessing(true);\n    try {\n      const response = await floatMockService.topUpFloat(\n        amount,\n        selectedPaymentMethod\n      );\n      if (response.success) {\n        Alert.alert('Success', 'Float top-up completed!', [\n          {\n            text: 'OK',\n            onPress: () => {\n              setFloatBalance({\n                ...floatBalance,\n                floatBalance: response.data.newBalance,\n              });\n              setSelectedAmount(null);\n              setCustomAmount('');\n              setSelectedPaymentMethod(null);\n            },\n          },\n        ]);\n      }\n    } catch (error) {\n      Alert.alert('Error', 'Failed to process top-up');\n    } finally {\n      setProcessing(false);\n    }\n  };\n\n  if (loading) {\n    return (\n      <View className=\"flex-1 justify-center items-center bg-white\">\n        <ActivityIndicator size=\"large\" color=\"#FF6B35\" />\n      </View>\n    );\n  }\n\n  return (\n    <ScrollView className=\"flex-1 bg-gray-50\" showsVerticalScrollIndicator={false}>\n      {/* Header */}\n      <View className=\"bg-white border-b border-gray-200 px-4 py-4\">\n        <Text className=\"text-2xl font-bold text-gray-900\">Top Up Float</Text>\n      </View>\n\n      <View className=\"px-4 py-4\">\n        {/* Current Balance */}\n        <View className=\"bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg p-6 mb-6 text-white\">\n          <Text className=\"text-white text-sm opacity-90 mb-2\">Current Float Balance</Text>\n          <Text className=\"text-white text-4xl font-bold mb-4\">\n            ₭{floatBalance?.floatBalance.toFixed(2)}\n          </Text>\n          <View className=\"flex-row justify-between\">\n            <View>\n              <Text className=\"text-white text-xs opacity-75\">Earnings</Text>\n              <Text className=\"text-white text-lg font-semibold\">\n                ₭{floatBalance?.earningsBalance.toFixed(2)}\n              </Text>\n            </View>\n            <View>\n              <Text className=\"text-white text-xs opacity-75\">Minimum Required</Text>\n              <Text className=\"text-white text-lg font-semibold\">\n                ₭{floatBalance?.minimumRequired.toFixed(2)}\n              </Text>\n            </View>\n          </View>\n        </View>\n\n        {/* Float Status */}\n        {floatBalance?.floatBalance < floatBalance?.minimumRequired && (\n          <View className=\"bg-red-50 rounded-lg p-4 mb-6 border border-red-200\">\n            <Text className=\"text-red-900 font-semibold mb-1\">⚠️ Low Float Balance</Text>\n            <Text className=\"text-red-700 text-sm\">\n              Your float is below the minimum required. Top up to continue receiving jobs.\n            </Text>\n          </View>\n        )}\n\n        {/* Preset Amounts */}\n        <Text className=\"text-lg font-bold text-gray-900 mb-3\">Quick Select</Text>\n        <View className=\"flex-row flex-wrap gap-2 mb-6\">\n          {PRESET_AMOUNTS.map((amount) => (\n            <TouchableOpacity\n              key={amount}\n              onPress={() => {\n                setSelectedAmount(amount);\n                setCustomAmount('');\n              }}\n              className={`flex-1 min-w-[45%] py-3 rounded-lg border-2 ${\n                selectedAmount === amount\n                  ? 'bg-blue-500 border-blue-600'\n                  : 'bg-white border-gray-200'\n              }`}\n            >\n              <Text\n                className={`text-center font-bold ${\n                  selectedAmount === amount\n                    ? 'text-white'\n                    : 'text-gray-900'\n                }`}\n              >\n                ₭{amount}\n              </Text>\n            </TouchableOpacity>\n          ))}\n        </View>\n\n        {/* Custom Amount */}\n        <Text className=\"text-lg font-bold text-gray-900 mb-3\">Custom Amount</Text>\n        <TextInput\n          value={customAmount}\n          onChangeText={(text) => {\n            setCustomAmount(text);\n            setSelectedAmount(null);\n          }}\n          placeholder=\"Enter amount\"\n          keyboardType=\"decimal-pad\"\n          className=\"bg-white rounded-lg px-4 py-3 text-gray-900 border border-gray-200 mb-6\"\n          placeholderTextColor=\"#999\"\n        />\n\n        {/* Payment Methods */}\n        <Text className=\"text-lg font-bold text-gray-900 mb-3\">Payment Method</Text>\n        {paymentMethods.map((method) => (\n          <TouchableOpacity\n            key={method.id}\n            onPress={() => setSelectedPaymentMethod(method.id)}\n            className={`flex-row items-center p-4 rounded-lg mb-3 border-2 ${\n              selectedPaymentMethod === method.id\n                ? 'bg-blue-50 border-blue-500'\n                : 'bg-white border-gray-200'\n            }`}\n          >\n            <Ionicons\n              name={method.icon as any}\n              size={24}\n              color={selectedPaymentMethod === method.id ? '#3B82F6' : '#6B7280'}\n            />\n            <Text\n              className={`ml-3 font-semibold ${\n                selectedPaymentMethod === method.id\n                  ? 'text-blue-600'\n                  : 'text-gray-900'\n              }`}\n            >\n              {method.name}\n            </Text>\n          </TouchableOpacity>\n        ))}\n\n        {/* Summary */}\n        {getTopUpAmount() && (\n          <View className=\"bg-gray-100 rounded-lg p-4 mb-6\">\n            <View className=\"flex-row justify-between mb-2\">\n              <Text className=\"text-gray-600\">Amount to Top Up</Text>\n              <Text className=\"text-gray-900 font-semibold\">\n                ₭{getTopUpAmount()?.toFixed(2)}\n              </Text>\n            </View>\n            <View className=\"flex-row justify-between\">\n              <Text className=\"text-gray-600\">New Balance</Text>\n              <Text className=\"text-gray-900 font-bold\">\n                ₭{(floatBalance?.floatBalance + (getTopUpAmount() || 0)).toFixed(2)}\n              </Text>\n            </View>\n          </View>\n        )}\n      </View>\n\n      {/* Button */}\n      <View className=\"px-4 pb-6\">\n        <TouchableOpacity\n          onPress={handleTopUp}\n          disabled={processing || !getTopUpAmount() || !selectedPaymentMethod}\n          className={`py-4 rounded-lg ${\n            processing || !getTopUpAmount() || !selectedPaymentMethod\n              ? 'bg-gray-300'\n              : 'bg-blue-500'\n          }`}\n        >\n          <Text className=\"text-center text-white font-bold text-lg\">\n            {processing ? 'Processing...' : 'Top Up Float'}\n          </Text>\n        </TouchableOpacity>\n      </View>\n    </ScrollView>\n  );\n}\n
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  TextInput,
+  Alert,
+  ActivityIndicator,
+} from 'react-native';
+import { useRouter } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
+import { floatMockService } from '../../src/api/mockServices.extended';
+
+const PRESET_AMOUNTS = [10, 25, 50, 100];
+
+export default function FloatTopUpScreen() {
+  const router = useRouter();
+  const [floatBalance, setFloatBalance] = useState<any>(null);
+  const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
+  const [customAmount, setCustomAmount] = useState('');
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [processing, setProcessing] = useState(false);
+
+  const paymentMethods = [
+    { id: 'card', name: 'Debit/Credit Card', icon: 'card' },
+    { id: 'mobile_money', name: 'Mobile Money', icon: 'phone-portrait' },
+    { id: 'bank', name: 'Bank Transfer', icon: 'business' },
+  ];
+
+  useEffect(() => {
+    loadFloatBalance();
+  }, []);
+
+  const loadFloatBalance = async () => {
+    try {
+      const response = await floatMockService.getFloatBalance('tasker_1');
+      if (response.success) {
+        setFloatBalance(response.data);
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Failed to load float balance');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getTopUpAmount = (): number | null => {
+    if (selectedAmount) return selectedAmount;
+    if (customAmount.trim()) return parseFloat(customAmount);
+    return null;
+  };
+
+  const handleTopUp = async () => {
+    const amount = getTopUpAmount();
+
+    if (!amount || amount <= 0) {
+      Alert.alert('Error', 'Please select or enter a valid amount');
+      return;
+    }
+
+    if (!selectedPaymentMethod) {
+      Alert.alert('Error', 'Please select a payment method');
+      return;
+    }
+
+    setProcessing(true);
+    try {
+      const response = await floatMockService.topUpFloat(
+        amount,
+        selectedPaymentMethod
+      );
+      if (response.success) {
+        Alert.alert('Success', 'Float top-up completed!', [
+          {
+            text: 'OK',
+            onPress: () => {
+              setFloatBalance({
+                ...floatBalance,
+                floatBalance: response.data.newBalance,
+              });
+              setSelectedAmount(null);
+              setCustomAmount('');
+              setSelectedPaymentMethod(null);
+            },
+          },
+        ]);
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Failed to process top-up');
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <View className="flex-1 justify-center items-center bg-white">
+        <ActivityIndicator size="large" color="#FF6B35" />
+      </View>
+    );
+  }
+
+  return (
+    <ScrollView className="flex-1 bg-gray-50" showsVerticalScrollIndicator={false}>
+      {/* Header */}
+      <View className="bg-white border-b border-gray-200 px-4 py-4">
+        <Text className="text-2xl font-bold text-gray-900">Top Up Float</Text>
+      </View>
+
+      <View className="px-4 py-4">
+        {/* Current Balance */}
+        <View className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg p-6 mb-6 text-white">
+          <Text className="text-white text-sm opacity-90 mb-2">Current Float Balance</Text>
+          <Text className="text-white text-4xl font-bold mb-4">
+            â­{floatBalance?.floatBalance.toFixed(2)}
+          </Text>
+          <View className="flex-row justify-between">
+            <View>
+              <Text className="text-white text-xs opacity-75">Earnings</Text>
+              <Text className="text-white text-lg font-semibold">
+                â­{floatBalance?.earningsBalance.toFixed(2)}
+              </Text>
+            </View>
+            <View>
+              <Text className="text-white text-xs opacity-75">Minimum Required</Text>
+              <Text className="text-white text-lg font-semibold">
+                â­{floatBalance?.minimumRequired.toFixed(2)}
+              </Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Float Status */}
+        {floatBalance?.floatBalance < floatBalance?.minimumRequired && (
+          <View className="bg-red-50 rounded-lg p-4 mb-6 border border-red-200">
+            <Text className="text-red-900 font-semibold mb-1">â ï¸ Low Float Balance</Text>
+            <Text className="text-red-700 text-sm">
+              Your float is below the minimum required. Top up to continue receiving jobs.
+            </Text>
+          </View>
+        )}
+
+        {/* Preset Amounts */}
+        <Text className="text-lg font-bold text-gray-900 mb-3">Quick Select</Text>
+        <View className="flex-row flex-wrap gap-2 mb-6">
+          {PRESET_AMOUNTS.map((amount) => (
+            <TouchableOpacity
+              key={amount}
+              onPress={() => {
+                setSelectedAmount(amount);
+                setCustomAmount('');
+              }}
+              className={`flex-1 min-w-[45%] py-3 rounded-lg border-2 ${
+                selectedAmount === amount
+                  ? 'bg-blue-500 border-blue-600'
+                  : 'bg-white border-gray-200'
+              }`}
+            >
+              <Text
+                className={`text-center font-bold ${
+                  selectedAmount === amount
+                    ? 'text-white'
+                    : 'text-gray-900'
+                }`}
+              >
+                â­{amount}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        {/* Custom Amount */}
+        <Text className="text-lg font-bold text-gray-900 mb-3">Custom Amount</Text>
+        <TextInput
+          value={customAmount}
+          onChangeText={(text) => {
+            setCustomAmount(text);
+            setSelectedAmount(null);
+          }}
+          placeholder="Enter amount"
+          keyboardType="decimal-pad"
+          className="bg-white rounded-lg px-4 py-3 text-gray-900 border border-gray-200 mb-6"
+          placeholderTextColor="#999"
+        />
+
+        {/* Payment Methods */}
+        <Text className="text-lg font-bold text-gray-900 mb-3">Payment Method</Text>
+        {paymentMethods.map((method) => (
+          <TouchableOpacity
+            key={method.id}
+            onPress={() => setSelectedPaymentMethod(method.id)}
+            className={`flex-row items-center p-4 rounded-lg mb-3 border-2 ${
+              selectedPaymentMethod === method.id
+                ? 'bg-blue-50 border-blue-500'
+                : 'bg-white border-gray-200'
+            }`}
+          >
+            <Ionicons
+              name={method.icon as any}
+              size={24}
+              color={selectedPaymentMethod === method.id ? '#3B82F6' : '#6B7280'}
+            />
+            <Text
+              className={`ml-3 font-semibold ${
+                selectedPaymentMethod === method.id
+                  ? 'text-blue-600'
+                  : 'text-gray-900'
+              }`}
+            >
+              {method.name}
+            </Text>
+          </TouchableOpacity>
+        ))}
+
+        {/* Summary */}
+        {getTopUpAmount() && (
+          <View className="bg-gray-100 rounded-lg p-4 mb-6">
+            <View className="flex-row justify-between mb-2">
+              <Text className="text-gray-600">Amount to Top Up</Text>
+              <Text className="text-gray-900 font-semibold">
+                â­{getTopUpAmount()?.toFixed(2)}
+              </Text>
+            </View>
+            <View className="flex-row justify-between">
+              <Text className="text-gray-600">New Balance</Text>
+              <Text className="text-gray-900 font-bold">
+                â­{(floatBalance?.floatBalance + (getTopUpAmount() || 0)).toFixed(2)}
+              </Text>
+            </View>
+          </View>
+        )}
+      </View>
+
+      {/* Button */}
+      <View className="px-4 pb-6">
+        <TouchableOpacity
+          onPress={handleTopUp}
+          disabled={processing || !getTopUpAmount() || !selectedPaymentMethod}
+          className={`py-4 rounded-lg ${
+            processing || !getTopUpAmount() || !selectedPaymentMethod
+              ? 'bg-gray-300'
+              : 'bg-blue-500'
+          }`}
+        >
+          <Text className="text-center text-white font-bold text-lg">
+            {processing ? 'Processing...' : 'Top Up Float'}
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
+  );
+}
+

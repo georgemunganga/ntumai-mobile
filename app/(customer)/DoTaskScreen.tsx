@@ -1,1 +1,379 @@
-import React, { useState } from 'react';\nimport {\n  View,\n  Text,\n  TouchableOpacity,\n  ScrollView,\n  TextInput,\n  ActivityIndicator,\n  Alert,\n} from 'react-native';\nimport { useRouter } from 'expo-router';\nimport { useTaskStore } from '../../src/store';\nimport { Feather } from '@expo/vector-icons';\n\ntype TaskStep = 'category' | 'details' | 'budget' | 'confirmation';\n\nconst TASK_CATEGORIES = [\n  { id: 'shopping', label: 'Shopping', icon: '🛍️', description: 'Buy items from stores' },\n  { id: 'cleaning', label: 'Cleaning', icon: '🧹', description: 'Home cleaning services' },\n  { id: 'moving', label: 'Moving', icon: '📦', description: 'Help with moving' },\n  { id: 'handyman', label: 'Handyman', icon: '🔧', description: 'Repairs & maintenance' },\n  { id: 'delivery', label: 'Delivery', icon: '📮', description: 'Deliver items' },\n  { id: 'other', label: 'Other', icon: '⭐', description: 'Other tasks' },\n];\n\nexport default function DoTaskScreen() {\n  const router = useRouter();\n  const { createTask, isLoading } = useTaskStore();\n\n  const [step, setStep] = useState<TaskStep>('category');\n  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);\n  const [taskDetails, setTaskDetails] = useState({\n    title: '',\n    description: '',\n    location: '',\n    dueDate: '',\n    dueTime: '',\n  });\n  const [budget, setBudget] = useState({\n    min: '',\n    max: '',\n  });\n\n  const handleCreateTask = async () => {\n    if (!selectedCategory || !taskDetails.title || !taskDetails.description) {\n      Alert.alert('Error', 'Please fill in all required fields');\n      return;\n    }\n\n    if (!budget.min || !budget.max) {\n      Alert.alert('Error', 'Please set a budget range');\n      return;\n    }\n\n    try {\n      const task = await createTask({\n        category: selectedCategory,\n        title: taskDetails.title,\n        description: taskDetails.description,\n        location: taskDetails.location,\n        dueDate: taskDetails.dueDate,\n        dueTime: taskDetails.dueTime,\n        budgetMin: parseInt(budget.min),\n        budgetMax: parseInt(budget.max),\n      });\n\n      if (task) {\n        Alert.alert('Success', 'Task posted! Taskers will start bidding soon.');\n        router.replace(`/(customer)/TaskDetail?taskId=${task.id}`);\n      }\n    } catch (error: any) {\n      Alert.alert('Error', error.message);\n    }\n  };\n\n  // Step 1: Category Selection\n  if (step === 'category') {\n    return (\n      <ScrollView className=\"flex-1 bg-white\">\n        <View className=\"px-6 py-8\">\n          {/* Header */}\n          <View className=\"mb-8\">\n            <TouchableOpacity onPress={() => router.back()} className=\"mb-4\">\n              <Feather name=\"chevron-left\" size={24} color=\"#1F2937\" />\n            </TouchableOpacity>\n            <View className=\"flex-row items-center mb-4\">\n              <View className=\"w-8 h-8 bg-green-600 rounded-full items-center justify-center mr-3\">\n                <Text className=\"text-white font-bold text-sm\">1</Text>\n              </View>\n              <Text className=\"text-sm font-semibold text-gray-600\">Task Category</Text>\n            </View>\n            <Text className=\"text-3xl font-bold text-gray-900\">What do you need help with?</Text>\n          </View>\n\n          {/* Category Grid */}\n          <View className=\"gap-3 mb-8\">\n            {TASK_CATEGORIES.map(category => (\n              <TouchableOpacity\n                key={category.id}\n                onPress={() => {\n                  setSelectedCategory(category.id);\n                  setStep('details');\n                }}\n                className={`border-2 rounded-lg p-4 flex-row items-center ${\n                  selectedCategory === category.id\n                    ? 'border-green-600 bg-green-50'\n                    : 'border-gray-200'\n                }`}\n              >\n                <Text className=\"text-3xl mr-4\">{category.icon}</Text>\n                <View className=\"flex-1\">\n                  <Text className=\"text-lg font-bold text-gray-900\">{category.label}</Text>\n                  <Text className=\"text-gray-600 text-sm\">{category.description}</Text>\n                </View>\n                {selectedCategory === category.id && (\n                  <Feather name=\"check-circle\" size={24} color=\"#16A34A\" />\n                )}\n              </TouchableOpacity>\n            ))}\n          </View>\n        </View>\n      </ScrollView>\n    );\n  }\n\n  // Step 2: Task Details\n  if (step === 'details') {\n    const category = TASK_CATEGORIES.find(c => c.id === selectedCategory);\n\n    return (\n      <ScrollView className=\"flex-1 bg-white\">\n        <View className=\"px-6 py-8\">\n          {/* Header */}\n          <View className=\"mb-8\">\n            <TouchableOpacity onPress={() => setStep('category')} className=\"mb-4\">\n              <Feather name=\"chevron-left\" size={24} color=\"#1F2937\" />\n            </TouchableOpacity>\n            <View className=\"flex-row items-center mb-4\">\n              <View className=\"w-8 h-8 bg-green-600 rounded-full items-center justify-center mr-3\">\n                <Text className=\"text-white font-bold text-sm\">2</Text>\n              </View>\n              <Text className=\"text-sm font-semibold text-gray-600\">Task Details</Text>\n            </View>\n            <Text className=\"text-3xl font-bold text-gray-900\">Tell us more about your task</Text>\n          </View>\n\n          {/* Category Badge */}\n          <View className=\"bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 flex-row items-center\">\n            <Text className=\"text-2xl mr-3\">{category?.icon}</Text>\n            <Text className=\"text-blue-900 font-semibold\">{category?.label}</Text>\n          </View>\n\n          {/* Task Title */}\n          <View className=\"mb-6\">\n            <Text className=\"text-sm font-semibold text-gray-700 mb-2\">Task Title</Text>\n            <TextInput\n              className=\"border border-gray-300 rounded-lg px-4 py-3\"\n              placeholder=\"e.g., Buy groceries from Shoprite\"\n              value={taskDetails.title}\n              onChangeText={(text) => setTaskDetails(prev => ({ ...prev, title: text }))}\n              placeholderTextColor=\"#9CA3AF\"\n            />\n          </View>\n\n          {/* Description */}\n          <View className=\"mb-6\">\n            <Text className=\"text-sm font-semibold text-gray-700 mb-2\">Description</Text>\n            <TextInput\n              className=\"border border-gray-300 rounded-lg px-4 py-3 h-24\"\n              placeholder=\"Provide detailed instructions...\"\n              value={taskDetails.description}\n              onChangeText={(text) => setTaskDetails(prev => ({ ...prev, description: text }))}\n              multiline\n              placeholderTextColor=\"#9CA3AF\"\n            />\n          </View>\n\n          {/* Location */}\n          <View className=\"mb-6\">\n            <Text className=\"text-sm font-semibold text-gray-700 mb-2\">Location</Text>\n            <TextInput\n              className=\"border border-gray-300 rounded-lg px-4 py-3\"\n              placeholder=\"Where should the task be done?\"\n              value={taskDetails.location}\n              onChangeText={(text) => setTaskDetails(prev => ({ ...prev, location: text }))}\n              placeholderTextColor=\"#9CA3AF\"\n            />\n          </View>\n\n          {/* Due Date */}\n          <View className=\"mb-6 flex-row gap-4\">\n            <View className=\"flex-1\">\n              <Text className=\"text-sm font-semibold text-gray-700 mb-2\">Due Date</Text>\n              <TextInput\n                className=\"border border-gray-300 rounded-lg px-4 py-3\"\n                placeholder=\"YYYY-MM-DD\"\n                value={taskDetails.dueDate}\n                onChangeText={(text) => setTaskDetails(prev => ({ ...prev, dueDate: text }))}\n                placeholderTextColor=\"#9CA3AF\"\n              />\n            </View>\n            <View className=\"flex-1\">\n              <Text className=\"text-sm font-semibold text-gray-700 mb-2\">Time</Text>\n              <TextInput\n                className=\"border border-gray-300 rounded-lg px-4 py-3\"\n                placeholder=\"HH:MM\"\n                value={taskDetails.dueTime}\n                onChangeText={(text) => setTaskDetails(prev => ({ ...prev, dueTime: text }))}\n                placeholderTextColor=\"#9CA3AF\"\n              />\n            </View>\n          </View>\n\n          <TouchableOpacity\n            onPress={() => setStep('budget')}\n            disabled={!taskDetails.title || !taskDetails.description}\n            className={`rounded-lg py-4 ${\n              !taskDetails.title || !taskDetails.description ? 'bg-gray-300' : 'bg-green-600'\n            }`}\n          >\n            <Text className=\"text-white text-center font-bold text-lg\">Continue</Text>\n          </TouchableOpacity>\n        </View>\n      </ScrollView>\n    );\n  }\n\n  // Step 3: Budget\n  if (step === 'budget') {\n    return (\n      <ScrollView className=\"flex-1 bg-white\">\n        <View className=\"px-6 py-8\">\n          {/* Header */}\n          <View className=\"mb-8\">\n            <TouchableOpacity onPress={() => setStep('details')} className=\"mb-4\">\n              <Feather name=\"chevron-left\" size={24} color=\"#1F2937\" />\n            </TouchableOpacity>\n            <View className=\"flex-row items-center mb-4\">\n              <View className=\"w-8 h-8 bg-green-600 rounded-full items-center justify-center mr-3\">\n                <Text className=\"text-white font-bold text-sm\">3</Text>\n              </View>\n              <Text className=\"text-sm font-semibold text-gray-600\">Budget</Text>\n            </View>\n            <Text className=\"text-3xl font-bold text-gray-900\">What's your budget?</Text>\n          </View>\n\n          {/* Budget Info */}\n          <View className=\"bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8\">\n            <Text className=\"text-blue-900 font-semibold mb-2\">💡 Budget Tips</Text>\n            <Text className=\"text-blue-800 text-sm\">\n              Set a realistic budget range. Higher budgets attract more taskers and get completed faster.\n            </Text>\n          </View>\n\n          {/* Min Budget */}\n          <View className=\"mb-6\">\n            <Text className=\"text-sm font-semibold text-gray-700 mb-2\">Minimum Budget (K)</Text>\n            <TextInput\n              className=\"border border-gray-300 rounded-lg px-4 py-3\"\n              placeholder=\"e.g., 50\"\n              value={budget.min}\n              onChangeText={(text) => setBudget(prev => ({ ...prev, min: text }))}\n              keyboardType=\"numeric\"\n              placeholderTextColor=\"#9CA3AF\"\n            />\n          </View>\n\n          {/* Max Budget */}\n          <View className=\"mb-8\">\n            <Text className=\"text-sm font-semibold text-gray-700 mb-2\">Maximum Budget (K)</Text>\n            <TextInput\n              className=\"border border-gray-300 rounded-lg px-4 py-3\"\n              placeholder=\"e.g., 150\"\n              value={budget.max}\n              onChangeText={(text) => setBudget(prev => ({ ...prev, max: text }))}\n              keyboardType=\"numeric\"\n              placeholderTextColor=\"#9CA3AF\"\n            />\n          </View>\n\n          {/* Budget Summary */}\n          {budget.min && budget.max && (\n            <View className=\"bg-green-50 border border-green-200 rounded-lg p-4 mb-8\">\n              <Text className=\"text-green-900 font-semibold mb-2\">Budget Range</Text>\n              <Text className=\"text-2xl font-bold text-green-600\">\n                {budget.min}K - {budget.max}K\n              </Text>\n            </View>\n          )}\n\n          <TouchableOpacity\n            onPress={() => setStep('confirmation')}\n            disabled={!budget.min || !budget.max}\n            className={`rounded-lg py-4 ${\n              !budget.min || !budget.max ? 'bg-gray-300' : 'bg-green-600'\n            }`}\n          >\n            <Text className=\"text-white text-center font-bold text-lg\">Continue</Text>\n          </TouchableOpacity>\n        </View>\n      </ScrollView>\n    );\n  }\n\n  // Step 4: Confirmation\n  return (\n    <ScrollView className=\"flex-1 bg-white\">\n      <View className=\"px-6 py-8\">\n        {/* Header */}\n        <View className=\"mb-8\">\n          <TouchableOpacity onPress={() => setStep('budget')} className=\"mb-4\">\n            <Feather name=\"chevron-left\" size={24} color=\"#1F2937\" />\n          </TouchableOpacity>\n          <View className=\"flex-row items-center mb-4\">\n            <View className=\"w-8 h-8 bg-green-600 rounded-full items-center justify-center mr-3\">\n              <Text className=\"text-white font-bold text-sm\">4</Text>\n            </View>\n            <Text className=\"text-sm font-semibold text-gray-600\">Review & Post</Text>\n          </View>\n          <Text className=\"text-3xl font-bold text-gray-900\">Review your task</Text>\n        </View>\n\n        {/* Summary */}\n        <View className=\"bg-gray-50 rounded-lg p-6 mb-8\">\n          <View className=\"mb-4 pb-4 border-b border-gray-200\">\n            <Text className=\"text-gray-600 text-sm\">Category</Text>\n            <Text className=\"text-lg font-bold text-gray-900\">\n              {TASK_CATEGORIES.find(c => c.id === selectedCategory)?.label}\n            </Text>\n          </View>\n\n          <View className=\"mb-4 pb-4 border-b border-gray-200\">\n            <Text className=\"text-gray-600 text-sm\">Title</Text>\n            <Text className=\"text-lg font-bold text-gray-900\">{taskDetails.title}</Text>\n          </View>\n\n          <View className=\"mb-4 pb-4 border-b border-gray-200\">\n            <Text className=\"text-gray-600 text-sm\">Description</Text>\n            <Text className=\"text-gray-900\">{taskDetails.description}</Text>\n          </View>\n\n          <View className=\"mb-4 pb-4 border-b border-gray-200\">\n            <Text className=\"text-gray-600 text-sm\">Location</Text>\n            <Text className=\"text-gray-900\">{taskDetails.location}</Text>\n          </View>\n\n          <View className=\"mb-4 pb-4 border-b border-gray-200\">\n            <Text className=\"text-gray-600 text-sm\">Due Date & Time</Text>\n            <Text className=\"text-gray-900\">\n              {taskDetails.dueDate} at {taskDetails.dueTime}\n            </Text>\n          </View>\n\n          <View>\n            <Text className=\"text-gray-600 text-sm\">Budget</Text>\n            <Text className=\"text-2xl font-bold text-green-600\">\n              {budget.min}K - {budget.max}K\n            </Text>\n          </View>\n        </View>\n\n        <TouchableOpacity\n          onPress={handleCreateTask}\n          disabled={isLoading}\n          className={`rounded-lg py-4 flex-row items-center justify-center ${\n            isLoading ? 'bg-gray-300' : 'bg-green-600'\n          }`}\n        >\n          {isLoading ? (\n            <ActivityIndicator color=\"white\" />\n          ) : (\n            <Text className=\"text-white text-center font-bold text-lg\">Post Task</Text>\n          )}\n        </TouchableOpacity>\n      </View>\n    </ScrollView>\n  );\n}\n
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  TextInput,
+  ActivityIndicator,
+  Alert,
+} from 'react-native';
+import { useRouter } from 'expo-router';
+import { useTaskStore } from '../../src/store';
+import { Feather } from '@expo/vector-icons';
+
+type TaskStep = 'category' | 'details' | 'budget' | 'confirmation';
+
+const TASK_CATEGORIES = [
+  { id: 'shopping', label: 'Shopping', icon: 'ðï¸', description: 'Buy items from stores' },
+  { id: 'cleaning', label: 'Cleaning', icon: 'ð§¹', description: 'Home cleaning services' },
+  { id: 'moving', label: 'Moving', icon: 'ð¦', description: 'Help with moving' },
+  { id: 'handyman', label: 'Handyman', icon: 'ð§', description: 'Repairs & maintenance' },
+  { id: 'delivery', label: 'Delivery', icon: 'ð®', description: 'Deliver items' },
+  { id: 'other', label: 'Other', icon: 'â­', description: 'Other tasks' },
+];
+
+export default function DoTaskScreen() {
+  const router = useRouter();
+  const { createTask, isLoading } = useTaskStore();
+
+  const [step, setStep] = useState<TaskStep>('category');
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [taskDetails, setTaskDetails] = useState({
+    title: '',
+    description: '',
+    location: '',
+    dueDate: '',
+    dueTime: '',
+  });
+  const [budget, setBudget] = useState({
+    min: '',
+    max: '',
+  });
+
+  const handleCreateTask = async () => {
+    if (!selectedCategory || !taskDetails.title || !taskDetails.description) {
+      Alert.alert('Error', 'Please fill in all required fields');
+      return;
+    }
+
+    if (!budget.min || !budget.max) {
+      Alert.alert('Error', 'Please set a budget range');
+      return;
+    }
+
+    try {
+      const task = await createTask({
+        category: selectedCategory,
+        title: taskDetails.title,
+        description: taskDetails.description,
+        location: taskDetails.location,
+        dueDate: taskDetails.dueDate,
+        dueTime: taskDetails.dueTime,
+        budgetMin: parseInt(budget.min),
+        budgetMax: parseInt(budget.max),
+      });
+
+      if (task) {
+        Alert.alert('Success', 'Task posted! Taskers will start bidding soon.');
+        router.replace(`/(customer)/TaskDetail?taskId=${task.id}`);
+      }
+    } catch (error: any) {
+      Alert.alert('Error', error.message);
+    }
+  };
+
+  // Step 1: Category Selection
+  if (step === 'category') {
+    return (
+      <ScrollView className="flex-1 bg-white">
+        <View className="px-6 py-8">
+          {/* Header */}
+          <View className="mb-8">
+            <TouchableOpacity onPress={() => router.back()} className="mb-4">
+              <Feather name="chevron-left" size={24} color="#1F2937" />
+            </TouchableOpacity>
+            <View className="flex-row items-center mb-4">
+              <View className="w-8 h-8 bg-green-600 rounded-full items-center justify-center mr-3">
+                <Text className="text-white font-bold text-sm">1</Text>
+              </View>
+              <Text className="text-sm font-semibold text-gray-600">Task Category</Text>
+            </View>
+            <Text className="text-3xl font-bold text-gray-900">What do you need help with?</Text>
+          </View>
+
+          {/* Category Grid */}
+          <View className="gap-3 mb-8">
+            {TASK_CATEGORIES.map(category => (
+              <TouchableOpacity
+                key={category.id}
+                onPress={() => {
+                  setSelectedCategory(category.id);
+                  setStep('details');
+                }}
+                className={`border-2 rounded-lg p-4 flex-row items-center ${
+                  selectedCategory === category.id
+                    ? 'border-green-600 bg-green-50'
+                    : 'border-gray-200'
+                }`}
+              >
+                <Text className="text-3xl mr-4">{category.icon}</Text>
+                <View className="flex-1">
+                  <Text className="text-lg font-bold text-gray-900">{category.label}</Text>
+                  <Text className="text-gray-600 text-sm">{category.description}</Text>
+                </View>
+                {selectedCategory === category.id && (
+                  <Feather name="check-circle" size={24} color="#16A34A" />
+                )}
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+      </ScrollView>
+    );
+  }
+
+  // Step 2: Task Details
+  if (step === 'details') {
+    const category = TASK_CATEGORIES.find(c => c.id === selectedCategory);
+
+    return (
+      <ScrollView className="flex-1 bg-white">
+        <View className="px-6 py-8">
+          {/* Header */}
+          <View className="mb-8">
+            <TouchableOpacity onPress={() => setStep('category')} className="mb-4">
+              <Feather name="chevron-left" size={24} color="#1F2937" />
+            </TouchableOpacity>
+            <View className="flex-row items-center mb-4">
+              <View className="w-8 h-8 bg-green-600 rounded-full items-center justify-center mr-3">
+                <Text className="text-white font-bold text-sm">2</Text>
+              </View>
+              <Text className="text-sm font-semibold text-gray-600">Task Details</Text>
+            </View>
+            <Text className="text-3xl font-bold text-gray-900">Tell us more about your task</Text>
+          </View>
+
+          {/* Category Badge */}
+          <View className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 flex-row items-center">
+            <Text className="text-2xl mr-3">{category?.icon}</Text>
+            <Text className="text-blue-900 font-semibold">{category?.label}</Text>
+          </View>
+
+          {/* Task Title */}
+          <View className="mb-6">
+            <Text className="text-sm font-semibold text-gray-700 mb-2">Task Title</Text>
+            <TextInput
+              className="border border-gray-300 rounded-lg px-4 py-3"
+              placeholder="e.g., Buy groceries from Shoprite"
+              value={taskDetails.title}
+              onChangeText={(text) => setTaskDetails(prev => ({ ...prev, title: text }))}
+              placeholderTextColor="#9CA3AF"
+            />
+          </View>
+
+          {/* Description */}
+          <View className="mb-6">
+            <Text className="text-sm font-semibold text-gray-700 mb-2">Description</Text>
+            <TextInput
+              className="border border-gray-300 rounded-lg px-4 py-3 h-24"
+              placeholder="Provide detailed instructions..."
+              value={taskDetails.description}
+              onChangeText={(text) => setTaskDetails(prev => ({ ...prev, description: text }))}
+              multiline
+              placeholderTextColor="#9CA3AF"
+            />
+          </View>
+
+          {/* Location */}
+          <View className="mb-6">
+            <Text className="text-sm font-semibold text-gray-700 mb-2">Location</Text>
+            <TextInput
+              className="border border-gray-300 rounded-lg px-4 py-3"
+              placeholder="Where should the task be done?"
+              value={taskDetails.location}
+              onChangeText={(text) => setTaskDetails(prev => ({ ...prev, location: text }))}
+              placeholderTextColor="#9CA3AF"
+            />
+          </View>
+
+          {/* Due Date */}
+          <View className="mb-6 flex-row gap-4">
+            <View className="flex-1">
+              <Text className="text-sm font-semibold text-gray-700 mb-2">Due Date</Text>
+              <TextInput
+                className="border border-gray-300 rounded-lg px-4 py-3"
+                placeholder="YYYY-MM-DD"
+                value={taskDetails.dueDate}
+                onChangeText={(text) => setTaskDetails(prev => ({ ...prev, dueDate: text }))}
+                placeholderTextColor="#9CA3AF"
+              />
+            </View>
+            <View className="flex-1">
+              <Text className="text-sm font-semibold text-gray-700 mb-2">Time</Text>
+              <TextInput
+                className="border border-gray-300 rounded-lg px-4 py-3"
+                placeholder="HH:MM"
+                value={taskDetails.dueTime}
+                onChangeText={(text) => setTaskDetails(prev => ({ ...prev, dueTime: text }))}
+                placeholderTextColor="#9CA3AF"
+              />
+            </View>
+          </View>
+
+          <TouchableOpacity
+            onPress={() => setStep('budget')}
+            disabled={!taskDetails.title || !taskDetails.description}
+            className={`rounded-lg py-4 ${
+              !taskDetails.title || !taskDetails.description ? 'bg-gray-300' : 'bg-green-600'
+            }`}
+          >
+            <Text className="text-white text-center font-bold text-lg">Continue</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    );
+  }
+
+  // Step 3: Budget
+  if (step === 'budget') {
+    return (
+      <ScrollView className="flex-1 bg-white">
+        <View className="px-6 py-8">
+          {/* Header */}
+          <View className="mb-8">
+            <TouchableOpacity onPress={() => setStep('details')} className="mb-4">
+              <Feather name="chevron-left" size={24} color="#1F2937" />
+            </TouchableOpacity>
+            <View className="flex-row items-center mb-4">
+              <View className="w-8 h-8 bg-green-600 rounded-full items-center justify-center mr-3">
+                <Text className="text-white font-bold text-sm">3</Text>
+              </View>
+              <Text className="text-sm font-semibold text-gray-600">Budget</Text>
+            </View>
+            <Text className="text-3xl font-bold text-gray-900">What's your budget?</Text>
+          </View>
+
+          {/* Budget Info */}
+          <View className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8">
+            <Text className="text-blue-900 font-semibold mb-2">ð¡ Budget Tips</Text>
+            <Text className="text-blue-800 text-sm">
+              Set a realistic budget range. Higher budgets attract more taskers and get completed faster.
+            </Text>
+          </View>
+
+          {/* Min Budget */}
+          <View className="mb-6">
+            <Text className="text-sm font-semibold text-gray-700 mb-2">Minimum Budget (K)</Text>
+            <TextInput
+              className="border border-gray-300 rounded-lg px-4 py-3"
+              placeholder="e.g., 50"
+              value={budget.min}
+              onChangeText={(text) => setBudget(prev => ({ ...prev, min: text }))}
+              keyboardType="numeric"
+              placeholderTextColor="#9CA3AF"
+            />
+          </View>
+
+          {/* Max Budget */}
+          <View className="mb-8">
+            <Text className="text-sm font-semibold text-gray-700 mb-2">Maximum Budget (K)</Text>
+            <TextInput
+              className="border border-gray-300 rounded-lg px-4 py-3"
+              placeholder="e.g., 150"
+              value={budget.max}
+              onChangeText={(text) => setBudget(prev => ({ ...prev, max: text }))}
+              keyboardType="numeric"
+              placeholderTextColor="#9CA3AF"
+            />
+          </View>
+
+          {/* Budget Summary */}
+          {budget.min && budget.max && (
+            <View className="bg-green-50 border border-green-200 rounded-lg p-4 mb-8">
+              <Text className="text-green-900 font-semibold mb-2">Budget Range</Text>
+              <Text className="text-2xl font-bold text-green-600">
+                {budget.min}K - {budget.max}K
+              </Text>
+            </View>
+          )}
+
+          <TouchableOpacity
+            onPress={() => setStep('confirmation')}
+            disabled={!budget.min || !budget.max}
+            className={`rounded-lg py-4 ${
+              !budget.min || !budget.max ? 'bg-gray-300' : 'bg-green-600'
+            }`}
+          >
+            <Text className="text-white text-center font-bold text-lg">Continue</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    );
+  }
+
+  // Step 4: Confirmation
+  return (
+    <ScrollView className="flex-1 bg-white">
+      <View className="px-6 py-8">
+        {/* Header */}
+        <View className="mb-8">
+          <TouchableOpacity onPress={() => setStep('budget')} className="mb-4">
+            <Feather name="chevron-left" size={24} color="#1F2937" />
+          </TouchableOpacity>
+          <View className="flex-row items-center mb-4">
+            <View className="w-8 h-8 bg-green-600 rounded-full items-center justify-center mr-3">
+              <Text className="text-white font-bold text-sm">4</Text>
+            </View>
+            <Text className="text-sm font-semibold text-gray-600">Review & Post</Text>
+          </View>
+          <Text className="text-3xl font-bold text-gray-900">Review your task</Text>
+        </View>
+
+        {/* Summary */}
+        <View className="bg-gray-50 rounded-lg p-6 mb-8">
+          <View className="mb-4 pb-4 border-b border-gray-200">
+            <Text className="text-gray-600 text-sm">Category</Text>
+            <Text className="text-lg font-bold text-gray-900">
+              {TASK_CATEGORIES.find(c => c.id === selectedCategory)?.label}
+            </Text>
+          </View>
+
+          <View className="mb-4 pb-4 border-b border-gray-200">
+            <Text className="text-gray-600 text-sm">Title</Text>
+            <Text className="text-lg font-bold text-gray-900">{taskDetails.title}</Text>
+          </View>
+
+          <View className="mb-4 pb-4 border-b border-gray-200">
+            <Text className="text-gray-600 text-sm">Description</Text>
+            <Text className="text-gray-900">{taskDetails.description}</Text>
+          </View>
+
+          <View className="mb-4 pb-4 border-b border-gray-200">
+            <Text className="text-gray-600 text-sm">Location</Text>
+            <Text className="text-gray-900">{taskDetails.location}</Text>
+          </View>
+
+          <View className="mb-4 pb-4 border-b border-gray-200">
+            <Text className="text-gray-600 text-sm">Due Date & Time</Text>
+            <Text className="text-gray-900">
+              {taskDetails.dueDate} at {taskDetails.dueTime}
+            </Text>
+          </View>
+
+          <View>
+            <Text className="text-gray-600 text-sm">Budget</Text>
+            <Text className="text-2xl font-bold text-green-600">
+              {budget.min}K - {budget.max}K
+            </Text>
+          </View>
+        </View>
+
+        <TouchableOpacity
+          onPress={handleCreateTask}
+          disabled={isLoading}
+          className={`rounded-lg py-4 flex-row items-center justify-center ${
+            isLoading ? 'bg-gray-300' : 'bg-green-600'
+          }`}
+        >
+          {isLoading ? (
+            <ActivityIndicator color="white" />
+          ) : (
+            <Text className="text-white text-center font-bold text-lg">Post Task</Text>
+          )}
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
+  );
+}
+

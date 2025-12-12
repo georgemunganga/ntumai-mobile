@@ -4,6 +4,12 @@
                             "strict":  true,
                             "jsx":  "react-jsx",
                             "skipLibCheck":  true,
+                            "baseUrl":  ".",
+                            "paths":  {
+                                          "@/*":  [
+                                              "./*"
+                                          ]
+                                      },
                             "types":  [
                                           "nativewind/types",
                                           "node",

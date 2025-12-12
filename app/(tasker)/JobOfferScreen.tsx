@@ -1,1 +1,178 @@
-import React, { useState, useEffect } from 'react';\nimport {\n  View,\n  Text,\n  TouchableOpacity,\n  Animated,\n  Dimensions,\n  Alert,\n  Vibration,\n} from 'react-native';\nimport { useRouter, useRoute } from 'expo-router';\nimport { Ionicons } from '@expo/vector-icons';\n\nconst { width, height } = Dimensions.get('window');\n\nexport default function JobOfferScreen() {\n  const router = useRouter();\n  const route = useRoute();\n  const [timeLeft, setTimeLeft] = useState(30);\n  const [swipeProgress] = useState(new Animated.Value(0));\n  const [isAccepting, setIsAccepting] = useState(false);\n\n  const jobData = {\n    jobId: 'job_123',\n    pickupLocation: 'Downtown Market',\n    dropoffLocation: 'Residential Area',\n    estimatedEarnings: 2.5,\n    distance: 3.2,\n    type: 'delivery',\n  };\n\n  // Timer\n  useEffect(() => {\n    const timer = setInterval(() => {\n      setTimeLeft((prev) => {\n        if (prev <= 1) {\n          handleReject();\n          return 0;\n        }\n        return prev - 1;\n      });\n    }, 1000);\n\n    return () => clearInterval(timer);\n  }, []);\n\n  // Vibration on mount\n  useEffect(() => {\n    Vibration.vibrate([0, 500, 200, 500]);\n  }, []);\n\n  const handleAccept = async () => {\n    setIsAccepting(true);\n    Vibration.vibrate(200);\n\n    // Simulate API call\n    setTimeout(() => {\n      Alert.alert('Success', 'Job accepted! Navigate to pickup location.', [\n        {\n          text: 'Start Navigation',\n          onPress: () => {\n            router.push({\n              pathname: '/(tasker)/ActiveJobScreen',\n              params: { jobId: jobData.jobId },\n            });\n          },\n        },\n      ]);\n    }, 500);\n  };\n\n  const handleReject = () => {\n    Vibration.vibrate(100);\n    router.back();\n  };\n\n  return (\n    <View className=\"flex-1 bg-gradient-to-b from-orange-500 to-orange-600\">\n      {/* Header with Timer */}\n      <View className=\"pt-8 pb-4 px-4\">\n        <View className=\"flex-row justify-between items-center\">\n          <Text className=\"text-white text-lg font-bold\">New Job Offer</Text>\n          <View className={`px-3 py-1 rounded-full ${\n            timeLeft <= 10 ? 'bg-red-500' : 'bg-white'\n          }`}>\n            <Text className={`font-bold ${\n              timeLeft <= 10 ? 'text-white' : 'text-orange-600'\n            }`}>\n              {timeLeft}s\n            </Text>\n          </View>\n        </View>\n      </View>\n\n      {/* Main Content */}\n      <View className=\"flex-1 justify-center items-center px-4\">\n        {/* Job Icon */}\n        <View className=\"mb-6\">\n          <View className=\"w-20 h-20 bg-white rounded-full items-center justify-center\">\n            <Ionicons name=\"car\" size={40} color=\"#FF6B35\" />\n          </View>\n        </View>\n\n        {/* Job Details */}\n        <View className=\"bg-white rounded-2xl p-6 w-full mb-6\">\n          {/* Earnings */}\n          <View className=\"mb-6 items-center\">\n            <Text className=\"text-gray-600 text-sm mb-1\">Estimated Earnings</Text>\n            <Text className=\"text-4xl font-bold text-orange-600\">\n              ₭{jobData.estimatedEarnings}\n            </Text>\n          </View>\n\n          {/* Route */}\n          <View className=\"mb-6\">\n            {/* Pickup */}\n            <View className=\"flex-row items-start mb-4\">\n              <View className=\"w-6 h-6 rounded-full bg-green-500 items-center justify-center mr-3 mt-1\">\n                <Text className=\"text-white text-xs\">📍</Text>\n              </View>\n              <View className=\"flex-1\">\n                <Text className=\"text-gray-600 text-xs\">Pickup</Text>\n                <Text className=\"text-gray-900 font-semibold\">\n                  {jobData.pickupLocation}\n                </Text>\n              </View>\n            </View>\n\n            {/* Divider */}\n            <View className=\"ml-3 mb-4 border-l-2 border-gray-300 h-4\" />\n\n            {/* Dropoff */}\n            <View className=\"flex-row items-start\">\n              <View className=\"w-6 h-6 rounded-full bg-red-500 items-center justify-center mr-3 mt-1\">\n                <Text className=\"text-white text-xs\">📍</Text>\n              </View>\n              <View className=\"flex-1\">\n                <Text className=\"text-gray-600 text-xs\">Dropoff</Text>\n                <Text className=\"text-gray-900 font-semibold\">\n                  {jobData.dropoffLocation}\n                </Text>\n              </View>\n            </View>\n          </View>\n\n          {/* Distance */}\n          <View className=\"flex-row justify-between items-center p-3 bg-gray-100 rounded-lg\">\n            <Text className=\"text-gray-600\">Distance</Text>\n            <Text className=\"text-gray-900 font-semibold\">{jobData.distance} km</Text>\n          </View>\n        </View>\n      </View>\n\n      {/* Action Buttons */}\n      <View className=\"px-4 pb-8\">\n        {/* Accept Button */}\n        <TouchableOpacity\n          onPress={handleAccept}\n          disabled={isAccepting}\n          className=\"bg-white py-4 rounded-full mb-3 active:opacity-80\"\n        >\n          <Text className=\"text-center text-orange-600 font-bold text-lg\">\n            {isAccepting ? 'Accepting...' : '✓ Swipe to Accept'}\n          </Text>\n        </TouchableOpacity>\n\n        {/* Reject Button */}\n        <TouchableOpacity\n          onPress={handleReject}\n          className=\"bg-orange-700 py-3 rounded-full active:opacity-80\"\n        >\n          <Text className=\"text-center text-white font-semibold\">✕ Decline</Text>\n        </TouchableOpacity>\n      </View>\n    </View>\n  );\n}\n
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Animated,
+  Dimensions,
+  Alert,
+  Vibration,
+} from 'react-native';
+import { useRouter, useRoute } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
+
+const { width, height } = Dimensions.get('window');
+
+export default function JobOfferScreen() {
+  const router = useRouter();
+  const route = useRoute();
+  const [timeLeft, setTimeLeft] = useState(30);
+  const [swipeProgress] = useState(new Animated.Value(0));
+  const [isAccepting, setIsAccepting] = useState(false);
+
+  const jobData = {
+    jobId: 'job_123',
+    pickupLocation: 'Downtown Market',
+    dropoffLocation: 'Residential Area',
+    estimatedEarnings: 2.5,
+    distance: 3.2,
+    type: 'delivery',
+  };
+
+  // Timer
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          handleReject();
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  // Vibration on mount
+  useEffect(() => {
+    Vibration.vibrate([0, 500, 200, 500]);
+  }, []);
+
+  const handleAccept = async () => {
+    setIsAccepting(true);
+    Vibration.vibrate(200);
+
+    // Simulate API call
+    setTimeout(() => {
+      Alert.alert('Success', 'Job accepted! Navigate to pickup location.', [
+        {
+          text: 'Start Navigation',
+          onPress: () => {
+            router.push({
+              pathname: '/(tasker)/ActiveJobScreen',
+              params: { jobId: jobData.jobId },
+            });
+          },
+        },
+      ]);
+    }, 500);
+  };
+
+  const handleReject = () => {
+    Vibration.vibrate(100);
+    router.back();
+  };
+
+  return (
+    <View className="flex-1 bg-gradient-to-b from-orange-500 to-orange-600">
+      {/* Header with Timer */}
+      <View className="pt-8 pb-4 px-4">
+        <View className="flex-row justify-between items-center">
+          <Text className="text-white text-lg font-bold">New Job Offer</Text>
+          <View className={`px-3 py-1 rounded-full ${
+            timeLeft <= 10 ? 'bg-red-500' : 'bg-white'
+          }`}>
+            <Text className={`font-bold ${
+              timeLeft <= 10 ? 'text-white' : 'text-orange-600'
+            }`}>
+              {timeLeft}s
+            </Text>
+          </View>
+        </View>
+      </View>
+
+      {/* Main Content */}
+      <View className="flex-1 justify-center items-center px-4">
+        {/* Job Icon */}
+        <View className="mb-6">
+          <View className="w-20 h-20 bg-white rounded-full items-center justify-center">
+            <Ionicons name="car" size={40} color="#FF6B35" />
+          </View>
+        </View>
+
+        {/* Job Details */}
+        <View className="bg-white rounded-2xl p-6 w-full mb-6">
+          {/* Earnings */}
+          <View className="mb-6 items-center">
+            <Text className="text-gray-600 text-sm mb-1">Estimated Earnings</Text>
+            <Text className="text-4xl font-bold text-orange-600">
+              â­{jobData.estimatedEarnings}
+            </Text>
+          </View>
+
+          {/* Route */}
+          <View className="mb-6">
+            {/* Pickup */}
+            <View className="flex-row items-start mb-4">
+              <View className="w-6 h-6 rounded-full bg-green-500 items-center justify-center mr-3 mt-1">
+                <Text className="text-white text-xs">ð</Text>
+              </View>
+              <View className="flex-1">
+                <Text className="text-gray-600 text-xs">Pickup</Text>
+                <Text className="text-gray-900 font-semibold">
+                  {jobData.pickupLocation}
+                </Text>
+              </View>
+            </View>
+
+            {/* Divider */}
+            <View className="ml-3 mb-4 border-l-2 border-gray-300 h-4" />
+
+            {/* Dropoff */}
+            <View className="flex-row items-start">
+              <View className="w-6 h-6 rounded-full bg-red-500 items-center justify-center mr-3 mt-1">
+                <Text className="text-white text-xs">ð</Text>
+              </View>
+              <View className="flex-1">
+                <Text className="text-gray-600 text-xs">Dropoff</Text>
+                <Text className="text-gray-900 font-semibold">
+                  {jobData.dropoffLocation}
+                </Text>
+              </View>
+            </View>
+          </View>
+
+          {/* Distance */}
+          <View className="flex-row justify-between items-center p-3 bg-gray-100 rounded-lg">
+            <Text className="text-gray-600">Distance</Text>
+            <Text className="text-gray-900 font-semibold">{jobData.distance} km</Text>
+          </View>
+        </View>
+      </View>
+
+      {/* Action Buttons */}
+      <View className="px-4 pb-8">
+        {/* Accept Button */}
+        <TouchableOpacity
+          onPress={handleAccept}
+          disabled={isAccepting}
+          className="bg-white py-4 rounded-full mb-3 active:opacity-80"
+        >
+          <Text className="text-center text-orange-600 font-bold text-lg">
+            {isAccepting ? 'Accepting...' : 'â Swipe to Accept'}
+          </Text>
+        </TouchableOpacity>
+
+        {/* Reject Button */}
+        <TouchableOpacity
+          onPress={handleReject}
+          className="bg-orange-700 py-3 rounded-full active:opacity-80"
+        >
+          <Text className="text-center text-white font-semibold">â Decline</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+}
+

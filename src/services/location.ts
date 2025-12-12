@@ -1,1 +1,254 @@
-// Location and mapping service\nimport * as Location from 'expo-location';\nimport { LocationObject } from 'expo-location';\n\ninterface Coordinates {\n  latitude: number;\n  longitude: number;\n}\n\ninterface Address {\n  address: string;\n  city: string;\n  region: string;\n  country: string;\n  latitude: number;\n  longitude: number;\n}\n\nclass LocationService {\n  private currentLocation: LocationObject | null = null;\n  private locationListener: any = null;\n  private isTracking = false;\n\n  /**\n   * Request location permissions\n   */\n  async requestPermissions(): Promise<boolean> {\n    try {\n      const { status } = await Location.requestForegroundPermissionsAsync();\n      return status === 'granted';\n    } catch (error) {\n      console.error('Failed to request location permissions:', error);\n      return false;\n    }\n  }\n\n  /**\n   * Get current location\n   */\n  async getCurrentLocation(): Promise<Coordinates | null> {\n    try {\n      const hasPermission = await this.requestPermissions();\n      if (!hasPermission) {\n        console.warn('Location permission not granted');\n        return null;\n      }\n\n      const location = await Location.getCurrentPositionAsync({\n        accuracy: Location.Accuracy.High,\n      });\n\n      this.currentLocation = location;\n      return {\n        latitude: location.coords.latitude,\n        longitude: location.coords.longitude,\n      };\n    } catch (error) {\n      console.error('Failed to get current location:', error);\n      return null;\n    }\n  }\n\n  /**\n   * Get current location cached\n   */\n  getCurrentLocationCached(): Coordinates | null {\n    if (!this.currentLocation) return null;\n    return {\n      latitude: this.currentLocation.coords.latitude,\n      longitude: this.currentLocation.coords.longitude,\n    };\n  }\n\n  /**\n   * Start tracking location\n   */\n  async startTracking(\n    callback: (location: Coordinates) => void,\n    intervalMs: number = 5000\n  ): Promise<void> {\n    try {\n      const hasPermission = await this.requestPermissions();\n      if (!hasPermission) {\n        console.warn('Location permission not granted');\n        return;\n      }\n\n      this.isTracking = true;\n      this.locationListener = await Location.watchPositionAsync(\n        {\n          accuracy: Location.Accuracy.High,\n          timeInterval: intervalMs,\n          distanceInterval: 10, // Update every 10 meters\n        },\n        (location) => {\n          this.currentLocation = location;\n          callback({\n            latitude: location.coords.latitude,\n            longitude: location.coords.longitude,\n          });\n        }\n      );\n    } catch (error) {\n      console.error('Failed to start location tracking:', error);\n    }\n  }\n\n  /**\n   * Stop tracking location\n   */\n  stopTracking(): void {\n    if (this.locationListener) {\n      this.locationListener.remove();\n      this.locationListener = null;\n      this.isTracking = false;\n    }\n  }\n\n  /**\n   * Check if tracking\n   */\n  isTrackingActive(): boolean {\n    return this.isTracking;\n  }\n\n  /**\n   * Geocode address to coordinates\n   */\n  async geocodeAddress(address: string): Promise<Coordinates | null> {\n    try {\n      const results = await Location.geocodeAsync(address);\n      if (results.length > 0) {\n        return {\n          latitude: results[0].latitude,\n          longitude: results[0].longitude,\n        };\n      }\n      return null;\n    } catch (error) {\n      console.error('Failed to geocode address:', error);\n      return null;\n    }\n  }\n\n  /**\n   * Reverse geocode coordinates to address\n   */\n  async reverseGeocodeCoordinates(\n    latitude: number,\n    longitude: number\n  ): Promise<Address | null> {\n    try {\n      const results = await Location.reverseGeocodeAsync({\n        latitude,\n        longitude,\n      });\n\n      if (results.length > 0) {\n        const result = results[0];\n        return {\n          address: `${result.street || ''} ${result.name || ''}`.trim(),\n          city: result.city || '',\n          region: result.region || '',\n          country: result.country || '',\n          latitude,\n          longitude,\n        };\n      }\n      return null;\n    } catch (error) {\n      console.error('Failed to reverse geocode coordinates:', error);\n      return null;\n    }\n  }\n\n  /**\n   * Calculate distance between two coordinates (in kilometers)\n   */\n  calculateDistance(coord1: Coordinates, coord2: Coordinates): number {\n    const R = 6371; // Earth's radius in kilometers\n    const dLat = this.toRad(coord2.latitude - coord1.latitude);\n    const dLon = this.toRad(coord2.longitude - coord1.longitude);\n    const a =\n      Math.sin(dLat / 2) * Math.sin(dLat / 2) +\n      Math.cos(this.toRad(coord1.latitude)) *\n        Math.cos(this.toRad(coord2.latitude)) *\n        Math.sin(dLon / 2) *\n        Math.sin(dLon / 2);\n    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));\n    return R * c;\n  }\n\n  /**\n   * Convert degrees to radians\n   */\n  private toRad(deg: number): number {\n    return deg * (Math.PI / 180);\n  }\n\n  /**\n   * Calculate bearing between two coordinates\n   */\n  calculateBearing(coord1: Coordinates, coord2: Coordinates): number {\n    const dLon = this.toRad(coord2.longitude - coord1.longitude);\n    const y = Math.sin(dLon) * Math.cos(this.toRad(coord2.latitude));\n    const x =\n      Math.cos(this.toRad(coord1.latitude)) * Math.sin(this.toRad(coord2.latitude)) -\n      Math.sin(this.toRad(coord1.latitude)) *\n        Math.cos(this.toRad(coord2.latitude)) *\n        Math.cos(dLon);\n    const bearing = Math.atan2(y, x);\n    return (this.toDeg(bearing) + 360) % 360;\n  }\n\n  /**\n   * Convert radians to degrees\n   */\n  private toDeg(rad: number): number {\n    return rad * (180 / Math.PI);\n  }\n\n  /**\n   * Check if coordinates are within radius\n   */\n  isWithinRadius(\n    center: Coordinates,\n    point: Coordinates,\n    radiusKm: number\n  ): boolean {\n    const distance = this.calculateDistance(center, point);\n    return distance <= radiusKm;\n  }\n\n  /**\n   * Get nearby coordinates (simulate geofencing)\n   */\n  getNearbyCoordinates(\n    center: Coordinates,\n    radiusKm: number,\n    count: number = 5\n  ): Coordinates[] {\n    const nearby: Coordinates[] = [];\n    for (let i = 0; i < count; i++) {\n      const angle = (Math.random() * 2 * Math.PI);\n      const distance = Math.random() * radiusKm;\n      const lat = center.latitude + (distance / 111) * Math.cos(angle);\n      const lon = center.longitude + (distance / (111 * Math.cos(this.toRad(center.latitude)))) * Math.sin(angle);\n      nearby.push({ latitude: lat, longitude: lon });\n    }\n    return nearby;\n  }\n}\n\nexport const locationService = new LocationService();\n
+// Location and mapping service
+import * as Location from 'expo-location';
+import { LocationObject, LocationSubscription } from 'expo-location';
+
+interface Coordinates {
+  latitude: number;
+  longitude: number;
+}
+
+interface Address {
+  address: string;
+  city: string;
+  region: string;
+  country: string;
+  latitude: number;
+  longitude: number;
+}
+
+class LocationService {
+  private currentLocation: LocationObject | null = null;
+  private locationListener: LocationSubscription | null = null;
+  private isTracking = false;
+
+  /**
+   * Request location permissions
+   */
+  async requestPermissions(): Promise<boolean> {
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      return status === 'granted';
+    } catch (error) {
+      console.error('Failed to request location permissions:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Get current location
+   */
+  async getCurrentLocation(): Promise<Coordinates | null> {
+    try {
+      const hasPermission = await this.requestPermissions();
+      if (!hasPermission) {
+        console.warn('Location permission not granted');
+        return null;
+      }
+
+      const location = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.High,
+      });
+
+      this.currentLocation = location;
+      return {
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      };
+    } catch (error) {
+      console.error('Failed to get current location:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Get current location cached
+   */
+  getCurrentLocationCached(): Coordinates | null {
+    if (!this.currentLocation) return null;
+    return {
+      latitude: this.currentLocation.coords.latitude,
+      longitude: this.currentLocation.coords.longitude,
+    };
+  }
+
+  /**
+   * Start tracking location
+   */
+  async startTracking(
+    callback: (location: Coordinates) => void,
+    intervalMs: number = 5000
+  ): Promise<void> {
+    try {
+      const hasPermission = await this.requestPermissions();
+      if (!hasPermission) {
+        console.warn('Location permission not granted');
+        return;
+      }
+
+      this.isTracking = true;
+      this.locationListener = await Location.watchPositionAsync(
+        {
+          accuracy: Location.Accuracy.High,
+          timeInterval: intervalMs,
+          distanceInterval: 10, // Update every 10 meters
+        },
+        (location) => {
+          this.currentLocation = location;
+          callback({
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+          });
+        }
+      );
+    } catch (error) {
+      console.error('Failed to start location tracking:', error);
+    }
+  }
+
+  /**
+   * Stop tracking location
+   */
+  stopTracking(): void {
+    if (this.locationListener) {
+      this.locationListener.remove();
+      this.locationListener = null;
+      this.isTracking = false;
+    }
+  }
+
+  /**
+   * Check if tracking
+   */
+  isTrackingActive(): boolean {
+    return this.isTracking;
+  }
+
+  /**
+   * Geocode address to coordinates
+   */
+  async geocodeAddress(address: string): Promise<Coordinates | null> {
+    try {
+      const results = await Location.geocodeAsync(address);
+      if (results.length > 0) {
+        return {
+          latitude: results[0].latitude,
+          longitude: results[0].longitude,
+        };
+      }
+      return null;
+    } catch (error) {
+      console.error('Failed to geocode address:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Reverse geocode coordinates to address
+   */
+  async reverseGeocodeCoordinates(
+    latitude: number,
+    longitude: number
+  ): Promise<Address | null> {
+    try {
+      const results = await Location.reverseGeocodeAsync({
+        latitude,
+        longitude,
+      });
+
+      if (results.length > 0) {
+        const result = results[0];
+        return {
+          address: `${result.street || ''} ${result.name || ''}`.trim(),
+          city: result.city || '',
+          region: result.region || '',
+          country: result.country || '',
+          latitude,
+          longitude,
+        };
+      }
+      return null;
+    } catch (error) {
+      console.error('Failed to reverse geocode coordinates:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Calculate distance between two coordinates (in kilometers)
+   */
+  calculateDistance(coord1: Coordinates, coord2: Coordinates): number {
+    const R = 6371; // Earth's radius in kilometers
+    const dLat = this.toRad(coord2.latitude - coord1.latitude);
+    const dLon = this.toRad(coord2.longitude - coord1.longitude);
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(this.toRad(coord1.latitude)) *
+        Math.cos(this.toRad(coord2.latitude)) *
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+  }
+
+  /**
+   * Convert degrees to radians
+   */
+  private toRad(deg: number): number {
+    return deg * (Math.PI / 180);
+  }
+
+  /**
+   * Calculate bearing between two coordinates
+   */
+  calculateBearing(coord1: Coordinates, coord2: Coordinates): number {
+    const dLon = this.toRad(coord2.longitude - coord1.longitude);
+    const y = Math.sin(dLon) * Math.cos(this.toRad(coord2.latitude));
+    const x =
+      Math.cos(this.toRad(coord1.latitude)) * Math.sin(this.toRad(coord2.latitude)) -
+      Math.sin(this.toRad(coord1.latitude)) *
+        Math.cos(this.toRad(coord2.latitude)) *
+        Math.cos(dLon);
+    const bearing = Math.atan2(y, x);
+    return (this.toDeg(bearing) + 360) % 360;
+  }
+
+  /**
+   * Convert radians to degrees
+   */
+  private toDeg(rad: number): number {
+    return rad * (180 / Math.PI);
+  }
+
+  /**
+   * Check if coordinates are within radius
+   */
+  isWithinRadius(
+    center: Coordinates,
+    point: Coordinates,
+    radiusKm: number
+  ): boolean {
+    const distance = this.calculateDistance(center, point);
+    return distance <= radiusKm;
+  }
+
+  /**
+   * Get nearby coordinates (simulate geofencing)
+   */
+  getNearbyCoordinates(
+    center: Coordinates,
+    radiusKm: number,
+    count: number = 5
+  ): Coordinates[] {
+    const nearby: Coordinates[] = [];
+    for (let i = 0; i < count; i++) {
+      const angle = (Math.random() * 2 * Math.PI);
+      const distance = Math.random() * radiusKm;
+      const lat = center.latitude + (distance / 111) * Math.cos(angle);
+      const lon = center.longitude + (distance / (111 * Math.cos(this.toRad(center.latitude)))) * Math.sin(angle);
+      nearby.push({ latitude: lat, longitude: lon });
+    }
+    return nearby;
+  }
+}
+
+export const locationService = new LocationService();

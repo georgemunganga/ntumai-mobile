@@ -1,1 +1,96 @@
-import React from 'react';\nimport { View, Text } from 'react-native';\nimport { useRouter } from 'expo-router';\nimport { useAuthStore } from '../store';\nimport { Feather } from '@expo/vector-icons';\n\ninterface ProtectedRouteProps {\n  children: React.ReactNode;\n  requiredRole?: 'customer' | 'tasker' | 'vendor';\n  requiredAuth?: boolean;\n}\n\n/**\n * ProtectedRoute Component\n * Ensures user has required authentication and role to access route\n */\nexport function ProtectedRoute({\n  children,\n  requiredRole,\n  requiredAuth = true,\n}: ProtectedRouteProps) {\n  const router = useRouter();\n  const { user, isAuthenticated } = useAuthStore();\n\n  // Check authentication\n  if (requiredAuth && !isAuthenticated) {\n    React.useEffect(() => {\n      router.replace('/(auth)/SplashScreen');\n    }, []);\n    return null;\n  }\n\n  // Check role\n  if (requiredRole && user?.role !== requiredRole) {\n    return (\n      <View className=\"flex-1 items-center justify-center bg-white\">\n        <Feather name=\"lock\" size={64} color=\"#D1D5DB\" />\n        <Text className=\"text-2xl font-bold text-gray-900 mt-4\">Access Denied</Text>\n        <Text className=\"text-gray-600 text-center mt-2 px-6\">\n          You don't have permission to access this page.\n        </Text>\n      </View>\n    );\n  }\n\n  return <>{children}</>;\n}\n\n/**\n * Permission Checker\n * Returns true if user has required permission\n */\nexport function usePermission(requiredRole?: 'customer' | 'tasker' | 'vendor') {\n  const { user, isAuthenticated } = useAuthStore();\n\n  if (!isAuthenticated) return false;\n  if (!requiredRole) return true;\n  return user?.role === requiredRole;\n}\n\n/**\n * Role Checker Hook\n * Returns current user role\n */\nexport function useUserRole() {\n  const { user } = useAuthStore();\n  return user?.role || null;\n}\n\n/**\n * Authentication Checker Hook\n * Returns authentication status\n */\nexport function useIsAuthenticated() {\n  const { isAuthenticated } = useAuthStore();\n  return isAuthenticated;\n}\n\n/**\n * Feature Access Checker\n * Checks if user can access specific features\n */\nexport function useFeatureAccess() {\n  const { user } = useAuthStore();\n\n  return {\n    canOrderFood: user?.role === 'customer',\n    canSendParcel: user?.role === 'customer',\n    canCreateTask: user?.role === 'customer',\n    canAcceptJobs: user?.role === 'tasker',\n    canManageProducts: user?.role === 'vendor',\n    canViewAnalytics: user?.role === 'vendor',\n    canWithdraw: user?.role === 'tasker' || user?.role === 'vendor',\n  };\n}\n
+import React from 'react';
+import { View, Text } from 'react-native';
+import { useRouter } from 'expo-router';
+import { useAuthStore } from '../store';
+import { Feather } from '@expo/vector-icons';
+
+interface ProtectedRouteProps {
+  children: React.ReactNode;
+  requiredRole?: 'customer' | 'tasker' | 'vendor';
+  requiredAuth?: boolean;
+}
+
+/**
+ * ProtectedRoute Component
+ * Ensures user has required authentication and role to access route
+ */
+export function ProtectedRoute({
+  children,
+  requiredRole,
+  requiredAuth = true,
+}: ProtectedRouteProps) {
+  const router = useRouter();
+  const { user, isAuthenticated } = useAuthStore();
+
+  // Check authentication
+  if (requiredAuth && !isAuthenticated) {
+    React.useEffect(() => {
+      router.replace('/(auth)/SplashScreen');
+    }, []);
+    return null;
+  }
+
+  // Check role
+  if (requiredRole && user?.role !== requiredRole) {
+    return (
+      <View className="flex-1 items-center justify-center bg-white">
+        <Feather name="lock" size={64} color="#D1D5DB" />
+        <Text className="text-2xl font-bold text-gray-900 mt-4">Access Denied</Text>
+        <Text className="text-gray-600 text-center mt-2 px-6">
+          You don't have permission to access this page.
+        </Text>
+      </View>
+    );
+  }
+
+  return <>{children}</>;
+}
+
+/**
+ * Permission Checker
+ * Returns true if user has required permission
+ */
+export function usePermission(requiredRole?: 'customer' | 'tasker' | 'vendor') {
+  const { user, isAuthenticated } = useAuthStore();
+
+  if (!isAuthenticated) return false;
+  if (!requiredRole) return true;
+  return user?.role === requiredRole;
+}
+
+/**
+ * Role Checker Hook
+ * Returns current user role
+ */
+export function useUserRole() {
+  const { user } = useAuthStore();
+  return user?.role || null;
+}
+
+/**
+ * Authentication Checker Hook
+ * Returns authentication status
+ */
+export function useIsAuthenticated() {
+  const { isAuthenticated } = useAuthStore();
+  return isAuthenticated;
+}
+
+/**
+ * Feature Access Checker
+ * Checks if user can access specific features
+ */
+export function useFeatureAccess() {
+  const { user } = useAuthStore();
+
+  return {
+    canOrderFood: user?.role === 'customer',
+    canSendParcel: user?.role === 'customer',
+    canCreateTask: user?.role === 'customer',
+    canAcceptJobs: user?.role === 'tasker',
+    canManageProducts: user?.role === 'vendor',
+    canViewAnalytics: user?.role === 'vendor',
+    canWithdraw: user?.role === 'tasker' || user?.role === 'vendor',
+  };
+}
+

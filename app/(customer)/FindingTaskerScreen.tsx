@@ -1,1 +1,193 @@
-import React, { useState, useEffect } from 'react';\nimport {\n  View,\n  Text,\n  TouchableOpacity,\n  ActivityIndicator,\n  Animated,\n  Dimensions,\n} from 'react-native';\nimport { useMatchingStore } from '../../src/store/slices/matchingSlice';\nimport { useRouter } from 'expo-router';\n\nconst { width, height } = Dimensions.get('window');\n\nexport default function FindingTaskerScreen({ route }: any) {\n  const { jobData, pickupLocation } = route.params;\n  const router = useRouter();\n  const [mapMarkers, setMapMarkers] = useState<any[]>([]);\n  const [elapsedTime, setElapsedTime] = useState(0);\n\n  const {\n    isMatching,\n    matchedTasker,\n    availableTaskers,\n    estimatedWaitTime,\n    matchingProgress,\n    startMatching,\n    cancelMatching,\n    getAvailableTaskers,\n  } = useMatchingStore();\n\n  useEffect(() => {\n    // Start matching\n    startMatching(jobData);\n    getAvailableTaskers(pickupLocation);\n\n    // Timer\n    const timer = setInterval(() => {\n      setElapsedTime((prev) => prev + 1);\n    }, 1000);\n\n    return () => clearInterval(timer);\n  }, []);\n\n  useEffect(() => {\n    // Simulate map markers\n    const markers = availableTaskers.map((tasker, index) => ({\n      id: tasker.id,\n      name: tasker.name,\n      latitude: tasker.latitude,\n      longitude: tasker.longitude,\n      rating: tasker.rating,\n      distance: tasker.distance,\n      isMatched: matchedTasker?.taskerId === tasker.id,\n    }));\n    setMapMarkers(markers);\n  }, [availableTaskers, matchedTasker]);\n\n  // When tasker is matched\n  useEffect(() => {\n    if (matchedTasker && !isMatching) {\n      // Navigate to active order screen after 2 seconds\n      setTimeout(() => {\n        router.push({\n          pathname: '/(customer)/OrderTrackingScreen',\n          params: {\n            orderId: jobData.id,\n            taskerId: matchedTasker.taskerId,\n            taskerName: matchedTasker.taskerName,\n            taskerPhoto: matchedTasker.taskerPhoto,\n          },\n        });\n      }, 2000);\n    }\n  }, [matchedTasker, isMatching]);\n\n  const handleCancel = () => {\n    cancelMatching();\n    router.back();\n  };\n\n  return (\n    <View className=\"flex-1 bg-white\">\n      {/* Map Area (Placeholder) */}\n      <View className=\"flex-1 bg-gradient-to-b from-blue-50 to-blue-100 relative\">\n        {/* Simulated Map */}\n        <View className=\"flex-1 items-center justify-center\">\n          <View className=\"w-64 h-64 rounded-full border-4 border-blue-300 items-center justify-center\">\n            {/* Pickup Location */}\n            <View className=\"w-4 h-4 bg-green-500 rounded-full absolute\" />\n\n            {/* Available Taskers */}\n            {mapMarkers.map((marker, index) => (\n              <View\n                key={marker.id}\n                className={`w-8 h-8 rounded-full absolute items-center justify-center ${\n                  marker.isMatched ? 'bg-blue-600' : 'bg-orange-500'\n                }`}\n                style={{\n                  transform: [\n                    {\n                      rotate: `${(index * 360) / mapMarkers.length}deg`,\n                    },\n                  ],\n                  marginTop: -80,\n                }}\n              >\n                <Text className=\"text-white text-xs font-bold\">🚗</Text>\n              </View>\n            ))}\n          </View>\n\n          {/* Matching Status */}\n          <View className=\"mt-8 items-center\">\n            <Text className=\"text-lg font-bold text-gray-900 mb-2\">\n              Finding the Right Tasker...\n            </Text>\n            <View className=\"w-32 h-1 bg-gray-200 rounded-full overflow-hidden\">\n              <Animated.View\n                className=\"h-full bg-blue-500\"\n                style={{\n                  width: `${matchingProgress}%`,\n                }}\n              />\n            </View>\n            <Text className=\"text-sm text-gray-600 mt-2\">\n              {matchingProgress}% complete\n            </Text>\n          </View>\n        </View>\n      </Map>\n\n      {/* Info Panel */}\n      <View className=\"bg-white border-t border-gray-200 p-4\">\n        {/* Estimated Wait Time */}\n        <View className=\"mb-4\">\n          <Text className=\"text-sm text-gray-600 mb-1\">Estimated Wait Time</Text>\n          <Text className=\"text-2xl font-bold text-gray-900\">\n            {estimatedWaitTime}\n          </Text>\n        </View>\n\n        {/* Available Taskers Count */}\n        <View className=\"mb-4 p-3 bg-blue-50 rounded-lg\">\n          <Text className=\"text-sm text-gray-700\">\n            {availableTaskers.length} taskers available nearby\n          </Text>\n        </View>\n\n        {/* Matched Tasker Info */}\n        {matchedTasker && (\n          <View className=\"mb-4 p-3 bg-green-50 rounded-lg border border-green-200\">\n            <Text className=\"text-sm font-semibold text-green-900 mb-1\">\n              ✓ Tasker Found!\n            </Text>\n            <Text className=\"text-base font-bold text-green-900\">\n              {matchedTasker.taskerName}\n            </Text>\n            <Text className=\"text-sm text-green-700\">\n              Rating: {matchedTasker.rating} ⭐ • ETA: {matchedTasker.estimatedArrival} min\n            </Text>\n          </View>\n        )}\n\n        {/* Elapsed Time */}\n        <View className=\"mb-4 text-center\">\n          <Text className=\"text-xs text-gray-500\">\n            Searching for {Math.floor(elapsedTime / 60)}:{String(elapsedTime % 60).padStart(2, '0')}\n          </Text>\n        </View>\n\n        {/* Cancel Button */}\n        <TouchableOpacity\n          onPress={handleCancel}\n          className=\"bg-gray-100 py-3 rounded-lg\"\n        >\n          <Text className=\"text-center text-gray-900 font-semibold\">\n            Cancel\n          </Text>\n        </TouchableOpacity>\n      </View>\n    </View>\n  );\n}\n\n// Placeholder Map component\nfunction Map({ children }: any) {\n  return <View className=\"flex-1\">{children}</View>;\n}\n
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ActivityIndicator,
+  Animated,
+  Dimensions,
+} from 'react-native';
+import { useMatchingStore } from '../../src/store/slices/matchingSlice';
+import { useRouter } from 'expo-router';
+
+const { width, height } = Dimensions.get('window');
+
+export default function FindingTaskerScreen({ route }: any) {
+  const { jobData, pickupLocation } = route.params;
+  const router = useRouter();
+  const [mapMarkers, setMapMarkers] = useState<any[]>([]);
+  const [elapsedTime, setElapsedTime] = useState(0);
+
+  const {
+    isMatching,
+    matchedTasker,
+    availableTaskers,
+    estimatedWaitTime,
+    matchingProgress,
+    startMatching,
+    cancelMatching,
+    getAvailableTaskers,
+  } = useMatchingStore();
+
+  useEffect(() => {
+    // Start matching
+    startMatching(jobData);
+    getAvailableTaskers(pickupLocation);
+
+    // Timer
+    const timer = setInterval(() => {
+      setElapsedTime((prev) => prev + 1);
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    // Simulate map markers
+    const markers = availableTaskers.map((tasker, index) => ({
+      id: tasker.id,
+      name: tasker.name,
+      latitude: tasker.latitude,
+      longitude: tasker.longitude,
+      rating: tasker.rating,
+      distance: tasker.distance,
+      isMatched: matchedTasker?.taskerId === tasker.id,
+    }));
+    setMapMarkers(markers);
+  }, [availableTaskers, matchedTasker]);
+
+  // When tasker is matched
+  useEffect(() => {
+    if (matchedTasker && !isMatching) {
+      // Navigate to active order screen after 2 seconds
+      setTimeout(() => {
+        router.push({
+          pathname: '/(customer)/OrderTrackingScreen',
+          params: {
+            orderId: jobData.id,
+            taskerId: matchedTasker.taskerId,
+            taskerName: matchedTasker.taskerName,
+            taskerPhoto: matchedTasker.taskerPhoto,
+          },
+        });
+      }, 2000);
+    }
+  }, [matchedTasker, isMatching]);
+
+  const handleCancel = () => {
+    cancelMatching();
+    router.back();
+  };
+
+  return (
+    <View className="flex-1 bg-white">
+      {/* Map Area (Placeholder) */}
+      <Map>
+        <View className="flex-1 bg-gradient-to-b from-blue-50 to-blue-100 relative">
+          {/* Simulated Map */}
+          <View className="flex-1 items-center justify-center">
+            <View className="w-64 h-64 rounded-full border-4 border-blue-300 items-center justify-center">
+              {/* Pickup Location */}
+              <View className="w-4 h-4 bg-green-500 rounded-full absolute" />
+
+              {/* Available Taskers */}
+              {mapMarkers.map((marker, index) => (
+                <View
+                  key={marker.id}
+                  className={`w-8 h-8 rounded-full absolute items-center justify-center ${
+                    marker.isMatched ? 'bg-blue-600' : 'bg-orange-500'
+                  }`}
+                  style={{
+                    transform: [
+                      {
+                        rotate: `${(index * 360) / mapMarkers.length}deg`,
+                      },
+                    ],
+                    marginTop: -80,
+                  }}
+                >
+                  <Text className="text-white text-xs font-bold">
+                    {marker.name?.charAt(0)?.toUpperCase() || 'T'}
+                  </Text>
+                </View>
+              ))}
+            </View>
+
+            {/* Matching Status */}
+            <View className="mt-8 items-center">
+              <Text className="text-lg font-bold text-gray-900 mb-2">
+                Finding the Right Tasker...
+              </Text>
+              <View className="w-32 h-1 bg-gray-200 rounded-full overflow-hidden">
+                <Animated.View
+                  className="h-full bg-blue-500"
+                  style={{
+                    width: `${matchingProgress}%`,
+                  }}
+                />
+              </View>
+              <Text className="text-sm text-gray-600 mt-2">
+                {matchingProgress}% complete
+              </Text>
+            </View>
+          </View>
+        </View>
+      </Map>
+
+      {/* Info Panel */}
+      <View className="bg-white border-t border-gray-200 p-4">
+        {/* Estimated Wait Time */}
+        <View className="mb-4">
+          <Text className="text-sm text-gray-600 mb-1">Estimated Wait Time</Text>
+          <Text className="text-2xl font-bold text-gray-900">
+            {estimatedWaitTime}
+          </Text>
+        </View>
+
+        {/* Available Taskers Count */}
+        <View className="mb-4 p-3 bg-blue-50 rounded-lg">
+          <Text className="text-sm text-gray-700">
+            {availableTaskers.length} taskers available nearby
+          </Text>
+        </View>
+
+        {/* Matched Tasker Info */}
+        {matchedTasker && (
+          <View className="mb-4 p-3 bg-green-50 rounded-lg border border-green-200">
+            <Text className="text-sm font-semibold text-green-900 mb-1">
+              Tasker Found!
+            </Text>
+            <Text className="text-base font-bold text-green-900">
+              {matchedTasker.taskerName}
+            </Text>
+            <Text className="text-sm text-green-700">
+              Rating: {matchedTasker.rating} stars - ETA: {matchedTasker.estimatedArrival} min
+            </Text>
+          </View>
+        )}
+
+        {/* Elapsed Time */}
+        <View className="mb-4 text-center">
+          <Text className="text-xs text-gray-500">
+            Searching for {Math.floor(elapsedTime / 60)}:{String(elapsedTime % 60).padStart(2, '0')}
+          </Text>
+        </View>
+
+        {/* Cancel Button */}
+        <TouchableOpacity
+          onPress={handleCancel}
+          className="bg-gray-100 py-3 rounded-lg"
+        >
+          <Text className="text-center text-gray-900 font-semibold">
+            Cancel
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+}
+
+// Placeholder Map component
+function Map({ children }: any) {
+  return <View className="flex-1">{children}</View>;
+}
