@@ -37,10 +37,10 @@ export const STORAGE_KEYS = {
   FAVORITE_VENDORS: '@ntumai_favorite_vendors',
   FAVORITE_PRODUCTS: '@ntumai_favorite_products',
   
-  // Driver specific
-  DRIVER_STATUS: '@ntumai_driver_status',
-  DRIVER_LOCATION: '@ntumai_driver_location',
-  DRIVER_STATS: '@ntumai_driver_stats',
+  // Tasker specific (renamed from Driver)
+  TASKER_STATUS: '@ntumai_tasker_status',
+  TASKER_LOCATION: '@ntumai_tasker_location',
+  TASKER_STATS: '@ntumai_tasker_stats',
   
   // Vendor specific
   VENDOR_PROFILE: '@ntumai_vendor_profile',
@@ -134,10 +134,10 @@ export const BUSINESS_CONSTANTS = {
   PLATFORM_COMMISSION_RATE: 0.15, // 15%
   PAYMENT_PROCESSING_FEE: 0.029, // 2.9%
   
-  // Driver
-  DRIVER_COMMISSION_RATE: 0.8, // 80% of delivery fee
-  MIN_DRIVER_RATING: 4.0,
-  MAX_ACTIVE_ORDERS_PER_DRIVER: 3,
+  // Tasker (renamed from Driver)
+  TASKER_COMMISSION_RATE: 0.8, // 80% of delivery fee
+  MIN_TASKER_RATING: 4.0,
+  MAX_ACTIVE_ORDERS_PER_TASKER: 3,
 } as const;
 
 // Validation Constants
@@ -253,7 +253,7 @@ export const PAYMENT_METHODS = {
 // User Roles
 export const USER_ROLES = {
   CUSTOMER: 'customer',
-  DRIVER: 'driver',
+  TASKER: 'tasker',  // Changed from DRIVER to align with blueprint
   VENDOR: 'vendor',
   ADMIN: 'admin',
 } as const;
@@ -262,7 +262,7 @@ export const USER_ROLES = {
 export const NOTIFICATION_TYPES = {
   ORDER_UPDATE: 'order_update',
   PROMOTION: 'promotion',
-  DRIVER_ASSIGNMENT: 'driver_assignment',
+  TASKER_ASSIGNMENT: 'tasker_assignment',
   PAYMENT_CONFIRMATION: 'payment_confirmation',
   DELIVERY_UPDATE: 'delivery_update',
   REVIEW_REQUEST: 'review_request',
@@ -279,7 +279,7 @@ export const MAP_CONFIG = {
   MARKER_COLORS: {
     USER: '#007AFF',
     VENDOR: '#FF3B30',
-    DRIVER: '#34C759',
+    TASKER: '#34C759',
     DELIVERY: '#FF9500',
   },
 } as const;
@@ -302,7 +302,7 @@ export const FEATURE_FLAGS = {
   ENABLE_DARK_MODE: true,
   ENABLE_MULTI_LANGUAGE: true,
   ENABLE_CASH_ON_DELIVERY: true,
-  ENABLE_DRIVER_TIPS: true,
+  ENABLE_TASKER_TIPS: true,
   ENABLE_LOYALTY_PROGRAM: false,
   ENABLE_REFERRAL_PROGRAM: false,
 } as const;

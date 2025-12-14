@@ -11,7 +11,7 @@ import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 
-import AppText from '../components/AppText';
+import AppText from '@/components/AppText';
 
 const CreatePromotion = () => {
   const router = useRouter();
@@ -216,4 +216,3 @@ const CreatePromotion = () => {
 };
 
 export default CreatePromotion;
-

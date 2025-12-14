@@ -1,6 +1,6 @@
 // Matching store slice for auto-matching
 import { create } from 'zustand';
-import { matchingMockService } from '../../api/mockServices.extended';
+import { matchingMockService } from '@/src/api/mockServices.extended';
 
 interface MatchingState {
   isMatching: boolean;

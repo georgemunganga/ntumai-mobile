@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { create } from 'zustand';
-import { mockWalletService, mockPaymentService } from '../../api/mockServices';
-import { createPersistentStore } from '../utils/persistentStore';
+import { mockWalletService, mockPaymentService } from '@/src/api/mockServices';
+import { createPersistentStore } from '@/src/store/utils/persistentStore';
 
 interface Transaction {
   id: string;

@@ -8,8 +8,8 @@ import {
   mockAuthService,
   mockDriverService,
   mockOrderService,
-} from '../src/api/mockServices';
-import { useAuthStore, useDriverStore, useOrderStore } from '../src/store';
+} from '@/src/api/mockServices';
+import { useAuthStore, useDriverStore, useOrderStore } from '@/src/store';
 
 describe('Tasker Workflow E2E Tests', () => {
   beforeEach(() => {

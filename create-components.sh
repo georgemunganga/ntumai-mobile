@@ -109,7 +109,7 @@ EOF
 
 # Input Component
 cat > components/ui/Input.tsx << 'EOF'
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { View, TextInput, Text, TouchableOpacity } from 'react-native';
 
 interface InputProps {
@@ -706,7 +706,7 @@ EOF
 
 # Skeleton Component
 cat > components/ui/Skeleton.tsx << 'EOF'
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { View, Animated } from 'react-native';
 
 interface SkeletonProps {
@@ -1008,7 +1008,7 @@ EOF
 
 # Create example usage file
 cat > components/ui/Example.tsx << 'EOF'
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { ScrollView, View, Text } from 'react-native';
 import {
   Button,

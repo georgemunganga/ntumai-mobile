@@ -10,8 +10,7 @@ import {
   CreditCard,
 } from 'lucide-react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import Text from '../../components/Text';
-import AppText from '../../components/AppText';
+import AppText from '@/components/AppText';
 import { Ionicons } from '@expo/vector-icons';
 
 // Types
@@ -275,7 +274,7 @@ export function CheckoutScreen({ navigation }: CheckoutScreenProps) {
             >
               <View className='w-8 h-8 rounded-lg bg-teal-500 items-center justify-center mr-3'>
                 <Image
-                  source={require('../../assets/pay-pal1.png')}
+                  source={require('@/assets/pay-pal1.png')}
                   className='w-10 h-10'
                   // resizeMode='contain'
                 />
@@ -418,9 +417,9 @@ export function CheckoutScreen({ navigation }: CheckoutScreenProps) {
         <View className='flex-1 bg-black bg-opacity-50 justify-end'>
           <View className='bg-white rounded-t-3xl p-4 max-h-96'>
             <View className='flex-row items-center justify-between mb-4'>
-              <Text className='text-xl font-bold text-gray-800'>
+              <AppText className='text-xl font-bold text-gray-800'>
                 Select Address
-              </Text>
+              </AppText>
               <TouchableOpacity onPress={() => setShowAddressModal(false)}>
                 <X size={24} color='#9CA3AF' />
               </TouchableOpacity>
@@ -438,15 +437,15 @@ export function CheckoutScreen({ navigation }: CheckoutScreenProps) {
                 >
                   <MapPin size={20} color='#10B981' />
                   <View className='ml-3 flex-1'>
-                    <Text className='text-gray-800 font-medium'>
+                    <AppText className='text-gray-800 font-medium'>
                       {address.name}
-                    </Text>
-                    <Text
+                    </AppText>
+                    <AppText
                       style={{ fontFamily: 'Ubuntu-Regular' }}
                       className='text-gray-600 text-sm'
                     >
                       {address.address}
-                    </Text>
+                    </AppText>
                   </View>
                   {selectedAddress.id === address.id && (
                     <Check size={20} color='#10B981' />
@@ -462,9 +461,9 @@ export function CheckoutScreen({ navigation }: CheckoutScreenProps) {
         <View className='flex-1 bg-black bg-opacity-50 justify-end'>
           <View className='bg-white rounded-t-3xl p-4 max-h-96'>
             <View className='flex-row items-center justify-between mb-4'>
-              <Text className='text-xl font-bold text-gray-800'>
+              <AppText className='text-xl font-bold text-gray-800'>
                 Payment Method
-              </Text>
+              </AppText>
               <TouchableOpacity onPress={() => setShowPaymentModal(false)}>
                 <X size={24} color='#9CA3AF' />
               </TouchableOpacity>
@@ -480,17 +479,17 @@ export function CheckoutScreen({ navigation }: CheckoutScreenProps) {
                   }}
                   className='flex-row items-center p-3 rounded-xl mb-2 border border-gray-200'
                 >
-                  <Text className='text-2xl mr-3'>{method.icon}</Text>
+                  <AppText className='text-2xl mr-3'>{method.icon}</AppText>
                   <View className='flex-1'>
-                    <Text className='text-gray-800 font-medium'>
+                    <AppText className='text-gray-800 font-medium'>
                       {method.name}
-                    </Text>
-                    <Text
+                    </AppText>
+                    <AppText
                       style={{ fontFamily: 'Ubuntu-Regular' }}
                       className='text-gray-600 text-sm'
                     >
                       {method.details}
-                    </Text>
+                    </AppText>
                   </View>
                   {selectedPayment.id === method.id && (
                     <Check size={20} color='#10B981' />

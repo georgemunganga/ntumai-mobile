@@ -4,8 +4,8 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach } from '@jest/globals';
-import { mockAuthService } from '../src/api/mockServices';
-import { useAuthStore } from '../src/store';
+import { mockAuthService } from '@/src/api/mockServices';
+import { useAuthStore } from '@/src/store';
 
 describe('Authentication E2E Tests', () => {
   beforeEach(() => {

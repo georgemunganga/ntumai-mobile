@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import {
   View,
-  Text,
   TouchableOpacity,
   ScrollView,
   Image,
@@ -10,6 +9,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Star, ChevronDown } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
+import AppText from '@/components/AppText';
 
 interface Review {
   id: string;
@@ -78,7 +78,7 @@ export default function VendorProfile() {
             color={star <= rating ? '#ed4877' : '#d1d5db'}
           />
         ))}
-        <Text className='text-gray-500 text-sm ml-1'>({rating}/5)</Text>
+        <AppText variant="caption" className='text-gray-500 ml-1'>({rating}/5)</AppText>
       </View>
     );
   };
@@ -95,18 +95,18 @@ export default function VendorProfile() {
             />
           </View>
           <View className='flex-1'>
-            <Text className='text-black font-bold text-base'>
+            <AppText variant="body" weight="bold" className='text-black'>
               {review.userName}
-            </Text>
+            </AppText>
             {renderStars(review.rating)}
           </View>
         </View>
-        <Text className='text-gray-500 text-sm'>{review.timestamp}</Text>
+        <AppText variant="caption" className='text-gray-500'>{review.timestamp}</AppText>
       </View>
 
-      <Text className='text-gray-700 text-base mb-3' numberOfLines={3}>
+      <AppText variant="body" className='text-gray-700 mb-3' numberOfLines={3}>
         {review.reviewText}
-      </Text>
+      </AppText>
 
       {review.hasImages && review.images && (
         <View className='flex-row mb-3'>
@@ -122,7 +122,7 @@ export default function VendorProfile() {
               />
               {index === 2 && review.images && review.images.length > 3 && (
                 <View className='absolute inset-0 bg-[#000000a6] bg-opacity-30 items-center justify-center'>
-                  <Text className='text-white text-xs font-bold'>10 more</Text>
+                  <AppText variant="caption" weight="bold" className='text-white'>10 more</AppText>
                 </View>
               )}
             </View>
@@ -132,7 +132,7 @@ export default function VendorProfile() {
 
       <View className='flex-row justify-end'>
         <TouchableOpacity className='border border-gray-300 rounded-full px-4 py-2'>
-          <Text className='text-gray-600 text-sm'>Reply</Text>
+          <AppText variant="caption" className='text-gray-600'>Reply</AppText>
         </TouchableOpacity>
       </View>
     </View>
@@ -145,7 +145,7 @@ export default function VendorProfile() {
         <TouchableOpacity onPress={() => router.back()} className='mr-4'>
           <Ionicons name='arrow-back' size={24} color='white' />
         </TouchableOpacity>
-        <Text className='text-white font-medium text-lg'>Back</Text>
+        <AppText variant="body" weight="semibold" className='text-white'>Back</AppText>
       </View>
 
       <ScrollView className='flex-1'>
@@ -177,29 +177,29 @@ export default function VendorProfile() {
         <View className='flex-row items-start '>
           <View className='pt-[50px]'>
             <TouchableOpacity className='bg-[#ed4877] rounded-full ml-4 px-3 py-3'>
-              <Text className='text-white font-medium'>Edit Profile</Text>
+              <AppText variant="body" weight="semibold" className='text-white'>Edit Profile</AppText>
             </TouchableOpacity>
           </View>
           <View className='pl-2 pt-3 pb-6'>
             <View className='flex-1'>
-              <Text className='text-black font-bold text-2xl mb-2'>
+              <AppText variant="h3" weight="bold" className='text-black mb-2'>
                 Denvate Restaurant
-              </Text>
+              </AppText>
               {renderStars(3)}
             </View>
 
             <View className='flex-row items-center space-x-4'>
-              <Text className='text-gray-500 text-base'>2.68km</Text>
-              <Text className='text-gray-500 text-base'>19-29 mins</Text>
+              <AppText variant="caption" className='text-gray-500'>2.68km</AppText>
+              <AppText variant="caption" className='text-gray-500'>19-29 mins</AppText>
             </View>
           </View>
         </View>
 
         <View className='px-4 pb-6'>
           <View className='flex-row items-center justify-between mb-4'>
-            <Text className='text-black font-bold text-xl'>Reviews</Text>
+            <AppText variant="title" weight="bold" className='text-black'>Reviews</AppText>
             <TouchableOpacity className='bg-gray-200 rounded-full px-4 py-2 flex-row items-center'>
-              <Text className='text-gray-600 text-sm mr-2'>{activeFilter}</Text>
+              <AppText variant="caption" className='text-gray-600 mr-2'>{activeFilter}</AppText>
               <ChevronDown size={16} color='#6b7280' />
             </TouchableOpacity>
           </View>

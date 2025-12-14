@@ -28,8 +28,8 @@ import type {
   OtpSession,
   AuthUser,
   Role,
-} from '../../api/modules/auth/types';
-import { mockAuthService } from '../../api/mockAuthServices';
+} from '@/src/api/modules/auth/types';
+import { mockAuthService } from '@/src/api/mockAuthServices';
 
 // ============================================================================
 // STORE INTERFACE

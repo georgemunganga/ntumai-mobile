@@ -1,5 +1,5 @@
 // @ts-nocheck
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   View,
   ScrollView,
@@ -12,7 +12,7 @@ import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 
-import AppText from '../components/AppText';
+import AppText from '@/components/AppText';
 import { Package } from 'lucide-react-native';
 
 const CreateCategory = () => {
@@ -151,4 +151,3 @@ const CreateCategory = () => {
 };
 
 export default CreateCategory;
-

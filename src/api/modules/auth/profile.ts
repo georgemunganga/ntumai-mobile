@@ -1,8 +1,8 @@
-import { apiClient } from '../../client';
-import { ENDPOINTS } from '../../config';
+import { apiClient } from '@/src/api/client';
+import { ENDPOINTS } from '@/src/api/config';
 import { AuthProfileUpdateSchema } from './schemas';
 import type { AuthProfileUpdate } from './types';
-import type { User } from '../../types';
+import type { User } from '@/types';
 
 export const fetchProfile = async (): Promise<User> => {
   const response = await apiClient.get<User>(ENDPOINTS.AUTH.ME, {

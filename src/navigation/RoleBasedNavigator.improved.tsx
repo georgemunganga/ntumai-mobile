@@ -8,7 +8,7 @@
  * - Protected routes redirect to login if not authenticated
  */
 
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useRouter, useSegments } from 'expo-router';
 import { useAuthStore, selectIsFullyAuthenticated } from '@/src/store/slices/authSlice.improved';
 

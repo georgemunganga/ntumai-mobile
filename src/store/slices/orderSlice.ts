@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { OrderState, Order, OrderStatus } from '../types';
+import { OrderState, Order, OrderStatus } from '@/types';
 
 interface OrderStore extends OrderState {
   // Actions

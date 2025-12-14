@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+import AppText from '@/components/AppText';
+import { useEffect, useState } from "react";
 import {
   View,
-  Text,
   TouchableWithoutFeedback,
   Keyboard,
   KeyboardAvoidingView,
@@ -10,16 +10,17 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { useAuthContext } from "../src/providers";
-import type { LoginCredentials } from "../src/providers/types";
+import { useAuthContext } from "@/src/providers";
+import type { LoginCredentials } from "@/src/providers/types";
 
 // Import reusable components
-import SignupHeader from "../src/components/auth/SignupHeader";
-import AuthMethodTabs from "../src/components/auth/AuthMethodTabs";
-import AuthInput from "../src/components/auth/AuthInput";
-import AuthButton from "../src/components/auth/AuthButton";
-import SocialAuth from "../src/components/auth/SocialAuth";
-import AuthFooter from "../src/components/auth/AuthFooter";
+import SignupHeader from "@/src/components/auth/SignupHeader";
+import AuthMethodTabs from "@/src/components/auth/AuthMethodTabs";
+import AuthInput from "@/src/components/auth/AuthInput";
+import AuthButton from "@/src/components/auth/AuthButton";
+import SocialAuth from "@/src/components/auth/SocialAuth";
+import AuthFooter from "@/src/components/auth/AuthFooter";
+import DevResetAuthButton from "@/src/components/auth/DevResetAuthButton";
 
 const SelectMethodScreen = () => {
   const router = useRouter();
@@ -29,14 +30,9 @@ const SelectMethodScreen = () => {
     isLoading,
     error,
     clearError,
-    requiresVerification,
-    verificationMethod,
-    verificationValue,
-    isAuthenticated,
   } = useAuthContext();
-  const [selectedMethod, setSelectedMethod] = useState<"phone" | "email">(
-    "phone"
-  );
+
+  const [selectedMethod, setSelectedMethod] = useState<"phone" | "email">("phone");
   const [inputValue, setInputValue] = useState("");
   const [countryCode, setCountryCode] = useState("+260");
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
@@ -54,19 +50,12 @@ const SelectMethodScreen = () => {
     }
   }, [error]);
 
-  useEffect(() => {
-    if (requiresVerification && verificationMethod && verificationValue) {
-      router.push({
-        pathname: "/(auth)/Otp",
-        params: {
-          method: verificationMethod,
-          value: verificationValue,
-        },
-      });
-    } else if (isAuthenticated) {
-      router.replace("/Home");
-    }
-  }, [requiresVerification, verificationMethod, verificationValue, isAuthenticated, router]);
+  // REMOVED: Auto-navigation useEffect (lines 118-168)
+  // This violated architectural principles by auto-routing based on auth state changes.
+  // ALL routing now happens via:
+  // 1. User action: Manual navigation after clicking "Send OTP" button (line 236-248)
+  // 2. Routing layer: app/index.tsx routes authenticated users to /Home
+  // This prevents unwanted OTP routing on fresh devices with stale verification state.
 
   const handleNext = async () => {
     const trimmedValue = inputValue.trim();
@@ -99,6 +88,7 @@ const SelectMethodScreen = () => {
         result.verificationMethod &&
         result.verificationValue
       ) {
+        console.log('[SELECT] Manual navigation to OTP after user clicked Send OTP');
         router.push({
           pathname: "/(auth)/Otp",
           params: {
@@ -123,7 +113,7 @@ const SelectMethodScreen = () => {
   const description = (
     <>
       We will send you a{" "}
-      <Text className="font-semibold text-black">One Time Password (OTP)</Text>{" "}
+      <AppText className="font-semibold text-black">One Time Password (OTP)</AppText>{" "}
       on this {selectedMethod === "phone" ? "mobile number" : "email address"}.
     </>
   );
@@ -164,9 +154,9 @@ const SelectMethodScreen = () => {
             {validationErrors.length > 0 && (
               <View className="mt-2">
                 {validationErrors.map((errMsg) => (
-                  <Text key={errMsg} className="text-red-500 text-sm">
+                  <AppText key={errMsg} className="text-red-500 text-sm">
                     {errMsg}
-                  </Text>
+                  </AppText>
                 ))}
               </View>
             )}
@@ -183,6 +173,7 @@ const SelectMethodScreen = () => {
             disabled={isLoading}
           />
           <SocialAuth />
+          <DevResetAuthButton />
         </View>
 
         <AuthFooter

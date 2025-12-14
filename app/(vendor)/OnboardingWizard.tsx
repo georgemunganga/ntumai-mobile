@@ -8,8 +8,9 @@
  * 4. Review & Submit
  */
 
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, TextInput, Alert } from 'react-native';
+import { useState } from 'react';
+import { View, TouchableOpacity, ScrollView, TextInput, Alert } from 'react-native';
+import AppText from '@/components/AppText';
 import { useRouter } from 'expo-router';
 import { ChevronLeft } from 'lucide-react-native';
 
@@ -124,17 +125,17 @@ export default function VendorOnboardingWizard() {
             <View className="flex-1">
               <View className="flex-row items-center mb-2">
                 <View className="w-8 h-8 bg-green-600 rounded-full items-center justify-center mr-3">
-                  <Text className="text-white font-bold text-sm">1</Text>
+                  <AppText className="text-white font-bold text-sm">1</AppText>
                 </View>
-                <Text className="text-sm font-semibold text-gray-600">Business Information</Text>
+                <AppText className="text-sm font-semibold text-gray-600">Business Information</AppText>
               </View>
-              <Text className="text-2xl font-bold text-gray-900">Tell us about your store</Text>
+              <AppText className="text-2xl font-bold text-gray-900">Tell us about your store</AppText>
             </View>
           </View>
 
           {/* Business Name */}
           <View className="mb-6">
-            <Text className="text-sm font-semibold text-gray-700 mb-2">Business Name *</Text>
+            <AppText className="text-sm font-semibold text-gray-700 mb-2">Business Name *</AppText>
             <TextInput
               className="border border-gray-300 rounded-lg px-4 py-3"
               placeholder="e.g., John's Restaurant"
@@ -146,7 +147,7 @@ export default function VendorOnboardingWizard() {
 
           {/* Business Type */}
           <View className="mb-6">
-            <Text className="text-sm font-semibold text-gray-700 mb-2">Business Type *</Text>
+            <AppText className="text-sm font-semibold text-gray-700 mb-2">Business Type *</AppText>
             <View className="gap-2">
               {['Restaurant', 'Grocery', 'Pharmacy', 'Bakery', 'Other'].map((type) => (
                 <TouchableOpacity
@@ -158,9 +159,9 @@ export default function VendorOnboardingWizard() {
                       : 'border-gray-200'
                   }`}
                 >
-                  <Text className={businessInfo.businessType === type ? 'text-green-600 font-semibold' : 'text-gray-700'}>
+                  <AppText className={businessInfo.businessType === type ? 'text-green-600 font-semibold' : 'text-gray-700'}>
                     {type}
-                  </Text>
+                  </AppText>
                 </TouchableOpacity>
               ))}
             </View>
@@ -168,7 +169,7 @@ export default function VendorOnboardingWizard() {
 
           {/* Description */}
           <View className="mb-6">
-            <Text className="text-sm font-semibold text-gray-700 mb-2">Description</Text>
+            <AppText className="text-sm font-semibold text-gray-700 mb-2">Description</AppText>
             <TextInput
               className="border border-gray-300 rounded-lg px-4 py-3 h-24"
               placeholder="Tell customers about your business"
@@ -182,7 +183,7 @@ export default function VendorOnboardingWizard() {
 
           {/* Phone */}
           <View className="mb-8">
-            <Text className="text-sm font-semibold text-gray-700 mb-2">Phone Number</Text>
+            <AppText className="text-sm font-semibold text-gray-700 mb-2">Phone Number</AppText>
             <TextInput
               className="border border-gray-300 rounded-lg px-4 py-3"
               placeholder="+260..."
@@ -195,11 +196,11 @@ export default function VendorOnboardingWizard() {
 
           {/* Buttons */}
           <TouchableOpacity onPress={handleNext} className="bg-green-600 rounded-lg py-4 mb-3">
-            <Text className="text-white text-center font-bold text-lg">Continue</Text>
+            <AppText className="text-white text-center font-bold text-lg">Continue</AppText>
           </TouchableOpacity>
 
           <TouchableOpacity onPress={handleSkip} className="py-4">
-            <Text className="text-center text-gray-600 font-semibold">Skip for now</Text>
+            <AppText className="text-center text-gray-600 font-semibold">Skip for now</AppText>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -222,17 +223,17 @@ export default function VendorOnboardingWizard() {
             <View className="flex-1">
               <View className="flex-row items-center mb-2">
                 <View className="w-8 h-8 bg-green-600 rounded-full items-center justify-center mr-3">
-                  <Text className="text-white font-bold text-sm">2</Text>
+                  <AppText className="text-white font-bold text-sm">2</AppText>
                 </View>
-                <Text className="text-sm font-semibold text-gray-600">Location Setup</Text>
+                <AppText className="text-sm font-semibold text-gray-600">Location Setup</AppText>
               </View>
-              <Text className="text-2xl font-bold text-gray-900">Where are you located?</Text>
+              <AppText className="text-2xl font-bold text-gray-900">Where are you located?</AppText>
             </View>
           </View>
 
           {/* Address */}
           <View className="mb-6">
-            <Text className="text-sm font-semibold text-gray-700 mb-2">Address *</Text>
+            <AppText className="text-sm font-semibold text-gray-700 mb-2">Address *</AppText>
             <TextInput
               className="border border-gray-300 rounded-lg px-4 py-3"
               placeholder="Street address"
@@ -244,7 +245,7 @@ export default function VendorOnboardingWizard() {
 
           {/* City */}
           <View className="mb-6">
-            <Text className="text-sm font-semibold text-gray-700 mb-2">City *</Text>
+            <AppText className="text-sm font-semibold text-gray-700 mb-2">City *</AppText>
             <TextInput
               className="border border-gray-300 rounded-lg px-4 py-3"
               placeholder="e.g., Lusaka"
@@ -256,7 +257,7 @@ export default function VendorOnboardingWizard() {
 
           {/* District */}
           <View className="mb-8">
-            <Text className="text-sm font-semibold text-gray-700 mb-2">District</Text>
+            <AppText className="text-sm font-semibold text-gray-700 mb-2">District</AppText>
             <TextInput
               className="border border-gray-300 rounded-lg px-4 py-3"
               placeholder="e.g., Kabulonga"
@@ -268,11 +269,11 @@ export default function VendorOnboardingWizard() {
 
           {/* Buttons */}
           <TouchableOpacity onPress={handleNext} className="bg-green-600 rounded-lg py-4 mb-3">
-            <Text className="text-white text-center font-bold text-lg">Continue</Text>
+            <AppText className="text-white text-center font-bold text-lg">Continue</AppText>
           </TouchableOpacity>
 
           <TouchableOpacity onPress={handleSkip} className="py-4">
-            <Text className="text-center text-gray-600 font-semibold">Skip for now</Text>
+            <AppText className="text-center text-gray-600 font-semibold">Skip for now</AppText>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -295,17 +296,17 @@ export default function VendorOnboardingWizard() {
             <View className="flex-1">
               <View className="flex-row items-center mb-2">
                 <View className="w-8 h-8 bg-green-600 rounded-full items-center justify-center mr-3">
-                  <Text className="text-white font-bold text-sm">3</Text>
+                  <AppText className="text-white font-bold text-sm">3</AppText>
                 </View>
-                <Text className="text-sm font-semibold text-gray-600">Bank Details</Text>
+                <AppText className="text-sm font-semibold text-gray-600">Bank Details</AppText>
               </View>
-              <Text className="text-2xl font-bold text-gray-900">Where should we send payments?</Text>
+              <AppText className="text-2xl font-bold text-gray-900">Where should we send payments?</AppText>
             </View>
           </View>
 
           {/* Account Name */}
           <View className="mb-6">
-            <Text className="text-sm font-semibold text-gray-700 mb-2">Account Holder Name *</Text>
+            <AppText className="text-sm font-semibold text-gray-700 mb-2">Account Holder Name *</AppText>
             <TextInput
               className="border border-gray-300 rounded-lg px-4 py-3"
               placeholder="Business name"
@@ -317,7 +318,7 @@ export default function VendorOnboardingWizard() {
 
           {/* Bank Name */}
           <View className="mb-6">
-            <Text className="text-sm font-semibold text-gray-700 mb-2">Bank Name *</Text>
+            <AppText className="text-sm font-semibold text-gray-700 mb-2">Bank Name *</AppText>
             <TextInput
               className="border border-gray-300 rounded-lg px-4 py-3"
               placeholder="e.g., Zanaco, Standard Chartered"
@@ -329,7 +330,7 @@ export default function VendorOnboardingWizard() {
 
           {/* Account Number */}
           <View className="mb-6">
-            <Text className="text-sm font-semibold text-gray-700 mb-2">Account Number *</Text>
+            <AppText className="text-sm font-semibold text-gray-700 mb-2">Account Number *</AppText>
             <TextInput
               className="border border-gray-300 rounded-lg px-4 py-3"
               placeholder="Your account number"
@@ -342,7 +343,7 @@ export default function VendorOnboardingWizard() {
 
           {/* Branch Code */}
           <View className="mb-8">
-            <Text className="text-sm font-semibold text-gray-700 mb-2">Branch Code</Text>
+            <AppText className="text-sm font-semibold text-gray-700 mb-2">Branch Code</AppText>
             <TextInput
               className="border border-gray-300 rounded-lg px-4 py-3"
               placeholder="Optional"
@@ -354,11 +355,11 @@ export default function VendorOnboardingWizard() {
 
           {/* Buttons */}
           <TouchableOpacity onPress={handleNext} className="bg-green-600 rounded-lg py-4 mb-3">
-            <Text className="text-white text-center font-bold text-lg">Review</Text>
+            <AppText className="text-white text-center font-bold text-lg">Review</AppText>
           </TouchableOpacity>
 
           <TouchableOpacity onPress={handleSkip} className="py-4">
-            <Text className="text-center text-gray-600 font-semibold">Skip for now</Text>
+            <AppText className="text-center text-gray-600 font-semibold">Skip for now</AppText>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -373,52 +374,52 @@ export default function VendorOnboardingWizard() {
     return (
       <ScrollView className="flex-1 bg-white">
         <View className="px-6 py-8">
-          <Text className="text-3xl font-bold text-gray-900 mb-8">Review Your Information</Text>
+          <AppText className="text-3xl font-bold text-gray-900 mb-8">Review Your Information</AppText>
 
           {/* Business Summary */}
           <View className="bg-gray-50 rounded-lg p-4 mb-6">
-            <Text className="text-sm font-semibold text-gray-700 mb-3">Business</Text>
+            <AppText className="text-sm font-semibold text-gray-700 mb-3">Business</AppText>
             <View className="space-y-2">
-              <Text className="text-gray-900"><Text className="font-semibold">Name:</Text> {businessInfo.businessName}</Text>
-              <Text className="text-gray-900"><Text className="font-semibold">Type:</Text> {businessInfo.businessType}</Text>
-              <Text className="text-gray-900"><Text className="font-semibold">Phone:</Text> {businessInfo.phone}</Text>
+              <AppText className="text-gray-900"><AppText className="font-semibold">Name:</AppText> {businessInfo.businessName}</AppText>
+              <AppText className="text-gray-900"><AppText className="font-semibold">Type:</AppText> {businessInfo.businessType}</AppText>
+              <AppText className="text-gray-900"><AppText className="font-semibold">Phone:</AppText> {businessInfo.phone}</AppText>
             </View>
           </View>
 
           {/* Location Summary */}
           <View className="bg-gray-50 rounded-lg p-4 mb-6">
-            <Text className="text-sm font-semibold text-gray-700 mb-3">Location</Text>
+            <AppText className="text-sm font-semibold text-gray-700 mb-3">Location</AppText>
             <View className="space-y-2">
-              <Text className="text-gray-900"><Text className="font-semibold">Address:</Text> {location.address}</Text>
-              <Text className="text-gray-900"><Text className="font-semibold">City:</Text> {location.city}</Text>
-              {location.district && <Text className="text-gray-900"><Text className="font-semibold">District:</Text> {location.district}</Text>}
+              <AppText className="text-gray-900"><AppText className="font-semibold">Address:</AppText> {location.address}</AppText>
+              <AppText className="text-gray-900"><AppText className="font-semibold">City:</AppText> {location.city}</AppText>
+              {location.district && <AppText className="text-gray-900"><AppText className="font-semibold">District:</AppText> {location.district}</AppText>}
             </View>
           </View>
 
           {/* Bank Summary */}
           <View className="bg-gray-50 rounded-lg p-4 mb-8">
-            <Text className="text-sm font-semibold text-gray-700 mb-3">Bank Account</Text>
+            <AppText className="text-sm font-semibold text-gray-700 mb-3">Bank Account</AppText>
             <View className="space-y-2">
-              <Text className="text-gray-900"><Text className="font-semibold">Account Name:</Text> {bankDetails.accountName}</Text>
-              <Text className="text-gray-900"><Text className="font-semibold">Bank:</Text> {bankDetails.bankName}</Text>
-              <Text className="text-gray-900"><Text className="font-semibold">Account Number:</Text> ****{bankDetails.accountNumber.slice(-4)}</Text>
+              <AppText className="text-gray-900"><AppText className="font-semibold">Account Name:</AppText> {bankDetails.accountName}</AppText>
+              <AppText className="text-gray-900"><AppText className="font-semibold">Bank:</AppText> {bankDetails.bankName}</AppText>
+              <AppText className="text-gray-900"><AppText className="font-semibold">Account Number:</AppText> ****{bankDetails.accountNumber.slice(-4)}</AppText>
             </View>
           </View>
 
           {/* Info Box */}
           <View className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8">
-            <Text className="text-sm text-blue-900">
+            <AppText className="text-sm text-blue-900">
               By submitting, you agree to our merchant terms and conditions. We'll verify your information within 1-2 business days.
-            </Text>
+            </AppText>
           </View>
 
           {/* Buttons */}
           <TouchableOpacity onPress={handleSubmit} className="bg-green-600 rounded-lg py-4 mb-3">
-            <Text className="text-white text-center font-bold text-lg">Submit</Text>
+            <AppText className="text-white text-center font-bold text-lg">Submit</AppText>
           </TouchableOpacity>
 
           <TouchableOpacity onPress={() => setCurrentStep('bank')} className="border-2 border-green-600 rounded-lg py-4">
-            <Text className="text-green-600 text-center font-bold text-lg">Edit Information</Text>
+            <AppText className="text-green-600 text-center font-bold text-lg">Edit Information</AppText>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -433,17 +434,17 @@ export default function VendorOnboardingWizard() {
     <View className="flex-1 bg-white items-center justify-center px-6">
       <View className="items-center">
         <View className="w-20 h-20 rounded-full bg-green-100 items-center justify-center mb-6">
-          <Text className="text-5xl">✓</Text>
+          <AppText className="text-5xl">âœ“</AppText>
         </View>
-        <Text className="text-3xl font-bold text-gray-900 text-center mb-2">
+        <AppText className="text-3xl font-bold text-gray-900 text-center mb-2">
           Application Submitted!
-        </Text>
-        <Text className="text-gray-600 text-center mb-8">
+        </AppText>
+        <AppText className="text-gray-600 text-center mb-8">
           We'll verify your information and get back to you within 1-2 business days.
-        </Text>
-        <Text className="text-sm text-gray-500 text-center">
+        </AppText>
+        <AppText className="text-sm text-gray-500 text-center">
           Redirecting to your dashboard...
-        </Text>
+        </AppText>
       </View>
     </View>
   );

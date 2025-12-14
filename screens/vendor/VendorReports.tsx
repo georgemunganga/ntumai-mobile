@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   View,
-  Text,
   TouchableOpacity,
   ScrollView,
   TextInput,
@@ -11,13 +10,14 @@ import {
   FlatList,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import HeaderBar from '../../components/HeaderBar';
+import HeaderBar from '@/components/HeaderBar';
 import {
   CreditCard,
   DollarSign,
   Search,
   SlidersHorizontal,
 } from 'lucide-react-native';
+import AppText from '@/components/AppText';
 
 interface VendorReportsProps {
   navigation: any;
@@ -205,40 +205,40 @@ const VendorReports: React.FC<VendorReportsProps> = ({ navigation }) => {
               <View className='rounded-full p-3'>
                 <DollarSign size={32} color='#0aaf97' />
               </View>
-              <Text className='text-black font-bold text-3xl'>
+              <AppText className='text-black font-bold text-3xl'>
                 {selectedOrder?.price}
-              </Text>
+              </AppText>
             </View>
 
             <View className='space-y-4'>
               <View className='flex-row justify-between items-center'>
-                <Text className='text-gray-500 text-base'>Name</Text>
-                <Text className='text-black font-medium text-base'>
+                <AppText className='text-gray-500 text-base'>Name</AppText>
+                <AppText className='text-black font-medium text-base'>
                   {selectedOrder?.restaurantName}
-                </Text>
+                </AppText>
               </View>
 
               <View className='flex-row justify-between items-center'>
-                <Text className='text-gray-500 text-base'>Tax ID</Text>
-                <Text className='text-black font-medium text-base'>
+                <AppText className='text-gray-500 text-base'>Tax ID</AppText>
+                <AppText className='text-black font-medium text-base'>
                   {selectedOrder?.orderId}
-                </Text>
+                </AppText>
               </View>
 
               <View className='flex-row justify-between items-center'>
-                <Text className='text-gray-500 text-base'>
+                <AppText className='text-gray-500 text-base'>
                   Transaction Date
-                </Text>
-                <Text className='text-black font-medium text-base'>
+                </AppText>
+                <AppText className='text-black font-medium text-base'>
                   {selectedOrder?.date} {selectedOrder?.time}
-                </Text>
+                </AppText>
               </View>
 
               <View className='flex-row justify-between items-center'>
-                <Text className='text-gray-500 text-base'>Remarks</Text>
-                <Text className='text-black font-medium text-base'>
+                <AppText className='text-gray-500 text-base'>Remarks</AppText>
+                <AppText className='text-black font-medium text-base'>
                   Pay in App using my Credit Card
-                </Text>
+                </AppText>
               </View>
             </View>
           </Pressable>
@@ -249,35 +249,35 @@ const VendorReports: React.FC<VendorReportsProps> = ({ navigation }) => {
 
   const renderOrderReport = () => (
     <View className='mb-6'>
-      <Text className='text-black font-bold text-lg mb-4'>Order Report</Text>
+      <AppText className='text-black font-bold text-lg mb-4'>Order Report</AppText>
       <View className='flex-row flex-wrap justify-between'>
         <View className='w-[48%] bg-[#eeeeee] rounded-2xl p-4 mb-3'>
-          <Text className='text-primary font-medium text-xl mb-1'>Today</Text>
-          <Text className='text-black font-bold text-2xl text-right pt-7'>
+          <AppText className='text-primary font-medium text-xl mb-1'>Today</AppText>
+          <AppText className='text-black font-bold text-2xl text-right pt-7'>
             35
-          </Text>
+          </AppText>
         </View>
         <View className='w-[48%] bg-[#eeeeee] rounded-2xl p-4 mb-3'>
-          <Text className='text-primary font-medium text-xl mb-1'>
+          <AppText className='text-primary font-medium text-xl mb-1'>
             Yesterday
-          </Text>
-          <Text className='text-black font-bold text-2xl text-right pt-7'>
+          </AppText>
+          <AppText className='text-black font-bold text-2xl text-right pt-7'>
             43
-          </Text>
+          </AppText>
         </View>
         <View className='w-[48%] bg-[#eeeeee] rounded-2xl p-4 mb-3'>
-          <Text className='text-primary font-medium text-xl mb-1'>
+          <AppText className='text-primary font-medium text-xl mb-1'>
             This Week
-          </Text>
-          <Text className='text-black font-bold text-2xl text-right pt-7'>
+          </AppText>
+          <AppText className='text-black font-bold text-2xl text-right pt-7'>
             100
-          </Text>
+          </AppText>
         </View>
         <View className='w-[48%] bg-[#eeeeee] rounded-2xl p-4 mb-3'>
-          <Text className='text-primary font-medium text-xl mb-1'>Total</Text>
-          <Text className='text-black font-bold text-2xl text-right pt-7'>
+          <AppText className='text-primary font-medium text-xl mb-1'>Total</AppText>
+          <AppText className='text-black font-bold text-2xl text-right pt-7'>
             1500
-          </Text>
+          </AppText>
         </View>
       </View>
     </View>
@@ -285,46 +285,46 @@ const VendorReports: React.FC<VendorReportsProps> = ({ navigation }) => {
 
   const renderIncomeReport = () => (
     <View className='mb-6'>
-      <Text className='text-black font-bold text-lg mb-4'>Income Report</Text>
+      <AppText className='text-black font-bold text-lg mb-4'>Income Report</AppText>
       <View className='flex-row flex-wrap justify-between'>
         <View className='w-[48%] bg-[#eeeeee] rounded-xl p-4 mb-3'>
-          <Text className='text-primary font-medium text-xl mb-1'>Today</Text>
-          <Text className='text-black font-bold text-2xl text-right pt-7'>
+          <AppText className='text-primary font-medium text-xl mb-1'>Today</AppText>
+          <AppText className='text-black font-bold text-2xl text-right pt-7'>
             K14,592.00
-          </Text>
+          </AppText>
         </View>
         <View className='w-[48%] bg-[#eeeeee] rounded-xl p-4 mb-3'>
-          <Text className='text-primary font-medium text-xl mb-1'>
+          <AppText className='text-primary font-medium text-xl mb-1'>
             Yesterday
-          </Text>
-          <Text className='text-black font-bold text-2xl text-right pt-7'>
+          </AppText>
+          <AppText className='text-black font-bold text-2xl text-right pt-7'>
             K2,374.10
-          </Text>
+          </AppText>
         </View>
         <View className='flex-row justify-between'>
           <View className='w-[32%] bg-[#eeeeee] rounded-xl p-4 mb-3'>
-            <Text className='text-primary font-medium text-xl mb-1'>
+            <AppText className='text-primary font-medium text-xl mb-1'>
               This Week
-            </Text>
-            <Text className='text-black font-bold text-2xl text-right pt-7'>
+            </AppText>
+            <AppText className='text-black font-bold text-2xl text-right pt-7'>
               K14,592.00
-            </Text>
+            </AppText>
           </View>
           <View className='w-[32%] bg-[#eeeeee] rounded-xl p-4 mb-3'>
-            <Text className='text-primary font-medium text-xl mb-1'>
+            <AppText className='text-primary font-medium text-xl mb-1'>
               This Month
-            </Text>
-            <Text className='text-black font-bold text-2xl text-right pt-7'>
+            </AppText>
+            <AppText className='text-black font-bold text-2xl text-right pt-7'>
               K14,592.00
-            </Text>
+            </AppText>
           </View>
           <View className='w-[32%] bg-[#eeeeee] rounded-xl p-4 mb-3'>
-            <Text className='text-primary font-medium text-xl mb-1'>
+            <AppText className='text-primary font-medium text-xl mb-1'>
               This Year
-            </Text>
-            <Text className='text-black font-bold text-2xl text-right pt-7'>
+            </AppText>
+            <AppText className='text-black font-bold text-2xl text-right pt-7'>
               K14,592.00
-            </Text>
+            </AppText>
           </View>
         </View>
       </View>
@@ -336,7 +336,7 @@ const VendorReports: React.FC<VendorReportsProps> = ({ navigation }) => {
       <View className='flex-row items-center mb-4'>
         <View className='flex-row items-center bg-gray-100 rounded-full px-3 py-2 flex-1 mr-2'>
           <Search size={20} color='#9CA3AF' />
-          <TextInput
+          <AppTextInput
             className='flex-1 ml-2 text-gray-700'
             placeholder='Search'
             value={searchQuery}
@@ -362,19 +362,19 @@ const VendorReports: React.FC<VendorReportsProps> = ({ navigation }) => {
               </View>
 
               <View className='flex-1'>
-                <Text className='font-bold text-black text-base mb-1'>
+                <AppText className='font-bold text-black text-base mb-1'>
                   {order.restaurantName}
-                </Text>
-                <Text className='text-gray-600 text-sm mb-1'>
+                </AppText>
+                <AppText className='text-gray-600 text-sm mb-1'>
                   Order: {order.orderId}
-                </Text>
-                <Text className='text-gray-600 text-sm'>
+                </AppText>
+                <AppText className='text-gray-600 text-sm'>
                   {order.date} {order.time}
-                </Text>
+                </AppText>
               </View>
 
               <View className='items-end'>
-                <Text
+                <AppText
                   className={`font-bold text-lg mb-2 ${
                     order.status === 'Paid'
                       ? 'text-[#0aaf97]'
@@ -382,15 +382,15 @@ const VendorReports: React.FC<VendorReportsProps> = ({ navigation }) => {
                   }`}
                 >
                   {order.price}
-                </Text>
+                </AppText>
                 <View
                   className={`px-3 py-1 rounded-full ${
                     order.status === 'Paid' ? 'bg-[#0aaf97]' : 'bg-[#ed4877]'
                   }`}
                 >
-                  <Text className='text-white text-xs font-medium'>
+                  <AppText className='text-white text-xs font-medium'>
                     {order.status}
-                  </Text>
+                  </AppText>
                 </View>
               </View>
             </View>
@@ -425,55 +425,55 @@ const VendorReports: React.FC<VendorReportsProps> = ({ navigation }) => {
                   resizeMode='cover'
                 />
               </View>
-              <Text className='text-white font-semibold text-lg'>Gibson</Text>
+              <AppText className='text-white font-semibold text-lg'>Gibson</AppText>
             </View>
             <Image
-              source={require('../../assets/splash_logo.png')}
+              source={require('@/assets/splash_logo.png')}
               style={{ width: 80, height: 30 }}
             />
           </View>
 
-          <Text className='text-white text-4xl py-4 font-bold mb-2 w-full text-center tracking-wider'>
+          <AppText className='text-white text-4xl py-4 font-bold mb-2 w-full text-center tracking-wider'>
             1 3 2 0 7 5 1 3 9
-          </Text>
+          </AppText>
 
           <View className='flex-row justify-between items-end'>
             <View>
-              <Text className='text-white text-sm opacity-90'>Balance:</Text>
-              <Text className='text-white text-2xl font-bold'>K 250.00</Text>
+              <AppText className='text-white text-sm opacity-90'>Balance:</AppText>
+              <AppText className='text-white text-2xl font-bold'>K 250.00</AppText>
             </View>
             <View className='items-end'>
-              <Text className='text-white text-sm opacity-90'>
+              <AppText className='text-white text-sm opacity-90'>
                 Member since
-              </Text>
-              <Text className='text-white text-lg font-semibold'>
+              </AppText>
+              <AppText className='text-white text-lg font-semibold'>
                 Jan 25, 2021
-              </Text>
+              </AppText>
             </View>
           </View>
         </View>
 
         <View className='flex-row justify-end mb-4'>
           <TouchableOpacity>
-            <Text className='text-[#55c2fd] text-sm'>Terms & Conditions</Text>
+            <AppText className='text-[#55c2fd] text-sm'>Terms & Conditions</AppText>
           </TouchableOpacity>
         </View>
 
         <View className='flex-1'>
-          <Text className='text-black font-bold text-xl mb-2'>
+          <AppText className='text-black font-bold text-xl mb-2'>
             Recent Transactions
-          </Text>
+          </AppText>
 
           <ScrollView className='flex-1'>
             {Object.entries(groupedTransactions).map(
               ([date, dateTransactions]) => (
                 <View key={date} className='mb-6'>
                   <View className='flex-row justify-between items-center mb-3'>
-                    <Text className='text-gray-500 text-base'>{date}</Text>
+                    <AppText className='text-gray-500 text-base'>{date}</AppText>
                     <TouchableOpacity>
-                      <Text className='text-[#0aaf97] text-sm font-medium'>
+                      <AppText className='text-[#0aaf97] text-sm font-medium'>
                         View All
-                      </Text>
+                      </AppText>
                     </TouchableOpacity>
                   </View>
 
@@ -491,16 +491,16 @@ const VendorReports: React.FC<VendorReportsProps> = ({ navigation }) => {
                           />
                         </View>
                         <View className='flex-1'>
-                          <Text className='text-black font-medium text-base'>
+                          <AppText className='text-black font-medium text-base'>
                             {transaction.restaurantName}
-                          </Text>
-                          <Text className='text-gray-600 text-sm'>
+                          </AppText>
+                          <AppText className='text-gray-600 text-sm'>
                             {transaction.description}
-                          </Text>
+                          </AppText>
                         </View>
-                        <Text className='text-[#ed4877] font-bold text-base'>
+                        <AppText className='text-[#ed4877] font-bold text-base'>
                           {transaction.amount}
-                        </Text>
+                        </AppText>
                       </View>
                     ))}
                   </View>
@@ -520,7 +520,7 @@ const VendorReports: React.FC<VendorReportsProps> = ({ navigation }) => {
         <TouchableOpacity onPress={handleBackPress} className='mr-4'>
           <Ionicons name='arrow-back' size={24} color='#000' />
         </TouchableOpacity>
-        <Text className='text-lg font-semibold text-black'>Reports</Text>
+        <AppText className='text-lg font-semibold text-black'>Reports</AppText>
       </View> */}
 
       <ScrollView className='flex-1 p-4'>
@@ -541,13 +541,13 @@ const VendorReports: React.FC<VendorReportsProps> = ({ navigation }) => {
                   : 'bg-white border border-[#0aaf97]'
               }`}
             >
-              <Text
+              <AppText
                 className={`text-center font-medium w-[110px] ${
                   activeTab === tab ? 'text-white' : 'text-[#0aaf97]'
                 }`}
               >
                 {tab}
-              </Text>
+              </AppText>
             </TouchableOpacity>
           )}
         />
@@ -560,12 +560,12 @@ const VendorReports: React.FC<VendorReportsProps> = ({ navigation }) => {
                   <View className=' p-2 mr-3'>
                     <CreditCard size={24} color='#0aaf97' />
                   </View>
-                  <Text className='text-[#495057] font-bold text-2xl'>
+                  <AppText className='text-[#495057] font-bold text-2xl'>
                     K1500
-                  </Text>
+                  </AppText>
                 </View>
                 <TouchableOpacity className='bg-[#0aaf97] rounded-full px-5 py-4'>
-                  <Text className='text-white font-medium'>View Data</Text>
+                  <AppText className='text-white font-medium'>View Data</AppText>
                 </TouchableOpacity>
               </View>
             </View>
@@ -586,11 +586,11 @@ const VendorReports: React.FC<VendorReportsProps> = ({ navigation }) => {
           <View className='flex-row items-center justify-between'>
             <View className='flex-row items-center'>
               <DollarSign size={24} color='white' />
-              <Text className='text-white font-semibold text-xl ml-2'>
+              <AppText className='text-white font-semibold text-xl ml-2'>
                 Total Paid
-              </Text>
+              </AppText>
             </View>
-            <Text className='text-white font-bold text-xl'>K 253.95</Text>
+            <AppText className='text-white font-bold text-xl'>K 253.95</AppText>
           </View>
         </View>
       )}

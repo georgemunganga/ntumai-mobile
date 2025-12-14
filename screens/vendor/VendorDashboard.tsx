@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { VendorHeader } from './VendorHeader';
-import Text from '../../components/Text';
+import AppText from '@/components/AppText';
 
 export function VendorDashboard() {
   const [selectedPeriod, setSelectedPeriod] = useState('Today');
@@ -35,8 +35,8 @@ export function VendorDashboard() {
       <View className="bg-white px-4 py-4 border-b border-gray-200">
         <View className="flex-row items-center justify-between">
           <View>
-            <Text style={{fontFamily:'Ubuntu-Bold'}} className="text-2xl font-bold text-gray-900">Dashboard</Text>
-            <Text style={{fontFamily:'Ubuntu-Bold'}} className="text-gray-500 mt-1">Welcome back, Vendor!</Text>
+            <AppText variant="h3" weight="bold" className="text-gray-900">Dashboard</AppText>
+            <AppText variant="subtitle" className="text-gray-500 mt-1">Welcome back, Vendor!</AppText>
           </View>
           <TouchableOpacity className="p-2">
             <Ionicons name="notifications-outline" size={24} color="#374151" />
@@ -52,11 +52,11 @@ export function VendorDashboard() {
                 selectedPeriod === period ? 'bg-white' : ''
               }`}
             >
-              <Text style={{fontFamily:'Ubuntu-Medium'}} className={`text-center font-medium ${
+              <AppText variant="body" weight="semibold" className={`text-center ${
                 selectedPeriod === period ? 'text-emerald-600' : 'text-gray-600'
               }`}>
                 {period}
-              </Text>
+              </AppText>
             </TouchableOpacity>
           ))}
         </View>
@@ -74,15 +74,15 @@ export function VendorDashboard() {
                       <View className={`w-6 h-6 rounded-full`} 
                             style={{ backgroundColor: stat.color }} />
                     </View>
-                    <Text  className={`text-sm font-medium`} 
-                          style={{ color: stat.color , fontFamily:'Ubuntu-Medium'}}>
+                    <AppText  className="text-sm font-medium" 
+                          style={{ color: stat.color }}>
                       {stat.change}
-                    </Text>
+                    </AppText>
                   </View>
-                  <Text style={{fontFamily:'Ubuntu-Bold'}} className="text-2xl font-bold text-gray-900 mb-1">
+                  <AppText variant="h3" weight="bold" className="text-gray-900 mb-1">
                     {stat.value}
-                  </Text>
-                  <Text className="text-gray-500 text-sm">{stat.title}</Text>
+                  </AppText>
+                  <AppText variant="caption" className="text-gray-500">{stat.title}</AppText>
                 </View>
               </View>
             ))}
@@ -90,7 +90,7 @@ export function VendorDashboard() {
         </View>
 
         <View className="px-4 mb-6">
-          <Text style={{fontFamily:'Ubuntu-Bold'}} className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</Text>
+          <AppText variant="title" weight="bold" className="text-gray-900 mb-4">Quick Actions</AppText>
           <View className="flex-row justify-between">
             {[
               { title: 'Add Product', icon: 'add-circle', color: '#10B981' },
@@ -103,7 +103,7 @@ export function VendorDashboard() {
                       style={{ backgroundColor: `${action.color}20` }}>
                   <Ionicons name={action.icon} size={24} color={action.color} />
                 </View>
-                <Text style={{fontFamily:'Ubuntu-Medium'}} className="text-xs text-gray-600 text-center">{action.title}</Text>
+                <AppText variant="caption" className="text-gray-600 text-center">{action.title}</AppText>
               </TouchableOpacity>
             ))}
           </View>
@@ -111,9 +111,9 @@ export function VendorDashboard() {
 
         <View className="px-4 mb-6">
           <View className="flex-row items-center justify-between mb-4">
-            <Text style={{fontFamily:'Ubuntu-Bold'}} className="text-lg font-semibold text-gray-900">Recent Orders</Text>
+            <AppText variant="title" weight="bold" className="text-gray-900">Recent Orders</AppText>
             <TouchableOpacity>
-              <Text style={{fontFamily:'Ubuntu-Medium'}} className="text-emerald-600 font-medium">View All</Text>
+              <AppText variant="body" weight="semibold" className="text-emerald-600">View All</AppText>
             </TouchableOpacity>
           </View>
           
@@ -123,23 +123,23 @@ export function VendorDashboard() {
                 <View className="flex-row items-center justify-between">
                   <View className="flex-1">
                     <View className="flex-row items-center mb-1">
-                      <Text style={{fontFamily:'Ubuntu-Medium'}} className="font-semibold text-gray-900 mr-2">{order.id}</Text>
+                      <AppText variant="body" weight="semibold" className="text-gray-900 mr-2">{order.id}</AppText>
                       <View className={`px-2 py-1 rounded-full ${
                         order.status === 'Preparing' ? 'bg-yellow-100' :
                         order.status === 'Ready' ? 'bg-green-100' : 'bg-gray-100'
                       }`}>
-                        <Text style={{fontFamily:'Ubuntu-Medium'}} className={`text-xs font-medium ${
+                        <AppText className={`text-xs font-medium ${
                           order.status === 'Preparing' ? 'text-yellow-600' :
                           order.status === 'Ready' ? 'text-green-600' : 'text-gray-600'
                         }`}>
                           {order.status}
-                        </Text>
+                        </AppText>
                       </View>
                     </View>
-                    <Text style={{fontFamily:'Ubuntu-Medium'}} className="text-gray-600 text-sm">{order.customer}</Text>
-                    <Text style={{fontFamily:'Ubuntu-Medium'}} className="text-gray-400 text-xs mt-1">{order.time}</Text>
+                    <AppText variant="body" className="text-gray-600">{order.customer}</AppText>
+                    <AppText variant="caption" className="text-gray-400 mt-1">{order.time}</AppText>
                   </View>
-                  <Text style={{fontFamily:'Ubuntu-Medium'}} className="font-bold text-gray-900">{order.amount}</Text>
+                  <AppText variant="body" weight="bold" className="text-gray-900">{order.amount}</AppText>
                 </View>
               </View>
             ))}

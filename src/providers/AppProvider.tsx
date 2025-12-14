@@ -1,9 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { useRouter } from 'expo-router';
-import { AuthProvider } from './AuthProvider';
-import { OtpProvider } from './OtpProvider';
-import { useAuthStore } from '../store';
-import { RoleBasedNavigator } from '../navigation/RoleBasedNavigator';
+import { AuthProvider } from '@/src/providers/AuthProvider';
+import { OtpProvider } from '@/src/providers/OtpProvider';
 
 interface AppProviderProps {
   children: React.ReactNode;
@@ -12,42 +8,14 @@ interface AppProviderProps {
 /**
  * Main application provider that wraps all context providers
  * This ensures proper provider hierarchy and dependency management
- * Also handles role-based navigation and authentication initialization
+ *
+ * Note: With Expo Router, navigation is handled by the file-based routing system.
+ * The splash screen (app/index.tsx → /(auth)/Splash) handles initial routing decisions.
  */
 export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
-  const router = useRouter();
-  const { initializeAuth } = useAuthStore();
-  const [initialized, setInitialized] = useState(false);
-  const [initError, setInitError] = useState<string | null>(null);
-
-  // Initialize authentication on app start (only once)
-  useEffect(() => {
-    // Prevent multiple initialization attempts
-    if (initialized) return;
-
-    const initApp = async () => {
-      try {
-        await initializeAuth();
-        setInitialized(true);
-      } catch (error: any) {
-        console.error('Failed to initialize app:', error);
-        setInitError(error?.message || 'Initialization failed');
-        setInitialized(true); // Mark as initialized even on error to prevent infinite loop
-        
-        // Redirect to splash screen on error
-        setTimeout(() => {
-          router.replace('/(auth)/SplashScreen');
-        }, 500);
-      }
-    };
-
-    initApp();
-  }, []); // Empty dependency array - run only once on mount
-
   return (
     <AuthProvider>
       <OtpProvider>
-        <RoleBasedNavigator />
         {children}
       </OtpProvider>
     </AuthProvider>
@@ -58,9 +26,9 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
  * Navigation Structure:
  *
  * Auth Stack:
- * - SplashScreen (entry point)
+ * - Splash (entry point)
  * - PhoneLogin
- * - OtpVerification
+ * - Otp
  * - RoleSelection
  * - DriverOnboarding
  *

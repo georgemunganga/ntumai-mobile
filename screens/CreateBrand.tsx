@@ -11,7 +11,7 @@ import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 
-import AppText from '../components/AppText';
+import AppText from '@/components/AppText';
 import { Package } from 'lucide-react-native';
 
 const CreateBrand = () => {
@@ -118,4 +118,3 @@ const CreateBrand = () => {
 };
 
 export default CreateBrand;
-

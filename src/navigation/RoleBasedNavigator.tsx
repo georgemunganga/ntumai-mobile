@@ -1,35 +1,37 @@
 import React from 'react';
 import { View, Text, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useAuthStore } from '../store';
+import { useAuthStore } from '@/src/store';
 
 export function RoleBasedNavigator() {
   const router = useRouter();
   const { user, isAuthenticated, isLoading } = useAuthStore();
 
   React.useEffect(() => {
-    if (isLoading) return;
+    if (isLoading) {
+      return;
+    }
 
+    // Only handle redirection when we have a fully authenticated user
     if (!isAuthenticated || !user) {
-      router.replace('/(auth)/SplashScreen');
       return;
     }
 
     // Route based on user role
     switch (user.role) {
       case 'customer':
-        router.replace('/(customer)/Home');
+        router.replace('/(customer)/(tabs)');
         break;
       case 'tasker':
-        router.replace('/(tasker)/DriverDashboard');
+        router.replace('/(tasker)/(tabs)');
         break;
       case 'vendor':
-        router.replace('/(vendor)/VendorDashboard');
+        router.replace('/(vendor)/(tabs)');
         break;
       default:
         router.replace('/(auth)/RoleSelection');
     }
-  }, [isAuthenticated, user, isLoading]);
+  }, [isAuthenticated, user, isLoading, router]);
 
   if (isLoading) {
     return (
@@ -86,10 +88,9 @@ export function RoleBasedNavigator() {
  * - /(shared)/EditProfileScreen - Edit profile
  *
  * AUTH:
- * - /(auth)/SplashScreen - Initial splash
+ * - /(auth)/Splash - Initial splash
  * - /(auth)/PhoneLogin - Phone login
- * - /(auth)/OtpVerification - OTP verification
+ * - /(auth)/Otp - OTP verification
  * - /(auth)/RoleSelection - Role selection
  * - /(auth)/DriverOnboarding - Driver KYC
  */
-

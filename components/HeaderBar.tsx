@@ -54,7 +54,7 @@ export default function HeaderBar({
 
           <View className='flex-1 items-center '>
             <Image
-              source={require('../assets/logo_green.png')}
+              source={require('@/assets/logo_green.png')}
               height={10}
               width={20}
             />

@@ -2,7 +2,7 @@
 // Location services hook
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { UseLocationOptions, LocationData, LocationError } from './types';
-import { locationService, locationPermissions, geoUtils, LocationTracker } from '../utils/location';
+import { locationService, locationPermissions, geoUtils, LocationTracker } from '@/src/utils/location';
 
 export interface UseLocationResult {
   // Location state

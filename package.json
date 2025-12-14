@@ -51,8 +51,9 @@
   "devDependencies": {
     "@babel/core": "^7.28.5",
     "@types/react": "~19.1.17",
-    "expo-doctor": "1.17.12",
     "autoprefixer": "^10.4.22",
+    "babel-plugin-module-resolver": "^5.0.2",
+    "expo-doctor": "1.17.12",
     "typescript": "~5.9.3"
   },
   "private": true

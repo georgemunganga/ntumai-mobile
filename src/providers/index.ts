@@ -1,6 +1,6 @@
 // Provider layer exports
-export { AuthProvider, useAuthContext } from './AuthProvider';
-export { OtpProvider, useOtpContext } from './OtpProvider';
+export { AuthProvider, useAuthContext } from '@/src/providers/AuthProvider';
+export { OtpProvider, useOtpContext } from '@/src/providers/OtpProvider';
 export { AppProvider } from './AppProvider';
 
 // Provider types

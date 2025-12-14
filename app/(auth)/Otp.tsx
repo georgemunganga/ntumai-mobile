@@ -1,5 +1,5 @@
-import OtpInputScreen from '../../screens/OtpInputScreen';
-import { AuthGuard } from '../../src/components/auth';
+import OtpInputScreen from '@/screens/OtpInputScreen';
+import { AuthGuard } from '@/src/components/auth';
 
 export default function OtpRoute() {
   return (
@@ -8,3 +8,4 @@ export default function OtpRoute() {
     </AuthGuard>
   );
 }
+

@@ -61,7 +61,7 @@
 ---
 
 ### 3. OTP Verification Screen
-**File:** `app/(auth)/OtpVerification.tsx`
+**File:** `app/(auth)/Otp.tsx`
 
 **Purpose:** Verify OTP and authenticate user
 

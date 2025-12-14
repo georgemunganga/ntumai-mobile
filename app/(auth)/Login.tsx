@@ -1,5 +1,5 @@
-import LoginScreen from '../../screens/LoginScreen';
-import { AuthGuard } from '../../src/components/auth';
+import LoginScreen from '@/screens/LoginScreen';
+import { AuthGuard } from '@/src/components/auth';
 
 export default function LoginRoute() {
   return (
@@ -8,3 +8,4 @@ export default function LoginRoute() {
     </AuthGuard>
   );
 }
+

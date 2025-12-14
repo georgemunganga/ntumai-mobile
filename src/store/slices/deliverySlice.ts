@@ -1,8 +1,8 @@
 // @ts-nocheck
 import { create } from 'zustand';
-import { DeliveryAddress } from '../types';
-import { mockP2PService } from '../../api/mockServices';
-import { createPersistentStore } from '../utils/persistentStore';
+import { DeliveryAddress } from '@/types';
+import { mockP2PService } from '@/src/api/mockServices';
+import { createPersistentStore } from '@/src/store/utils/persistentStore';
 
 interface P2PDelivery {
   id: string;

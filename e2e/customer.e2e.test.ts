@@ -8,8 +8,8 @@ import {
   mockMarketplaceService,
   mockOrderService,
   mockAuthService,
-} from '../src/api/mockServices';
-import { useAuthStore, useMarketplaceStore, useCartStore, useOrderStore } from '../src/store';
+} from '@/src/api/mockServices';
+import { useAuthStore, useMarketplaceStore, useCartStore, useOrderStore } from '@/src/store';
 
 describe('Customer Workflow E2E Tests', () => {
   beforeEach(() => {

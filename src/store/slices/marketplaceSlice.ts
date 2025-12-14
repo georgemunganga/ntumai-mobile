@@ -1,8 +1,8 @@
 // @ts-nocheck
 import { create } from 'zustand';
-import { Product } from '../types';
-import { mockMarketplaceService } from '../../api/mockServices';
-import { createPersistentStore } from '../utils/persistentStore';
+import { Product } from '@/types';
+import { mockMarketplaceService } from '@/src/api/mockServices';
+import { createPersistentStore } from '@/src/store/utils/persistentStore';
 
 interface Vendor {
   id: string;

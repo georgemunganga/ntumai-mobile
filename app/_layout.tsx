@@ -4,8 +4,8 @@ import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
-import { AppProvider } from '../src/providers';
-import '../global.css';
+import { AppProvider } from '@/src/providers';
+import '@/global.css';
 
 void SplashScreen.preventAutoHideAsync();
 
@@ -15,10 +15,10 @@ export const unstable_settings = {
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
-    'Ubuntu-Regular': require('../assets/fonts/Ubuntu-Regular.ttf'),
-    'Ubuntu-Bold': require('../assets/fonts/Ubuntu-Bold.ttf'),
-    'Ubuntu-Light': require('../assets/fonts/Ubuntu-Light.ttf'),
-    'Ubuntu-Medium': require('../assets/fonts/Ubuntu-Medium.ttf'),
+    'Ubuntu-Regular': require('@/assets/fonts/Ubuntu-Regular.ttf'),
+    'Ubuntu-Bold': require('@/assets/fonts/Ubuntu-Bold.ttf'),
+    'Ubuntu-Light': require('@/assets/fonts/Ubuntu-Light.ttf'),
+    'Ubuntu-Medium': require('@/assets/fonts/Ubuntu-Medium.ttf'),
   });
 
   useEffect(() => {
@@ -49,3 +49,4 @@ export default function RootLayout() {
     </GestureHandlerRootView>
   );
 }
+

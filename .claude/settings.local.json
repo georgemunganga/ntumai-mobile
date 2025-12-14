@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find:*)",
+      "Bash(dir /b screens)",
+      "Bash(ls:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npm run web:*)",
+      "Bash(dir /b /s app*driver*)",
+      "Bash(findstr:*)",
+      "Bash(dir /b /s screens*driver*)",
+      "Bash(powershell.exe:*)",
+      "Bash(npm install:*)",
+      "Bash(node:*)",
+      "Bash(npx expo start:*)",
+      "Bash(grep:*)",
+      "Bash(xargs grep:*)",
+      "Bash(tail:*)",
+      "Bash(taskkill:*)",
+      "Bash(cat:*)"
+    ]
+  }
+}

@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Dimensions, Platform, StatusBar } from 'react-native';
 import { DeviceState } from './types';
-import { DeviceService, deviceDetection, screenUtils } from '../utils/device';
+import { DeviceService, deviceDetection, screenUtils } from '@/src/utils/device';
 
 export interface UseDeviceOptions {
   trackOrientation?: boolean;

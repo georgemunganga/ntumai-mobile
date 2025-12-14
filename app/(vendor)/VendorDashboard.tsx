@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   View,
-  Text,
   TouchableOpacity,
   ScrollView,
   Image,
@@ -9,8 +8,9 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useAuthStore } from '../../src/store';
+import { useAuthStore } from '@/src/store';
 import { Feather } from '@expo/vector-icons';
+import AppText from '@/components/AppText';
 
 export default function VendorDashboard() {
   const router = useRouter();
@@ -72,8 +72,8 @@ export default function VendorDashboard() {
       <View className="bg-white px-6 py-6 border-b border-gray-200">
         <View className="flex-row items-center justify-between mb-4">
           <View>
-            <Text className="text-sm text-gray-600">Welcome back</Text>
-            <Text className="text-2xl font-bold text-gray-900">{user?.firstName}</Text>
+            <AppText variant="caption" className="text-gray-600">Welcome back</AppText>
+            <AppText variant="h3" weight="bold" className="text-gray-900">{user?.firstName}</AppText>
           </View>
           <TouchableOpacity onPress={() => router.push('/(vendor)/Profile')}>
             <Image
@@ -86,13 +86,13 @@ export default function VendorDashboard() {
         {/* Status Badge */}
         <View className="bg-green-50 border border-green-200 rounded-lg p-3 flex-row items-center">
           <View className="w-2 h-2 bg-green-600 rounded-full mr-2" />
-          <Text className="text-green-700 font-semibold">Online & Accepting Orders</Text>
+          <AppText variant="body" weight="semibold" className="text-green-700">Online & Accepting Orders</AppText>
         </View>
       </View>
 
       {/* Stats Grid */}
       <View className="px-6 py-6">
-        <Text className="text-lg font-bold text-gray-900 mb-4">Today's Performance</Text>
+        <AppText variant="title" weight="bold" className="text-gray-900 mb-4">Today's Performance</AppText>
         <View className="gap-3">
           {/* Orders */}
           <View className="bg-white rounded-lg p-4 flex-row items-center border border-gray-200">
@@ -100,10 +100,10 @@ export default function VendorDashboard() {
               <Feather name="shopping-bag" size={24} color="#2563EB" />
             </View>
             <View className="flex-1">
-              <Text className="text-gray-600 text-sm">Orders</Text>
-              <Text className="text-2xl font-bold text-gray-900">{stats.todayOrders}</Text>
+              <AppText variant="caption" className="text-gray-600">Orders</AppText>
+              <AppText variant="h3" weight="bold" className="text-gray-900">{stats.todayOrders}</AppText>
             </View>
-            <Text className="text-green-600 font-bold">+2</Text>
+            <AppText variant="body" weight="bold" className="text-green-600">+2</AppText>
           </View>
 
           {/* Revenue */}
@@ -112,10 +112,10 @@ export default function VendorDashboard() {
               <Feather name="dollar-sign" size={24} color="#16A34A" />
             </View>
             <View className="flex-1">
-              <Text className="text-gray-600 text-sm">Revenue</Text>
-              <Text className="text-2xl font-bold text-gray-900">{stats.todayRevenue}K</Text>
+              <AppText variant="caption" className="text-gray-600">Revenue</AppText>
+              <AppText variant="h3" weight="bold" className="text-gray-900">{stats.todayRevenue}K</AppText>
             </View>
-            <Text className="text-green-600 font-bold">+15%</Text>
+            <AppText variant="body" weight="bold" className="text-green-600">+15%</AppText>
           </View>
 
           {/* Rating */}
@@ -124,12 +124,12 @@ export default function VendorDashboard() {
               <Feather name="star" size={24} color="#FCD34D" />
             </View>
             <View className="flex-1">
-              <Text className="text-gray-600 text-sm">Rating</Text>
-              <Text className="text-2xl font-bold text-gray-900">{stats.totalRating}</Text>
+              <AppText variant="caption" className="text-gray-600">Rating</AppText>
+              <AppText variant="h3" weight="bold" className="text-gray-900">{stats.totalRating}</AppText>
             </View>
             <View className="flex-row items-center">
               <Feather name="star" size={16} color="#FCD34D" fill="#FCD34D" />
-              <Text className="text-gray-600 text-sm ml-1">(248)</Text>
+              <AppText variant="caption" className="text-gray-600 ml-1">(248)</AppText>
             </View>
           </View>
         </View>
@@ -137,7 +137,7 @@ export default function VendorDashboard() {
 
       {/* Quick Actions */}
       <View className="px-6 py-6">
-        <Text className="text-lg font-bold text-gray-900 mb-4">Quick Actions</Text>
+        <AppText variant="title" weight="bold" className="text-gray-900 mb-4">Quick Actions</AppText>
         <View className="gap-3">
           <TouchableOpacity
             onPress={() => router.push('/(vendor)/ManageProducts')}
@@ -147,8 +147,8 @@ export default function VendorDashboard() {
               <Feather name="package" size={24} color="#7C3AED" />
             </View>
             <View className="flex-1">
-              <Text className="text-lg font-bold text-gray-900">Manage Products</Text>
-              <Text className="text-gray-600 text-sm">Add, edit, or remove items</Text>
+              <AppText variant="title" weight="bold" className="text-gray-900">Manage Products</AppText>
+              <AppText variant="caption" className="text-gray-600">Add, edit, or remove items</AppText>
             </View>
             <Feather name="chevron-right" size={20} color="#9CA3AF" />
           </TouchableOpacity>
@@ -161,8 +161,8 @@ export default function VendorDashboard() {
               <Feather name="bar-chart-2" size={24} color="#EA580C" />
             </View>
             <View className="flex-1">
-              <Text className="text-lg font-bold text-gray-900">Analytics</Text>
-              <Text className="text-gray-600 text-sm">View detailed reports</Text>
+              <AppText variant="title" weight="bold" className="text-gray-900">Analytics</AppText>
+              <AppText variant="caption" className="text-gray-600">View detailed reports</AppText>
             </View>
             <Feather name="chevron-right" size={20} color="#9CA3AF" />
           </TouchableOpacity>
@@ -172,9 +172,9 @@ export default function VendorDashboard() {
       {/* Recent Orders */}
       <View className="px-6 py-6">
         <View className="flex-row items-center justify-between mb-4">
-          <Text className="text-lg font-bold text-gray-900">Recent Orders</Text>
+          <AppText variant="title" weight="bold" className="text-gray-900">Recent Orders</AppText>
           <TouchableOpacity onPress={() => router.push('/(vendor)/OrderHistory')}>
-            <Text className="text-blue-600 font-semibold">View all</Text>
+            <AppText variant="body" weight="semibold" className="text-blue-600">View all</AppText>
           </TouchableOpacity>
         </View>
 
@@ -191,23 +191,23 @@ export default function VendorDashboard() {
               >
                 <View className="flex-row items-center justify-between mb-3">
                   <View className="flex-1">
-                    <Text className="text-lg font-bold text-gray-900">{item.orderNumber}</Text>
-                    <Text className="text-gray-600 text-sm">{item.customer}</Text>
+                    <AppText variant="title" weight="bold" className="text-gray-900">{item.orderNumber}</AppText>
+                    <AppText variant="caption" className="text-gray-600">{item.customer}</AppText>
                   </View>
                   <View className={`px-3 py-1 rounded-full ${statusColor.bg}`}>
-                    <Text className={`text-xs font-bold capitalize ${statusColor.text}`}>
+                    <AppText variant="caption" weight="bold" className={`capitalize ${statusColor.text}`}>
                       {item.status}
-                    </Text>
+                    </AppText>
                   </View>
                 </View>
                 <View className="flex-row items-center justify-between pt-3 border-t border-gray-200">
                   <View className="flex-row items-center">
                     <Feather name="package" size={14} color="#6B7280" />
-                    <Text className="text-gray-600 text-sm ml-2">{item.items} items</Text>
+                    <AppText variant="caption" className="text-gray-600 ml-2">{item.items} items</AppText>
                   </View>
                   <View className="flex-row items-center gap-4">
-                    <Text className="text-gray-600 text-sm">{item.time}</Text>
-                    <Text className="text-lg font-bold text-green-600">{item.total}K</Text>
+                    <AppText variant="caption" className="text-gray-600">{item.time}</AppText>
+                    <AppText variant="title" weight="bold" className="text-green-600">{item.total}K</AppText>
                   </View>
                 </View>
               </TouchableOpacity>

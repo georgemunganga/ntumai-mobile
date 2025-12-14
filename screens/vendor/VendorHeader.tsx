@@ -2,7 +2,7 @@
 import React from "react";
 import { View, Image, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import Text from "../../components/Text";
+import AppText from "@/components/AppText";
 
 export function VendorHeader() {
   return (
@@ -14,8 +14,8 @@ export function VendorHeader() {
           className="w-10 h-10 rounded-full mr-3 bg-white"
         />
         <View>
-          <Text style={{fontFamily:'Ubuntu-Bold'}} className="text-white font-semibold text-lg">Hi, Gibson</Text>
-          <Text style={{fontFamily:'Ubuntu-Bold'}} className="text-white text-xs">Stay safe</Text>
+          <AppText variant="subtitle" weight="bold" className="text-white">Hi, Gibson</AppText>
+          <AppText variant="caption" weight="bold" className="text-white">Stay safe</AppText>
         </View>
       </View>
 

@@ -1,7 +1,7 @@
 // @ts-nocheck
-import type { AuthChallengeResponse, AuthSession } from '../../api/modules/auth';
-import type { AuthChallengeRequest, AuthChallengeVerificationRequest } from '../../api/modules/auth';
-import type { User } from '../../api/types';
+import type { AuthChallengeResponse, AuthSession } from '@/src/api/modules/auth';
+import type { AuthChallengeRequest, AuthChallengeVerificationRequest } from '@/src/api/modules/auth';
+import type { User } from '@/src/api/types';
 
 export type AuthFlowStatus =
   | 'idle'

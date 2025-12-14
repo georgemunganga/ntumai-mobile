@@ -2,10 +2,10 @@
 // Authentication Service Layer
 // Handles business logic, validation, and coordination between API and store
 
-import { LoginCredentials, LoginResponse, User } from '../api/types';
-import { AuthService as ApiAuthService } from '../api/auth';
-import { useAuthStore } from '../store/slices/authSlice';
-import { StorageManager, asyncStorage } from '../persistence';
+import { LoginCredentials, LoginResponse, User } from '@/src/apitypes';
+import { AuthService as ApiAuthService } from '@/src/apiauth';
+import { useAuthStore } from '@/src/store/slices/authSlice';
+import { StorageManager, asyncStorage } from '@/src/persistence';
 
 export interface AuthServiceConfig {
   enablePersistence: boolean;

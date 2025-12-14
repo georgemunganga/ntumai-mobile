@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { TouchableOpacity, Text, View, Image } from 'react-native';
 import { CountryPicker } from 'react-native-country-codes-picker';
 import { ChevronDown } from 'lucide-react-native';

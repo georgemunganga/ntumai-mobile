@@ -1,6 +1,6 @@
 // Real-time communication service using Socket.io
 import { io, Socket } from 'socket.io-client';
-import { API_CONFIG } from '../api/config';
+import { API_CONFIG } from '@/src/api/config';
 
 interface WebSocketEvents {
   'location-update': (data: { taskerId: string; latitude: number; longitude: number; timestamp: string }) => void;

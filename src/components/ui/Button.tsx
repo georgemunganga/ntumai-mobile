@@ -1,26 +1,8 @@
 import React from "react";
-import { Pressable } from "react-native";
-import AppText from "../../../components/AppText";
+import { Button as CoreButton, ButtonProps } from "./index";
 
-interface ButtonProps {
-  title: string;
-  onPress: () => void;
-  className?: string;
-}
+// Passthrough to the shared Button definition in ui/index.ts for consistency.
+const Button: React.FC<ButtonProps> = (props) => <CoreButton {...props} />;
 
-const Button: React.FC<ButtonProps> = (props) => {
-  return (
-    <Pressable
-      className={`w-full py-5 rounded-2xl mb-2 ${props.className}`}
-      onPress={props.onPress}
-    >
-      <AppText
-        className={` text-center text-lg font-semibold ${props.className}`}
-      >
-        {props.title}
-      </AppText>
-    </Pressable>
-  );
-};
-
+export type { ButtonProps };
 export default Button;

@@ -7,9 +7,9 @@ import type {
   AuthVerificationResult,
   AuthSession,
 } from './types';
-import type { SendOtpRequest, SendOtpResponse, VerifyOtpRequest, VerifyOtpResponse, User } from '../../types';
-import { apiClient } from '../../client';
-import { ENDPOINTS } from '../../config';
+import type { SendOtpRequest, SendOtpResponse, VerifyOtpRequest, VerifyOtpResponse, User } from '@/types';
+import { apiClient } from '@/src/api/client';
+import { ENDPOINTS } from '@/src/api/config';
 
 const DEFAULT_ATTEMPT_LIMIT = 5;
 

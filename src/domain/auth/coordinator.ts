@@ -5,13 +5,13 @@ import {
   refreshSession,
   revokeSession,
   completePostAuthSync,
-} from '../../api/modules/auth';
+} from '@/src/api/modules/auth';
 import type {
   AuthChallengeRequest,
   AuthChallengeResponse,
   AuthChallengeVerificationRequest,
   AuthSession,
-} from '../../api/modules/auth';
+} from '@/src/api/modules/auth';
 import type {
   AuthMachineListener,
   AuthDomainConfig,
@@ -19,7 +19,7 @@ import type {
   PersistedAuthSnapshot,
 } from './types';
 import { AuthStateMachine } from './stateMachine';
-import { storageManager } from '../../persistence';
+import { storageManager } from '@/src/persistence';
 
 class AuthStateRepository {
   private store;
@@ -74,25 +74,17 @@ export class AuthCoordinator {
     if (!this.repository) return;
 
     const state = this.machine.getState();
+
+    // Only persist once the user has a valid session
+    if (!state.session || !state.user) {
+      return;
+    }
+
     const snapshot: PersistedAuthSnapshot = {
       updatedAt: new Date().toISOString(),
+      session: state.session,
+      user: state.user,
     };
-
-    if (state.session) {
-      snapshot.session = state.session;
-    }
-
-    if (state.user) {
-      snapshot.user = state.user;
-    }
-
-    if (state.challenge) {
-      snapshot.challenge = state.challenge;
-    }
-
-    if (state.request) {
-      snapshot.request = state.request;
-    }
 
     await this.repository.save(snapshot);
   }
@@ -116,13 +108,6 @@ export class AuthCoordinator {
       this.machine.transition('authenticated', {
         session: snapshot.session,
         user: snapshot.user,
-        challenge: snapshot.challenge,
-        request: snapshot.request,
-      });
-    } else if (snapshot?.challenge && snapshot.request) {
-      this.machine.transition('challenge-sent', {
-        challenge: snapshot.challenge,
-        request: snapshot.request,
       });
     } else {
       this.machine.reset();
@@ -209,4 +194,3 @@ export class AuthCoordinator {
 
 export const createAuthCoordinator = (config?: AuthDomainConfig): AuthCoordinator =>
   new AuthCoordinator(new AuthStateMachine(), config);
-

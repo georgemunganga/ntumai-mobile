@@ -9,7 +9,7 @@ const SocialAuth: React.FC = () => {
 
       <View className='flex-row items-center mb-10 w-full'>
         <Image
-          source={require('../../../assets/divider.png')}
+          source={require('@/assets/divider.png')}
           resizeMode='cover'
           style={{ height: 34, width: '100%' }}
         />

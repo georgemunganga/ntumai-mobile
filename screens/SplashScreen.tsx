@@ -1,124 +1,72 @@
-import React, { useEffect, useState } from 'react';
-import { View, ImageBackground, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
+import AppText from '@/components/AppText';
+import { useEffect } from 'react';
+import { View, ImageBackground } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useRouter } from 'expo-router';
-import { useAuthContext } from '../src/providers';
-import { USER_ROLES } from '../src/utils/constants';
+import { useAuthContext } from '@/src/providers';
+import Button from '@/src/components/ui/Button';
+import DevResetAuthButton from '@/src/components/auth/DevResetAuthButton';
 
+/**
+ * Splash/Onboarding Screen
+ *
+ * This is a PROMOTIONAL screen shown to unauthenticated users.
+ *
+ * Responsibilities:
+ * - Show app branding and value proposition
+ * - Provide entry points for user actions
+ * - NO automatic routing (only when user clicks)
+ *
+ * Note: This screen is only reached if user is NOT authenticated.
+ * Initial routing happens at app/index.tsx based on auth state.
+ */
 const SplashScreen = () => {
   const router = useRouter();
-  const {
-    isAuthenticated,
-    user,
-    isLoading,
-    isInitializing,
-    error,
-    clearError,
-    requiresVerification,
-    verificationMethod,
-    verificationValue,
-  } = useAuthContext();
-  const [minSplashTime, setMinSplashTime] = useState(false);
-  const [retryCount, setRetryCount] = useState(0);
+  const { clearError } = useAuthContext();
 
-  // Ensure minimum splash screen display time
+  // Clear any stale auth state/errors when landing on this screen
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setMinSplashTime(true);
-    }, 3000); // Minimum 3 seconds splash
-    return () => clearTimeout(timer);
+    clearError();
   }, []);
 
-  // Authentication initialization is handled by AuthProvider
-  
-  // Retry initialization on error
-  const handleRetry = () => {
-    clearError();
-    setRetryCount(prev => prev + 1);
-    // Force re-initialization by navigating to splash again
-    router.replace('/(auth)/Splash');
-  };
-
-  // Navigate based on authentication state after initialization
-  useEffect(() => {
-    if (!isInitializing && !isLoading && minSplashTime && !error) {
-      if (requiresVerification && verificationMethod && verificationValue) {
-        router.replace({
-          pathname: '/(auth)/Otp',
-          params: { method: verificationMethod, value: verificationValue },
-        });
-        return;
-      }
-
-      if (isAuthenticated && user) {
-        router.replace('/Home');
-      } else {
-        // User not authenticated, go to onboarding
-        router.replace('/(auth)/Onboarding');
-      }
-    }
-  }, [
-    isInitializing,
-    isLoading,
-    minSplashTime,
-    isAuthenticated,
-    requiresVerification,
-    verificationMethod,
-    verificationValue,
-    user,
-    router,
-    error,
-  ]);
-
   return (
-    <View className='flex-1 bg-primary'>
-      <ImageBackground
-        source={require('../assets/splash_style.png')}
-        className='flex-1 absolute top-0 left-0 w-full h-full'
-        resizeMode='cover'
-        style={{ opacity: 0.1 }}
-      />
-      <View className='flex-1 justify-center items-center px-8'>
-        {/* App Logo or Branding */}
-        <View className='mb-12'>
-          <Text className='text-white text-4xl font-bold text-center mb-2'>
-            NTUMAI
-          </Text>
-          <Text className='text-white/80 text-lg text-center'>
-            Food Delivery Made Easy
-          </Text>
-        </View>
-
-        {/* Loading and Error States */}
-        {error ? (
-          <View className='items-center'>
-            <Text className='text-red-300 text-center mb-4 text-base'>
-              {error.includes('Network') ? 
-                'Network connection failed. Please check your internet connection.' :
-                'Failed to initialize app. Please try again.'
-              }
-            </Text>
-            <TouchableOpacity 
-              onPress={handleRetry}
-              className='bg-white/20 px-6 py-3 rounded-lg'
-            >
-              <Text className='text-white font-semibold'>
-                Retry {retryCount > 0 && `(${retryCount})`}
-              </Text>
-            </TouchableOpacity>
-          </View>
-        ) : (
-          <View className='items-center'>
-            <ActivityIndicator size='large' color='white' className='mb-4' />
-            <Text className='text-white/80 text-center'>
-              {isInitializing ? 'Initializing...' : 
-               isLoading ? 'Loading...' : 
-               !minSplashTime ? 'Starting up...' : 'Almost ready...'}
-            </Text>
-          </View>
-        )}
+    <View className='flex-1 bg-white'>
+      {/* Top Section - Branding & Value Prop */}
+      <View className='flex-1 justify-center items-center p-6 bg-white'>
+        <AppText className='text-primary text-4xl font-bold text-center mb-4'>
+          Quick Deliveries at your fingertips
+        </AppText>
+        <AppText className='text-gray-600 text-base text-center mb-6 font-ubuntu'>
+          Find your favorite Meals at the best prices with exclusive deals only
+          on Ntumai app.
+        </AppText>
       </View>
-      <StatusBar style='light' />
+
+      {/* Bottom Section - Actions */}
+      <View className='relative h-1/4 bg-primary'>
+        <ImageBackground
+          source={require('@/assets/splash_style.png')}
+          className='absolute top-0 left-0 w-full h-full'
+          resizeMode='cover'
+          style={{ opacity: 0.3 }}
+        />
+
+        <View className='flex-1 gap-2 p-6 justify-end z-10'>
+          <Button
+            title='Get Started'
+            onPress={() => router.push('/(auth)/GuestDashboard')}
+            className='text-primary bg-white font-ubuntu-bold'
+          />
+          <Button
+            title='Sign In'
+            onPress={() => router.push('/(auth)/Login')}
+            className='text-white bg-black font-ubuntu-bold'
+          />
+          <DevResetAuthButton />
+        </View>
+      </View>
+
+      <StatusBar style='dark' />
     </View>
   );
 };

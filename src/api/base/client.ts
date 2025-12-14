@@ -1,9 +1,9 @@
 // @ts-nocheck
 // API client implementation
-import { ApiResponse, ApiError, RequestConfig } from '../types';
-import { API_CONFIG, getBaseUrl, DEFAULT_HEADERS, HTTP_STATUS, ERROR_CODES } from '../config';
-import { Storage } from '../../utils/storage';
-import { apiUtils } from '../../utils/api';
+import { ApiResponse, ApiError, RequestConfig } from '@/types';
+import { API_CONFIG, getBaseUrl, DEFAULT_HEADERS, HTTP_STATUS, ERROR_CODES } from '@/src/api/config';
+import { Storage } from '@/src/utils/storage';
+import { apiUtils } from '@/src/utils/api';
 
 // Request interceptor type
 export type RequestInterceptor = (config: RequestConfig) => RequestConfig | Promise<RequestConfig>;

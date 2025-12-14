@@ -16,7 +16,7 @@ import {
   getRandomItem,
   getRandomItems,
 } from './mockData';
-import { User, Product, Order, DeliveryAddress } from '../store/types';
+import { User, Product, Order, DeliveryAddress } from '@/src/store/types';
 
 // Simulate network delay
 const delay = (ms: number = 800) => new Promise(resolve => setTimeout(resolve, ms));

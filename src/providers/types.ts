@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import { User } from '../store/types';
+import { User } from '@/src/store/types';
 
 export type AuthChallengePurpose = 'login' | 'register' | 'reset-password' | 'verify';
 

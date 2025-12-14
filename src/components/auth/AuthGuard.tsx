@@ -1,9 +1,9 @@
 // @ts-nocheck
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { View, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
-import type { User } from '../../store/types';
-import { useAuthContext } from '../../providers';
+import type { User } from '@/src/store/types';
+import { useAuthContext } from '@/src/providers';
 
 type UserRole = User['role'];
 

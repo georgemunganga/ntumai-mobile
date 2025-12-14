@@ -9,9 +9,8 @@ import {
   TextInput,
 } from 'react-native';
 import { ArrowLeft, Check, Star } from 'lucide-react-native';
-import Text from '../../../components/Text';
-import { RateOrderScreenProps } from '../CheckoutScreen';
-import AppText from '../../../components/AppText';
+import { RateOrderScreenProps } from '@/CheckoutScreen';
+import AppText from '@/components/AppText';
 import { Ionicons } from '@expo/vector-icons';
 
 // Rate Order Screen
@@ -89,12 +88,12 @@ export function RateOrderScreen({ route, navigation }: RateOrderScreenProps) {
 
       <ScrollView className='flex-1 px-4 py-6'>
         <View className='items-center mb-8'>
-          <Text
+          <AppText
             style={{ fontFamily: 'Ubuntu-Bold' }}
             className='text-gray-500 text-2xl font-bold mb-8'
           >
             Rate Items
-          </Text>
+          </AppText>
 
           <View className='flex-row items-center justify-center mb-8'>
             <View className='w-24 h-24 rounded-full overflow-hidden mr-4'>
@@ -131,19 +130,19 @@ export function RateOrderScreen({ route, navigation }: RateOrderScreenProps) {
             </View>
           </View>
 
-          <Text
+          <AppText
             style={{ fontFamily: 'Ubuntu-Bold' }}
             className='text-gray-800 font-bold text-3xl mb-4'
           >
             Devante Restaurant
-          </Text>
+          </AppText>
 
-          <Text
+          <AppText
             style={{ fontFamily: 'Ubuntu-Regular' }}
             className='text-gray-500 text-lg mb-6'
           >
             What did you like about the product?
-          </Text>
+          </AppText>
 
           <View className='flex-row mb-8'>
             {[1, 2, 3, 4, 5].map((star) => (
@@ -163,31 +162,31 @@ export function RateOrderScreen({ route, navigation }: RateOrderScreenProps) {
 
           <View className='flex-row w-full flex-wrap gap-3 mb-4 justify-start'>
             <TouchableOpacity className='px-6 py-3 rounded-full border border-gray-300'>
-              <Text className='text-gray-600'>Yummy!</Text>
+              <AppText className='text-gray-600'>Yummy!</AppText>
             </TouchableOpacity>
             <TouchableOpacity
               className='px-6 py-3 rounded-full'
               style={{ backgroundColor: '#ec4876' }}
             >
-              <Text className='text-white font-medium'>Best Package</Text>
+              <AppText className='text-white font-medium'>Best Package</AppText>
             </TouchableOpacity>
             <TouchableOpacity className='px-6 py-3 rounded-full border border-gray-300'>
-              <Text className='text-gray-600'>Good Quality</Text>
+              <AppText className='text-gray-600'>Good Quality</AppText>
             </TouchableOpacity>
             <TouchableOpacity className='px-6 py-3 rounded-full border border-gray-300'>
-              <Text className='text-gray-600'>Nice!</Text>
+              <AppText className='text-gray-600'>Nice!</AppText>
             </TouchableOpacity>
             <TouchableOpacity className='px-6 py-3 rounded-full border border-gray-300'>
-              <Text className='text-gray-600'>On Point</Text>
+              <AppText className='text-gray-600'>On Point</AppText>
             </TouchableOpacity>
             <TouchableOpacity className='px-6 py-3 rounded-full border border-gray-300'>
-              <Text className='text-gray-600'>Trusted</Text>
+              <AppText className='text-gray-600'>Trusted</AppText>
             </TouchableOpacity>
             <TouchableOpacity className='px-6 py-3 rounded-full border border-gray-300'>
-              <Text className='text-gray-600'>New Model</Text>
+              <AppText className='text-gray-600'>New Model</AppText>
             </TouchableOpacity>
             <TouchableOpacity className='px-6 py-3 rounded-full border border-gray-300'>
-              <Text className='text-gray-600'>Good</Text>
+              <AppText className='text-gray-600'>Good</AppText>
             </TouchableOpacity>
           </View>
         </View>
@@ -210,24 +209,24 @@ export function RateOrderScreen({ route, navigation }: RateOrderScreenProps) {
 
           <TouchableOpacity className='flex-row items-center mb-8'>
             <View className='w-16 h-16 rounded-2xl border-2 border-gray-300 items-center justify-center mr-4'>
-              <Text className='text-gray-400 text-2xl'>+</Text>
+              <AppText className='text-gray-400 text-2xl'>+</AppText>
             </View>
-            <Text
+            <AppText
               className='text-gray-500 text-lg'
               style={{ fontFamily: 'Ubuntu-Regular' }}
             >
               Upload Image
-            </Text>
+            </AppText>
           </TouchableOpacity>
 
           <View className='items-center mt-8'>
-            <Text
+            <AppText
               className='text-gray-400 text-base mb-2'
               style={{ fontFamily: 'Ubuntu-Regular' }}
             >
               App version 1.0.0
-            </Text>
-            <Text
+            </AppText>
+            <AppText
               className='text-base font-medium'
               style={{
                 fontFamily: 'Ubuntu-Medium',
@@ -235,7 +234,7 @@ export function RateOrderScreen({ route, navigation }: RateOrderScreenProps) {
               }}
             >
               Ntumai delivery express
-            </Text>
+            </AppText>
           </View>
         </View>
       </ScrollView>
@@ -248,12 +247,12 @@ export function RateOrderScreen({ route, navigation }: RateOrderScreenProps) {
             isSubmitting ? 'bg-gray-400' : 'bg-primary'
           }`}
         >
-          <Text
+          <AppText
             style={{ fontFamily: 'Ubuntu-Bold' }}
             className='text-white font-bold text-lg text-center'
           >
             {isSubmitting ? 'Submitting...' : 'Post'}
-          </Text>
+          </AppText>
         </TouchableOpacity>
       </View>
     </View>

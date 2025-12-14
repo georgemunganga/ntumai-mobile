@@ -5,6 +5,7 @@ module.exports = {
     "./App.tsx",
     "./components/**/*.{js,jsx,ts,tsx}",
     "./screens/**/*.{js,jsx,ts,tsx}",
+    "./app/**/*.{js,jsx,ts,tsx}",
   ],
   presets: [require("nativewind/preset")],
   theme: {
@@ -12,6 +13,10 @@ module.exports = {
       colors: {
         primary: "#08AF97",
         secondary: "#FFE536",
+        destructive: "#F44336",
+        success: "#4CAF50",
+        warning: "#FF9800",
+        info: "#2196F3",
       },
       fontFamily: {
         ubuntu: ["Ubuntu-Regular"],

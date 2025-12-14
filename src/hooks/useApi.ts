@@ -1,7 +1,7 @@
 // @ts-nocheck
 // Generic API hook
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { apiClient } from '../utils/api';
+import { apiClient } from '@/src/utils/api';
 import { UseApiOptions, AsyncHookResult } from './types';
 
 export interface UseApiResult<T> extends AsyncHookResult<T> {

@@ -1,6 +1,6 @@
 import React from "react";
 import { Text, View } from "react-native";
-import AppText from "../../../components/AppText";
+import AppText from "@/components/AppText";
 
 interface AuthHeaderProps {
   title: string;
@@ -15,22 +15,13 @@ const AuthHeader: React.FC<AuthHeaderProps> = ({
 }) => {
   return (
     <View className='px-6 pt-8 pb-4 font-ubuntu'>
-      <AppText
-        className='text-primary text-5xl font-ubuntu-bold mb-1 leading-tight'
-        style={{ fontFamily: 'Ubuntu-Bold' }}
-      >
+      <AppText variant="h1" weight="bold" className='text-primary mb-1'>
         {title}
       </AppText>
-      <AppText
-        className='text-primary text-5xl font-ubuntu-bold'
-        style={{ fontFamily: 'Ubuntu-Medium' }}
-      >
+      <AppText variant="h1" weight="bold" className='text-primary'>
         {subtitle}
       </AppText>
-      <AppText
-        className='text-base mt-4 leading-relaxed pt-4 pb-4'
-        style={{ color: '#606268' }}
-      >
+      <AppText variant="body" className='mt-4 pt-4 pb-4 text-[#606268]'>
         {description}
       </AppText>
     </View>

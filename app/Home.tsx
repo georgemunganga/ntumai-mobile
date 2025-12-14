@@ -1,12 +1,12 @@
 import { Redirect } from 'expo-router';
-import { useAuthContext } from '../src/providers';
-import { USER_ROLES } from '../src/utils/constants';
+import { useAuthContext } from '@/src/providers';
+import { USER_ROLES } from '@/src/utils/constants';
 
 const roleToRouteMap: Record<string, string> = {
-  [USER_ROLES.CUSTOMER]: '/(customer)/CustomerDashboard',
-  [USER_ROLES.DRIVER]: '/(tasker)/DriverHome',
-  [USER_ROLES.VENDOR]: '/(vendor)/VendorTabs',
-  [USER_ROLES.ADMIN]: '/(customer)/CustomerDashboard',
+  [USER_ROLES.CUSTOMER]: '/(customer)/(tabs)',
+  [USER_ROLES.TASKER]: '/(tasker)/(tabs)',
+  [USER_ROLES.VENDOR]: '/(vendor)/(tabs)',
+  [USER_ROLES.ADMIN]: '/(customer)/(tabs)',
 };
 
 export default function HomeEntry() {
@@ -17,9 +17,10 @@ export default function HomeEntry() {
   }
 
   if (!isAuthenticated || !user) {
-    return <Redirect href="/(auth)/SelectMethod" />;
+    return <Redirect href="/(auth)/Splash" />;
   }
 
-  const target = roleToRouteMap[user.role] ?? '/(customer)/CustomerDashboard';
+  const target = roleToRouteMap[user.role] ?? '/(customer)/(tabs)';
   return <Redirect href={target} />;
 }
+

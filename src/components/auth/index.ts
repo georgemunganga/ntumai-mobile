@@ -2,7 +2,7 @@
 // This file exports all authentication-related components
 
 import React from 'react';
-import { AuthComponentProps } from '../index';
+import { AuthComponentProps } from '@/index';
 
 // Auth component types
 export interface LoginFormProps extends AuthComponentProps {

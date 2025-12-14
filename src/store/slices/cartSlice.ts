@@ -1,6 +1,6 @@
 import { create } from 'zustand';
-import { CartState, CartItem, Product } from '../types';
-import { createPersistentStore } from '../utils/persistentStore';
+import { CartState, CartItem, Product } from '@/types';
+import { createPersistentStore } from '@/src/store/utils/persistentStore';
 
 interface CartStore extends CartState {
   // Actions

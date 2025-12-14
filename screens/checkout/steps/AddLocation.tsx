@@ -8,8 +8,7 @@ import {
   TextInput,
   Switch,
 } from 'react-native';
-import Text from '../../../components/Text';
-import AppText from '../../../components/AppText';
+import AppText from '@/components/AppText';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 
@@ -40,13 +39,13 @@ export function AddLocation() {
       <ScrollView className='flex-1 px-4 py-6 mb-[120px] '>
 
         <View className='items-center mb-8'>
-          <Text
+          <AppText
             className='text-gray-500 text-lg font-medium mb-6'
             style={{ fontFamily: 'Ubuntu-Regular' }}
           >
             Add Location
-          </Text>
-          <Text
+          </AppText>
+          <AppText
             className='text-3xl font-bold text-center mb-8'
             style={{
               fontFamily: 'Ubuntu-Bold',
@@ -54,16 +53,16 @@ export function AddLocation() {
             }}
           >
             What's{'\n'}Your Location?
-          </Text>
+          </AppText>
         </View>
 
         <View className='mb-6'>
-          <Text
+          <AppText
             className='text-gray-500 text-sm mb-2'
             style={{ fontFamily: 'Ubuntu-Regular' }}
           >
             Location Name
-          </Text>
+          </AppText>
           <View className='flex-row items-center rounded-full justify-between bg-[#f8f9fa] p-4 py-2'>
             <TextInput
               value={locationName}
@@ -72,12 +71,12 @@ export function AddLocation() {
               style={{ fontFamily: 'Ubuntu-Medium' }}
             />
             <View className='flex-row items-center'>
-              <Text
+              <AppText
                 className='text-gray-500 mr-2'
                 style={{ fontFamily: 'Ubuntu-Regular' }}
               >
                 Default
-              </Text>
+              </AppText>
               <Switch
                 value={isDefault}
                 onValueChange={setIsDefault}
@@ -89,12 +88,12 @@ export function AddLocation() {
         </View>
 
         <View className='mb-6'>
-          <Text
+          <AppText
             className='text-gray-500 text-sm mb-2'
             style={{ fontFamily: 'Ubuntu-Regular' }}
           >
             Country
-          </Text>
+          </AppText>
           <View className='flex-row items-center rounded-full justify-between bg-[#f8f9fa] p-4 py-2'>
             <TextInput
               value={country}
@@ -106,12 +105,12 @@ export function AddLocation() {
         </View>
 
         <View className='mb-6'>
-          <Text
+          <AppText
             className='text-gray-500 text-sm mb-2'
             style={{ fontFamily: 'Ubuntu-Regular' }}
           >
             City/Town
-          </Text>
+          </AppText>
           <View className='flex-row items-center rounded-full justify-between bg-[#f8f9fa] p-4 py-2'>
             <TextInput
               value={city}
@@ -123,12 +122,12 @@ export function AddLocation() {
         </View>
 
         <View className='mb-6'>
-          <Text
+          <AppText
             className='text-gray-500 text-sm mb-2'
             style={{ fontFamily: 'Ubuntu-Regular' }}
           >
             Street
-          </Text>
+          </AppText>
           <View className='flex-row items-center rounded-full justify-between bg-[#f8f9fa] p-4 py-2'>
             <TextInput
               value={street}
@@ -140,12 +139,12 @@ export function AddLocation() {
         </View>
 
         <View className='mb-8'>
-          <Text
+          <AppText
             className='text-gray-500 text-sm mb-2'
             style={{ fontFamily: 'Ubuntu-Regular' }}
           >
             Block Number
-          </Text>
+          </AppText>
           <View className='flex-row items-center rounded-full justify-between bg-[#f8f9fa] p-4 py-2'>
             <TextInput
               value={blockNumber}
@@ -163,23 +162,23 @@ export function AddLocation() {
             onPress={() => navigation.goBack()}
             activeOpacity={0.8}
           >
-            <Text
+            <AppText
               className='text-white font-bold text-lg'
               style={{ fontFamily: 'Ubuntu-Bold' }}
             >
               Save
-            </Text>
+            </AppText>
           </TouchableOpacity>
         </View>
 
         <View className='items-center pb-12 '>
-          <Text
+          <AppText
             className='text-gray-500 text-center text-base leading-6'
             style={{ fontFamily: 'Ubuntu-Regular' }}
           >
             Your orders will be delivered to this location.{'\n'}
             You can edit your address settings later.
-          </Text>
+          </AppText>
         </View>
       </ScrollView>
 
@@ -197,4 +196,3 @@ export function AddLocation() {
     </View>
   );
 }
-

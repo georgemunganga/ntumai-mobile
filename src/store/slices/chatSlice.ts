@@ -1,7 +1,7 @@
 // Chat store slice
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { chatService, Chat, ChatMessage } from '../../services/chat';
+import { chatService, Chat, ChatMessage } from '@/src/services/chat';
 
 interface ChatState {
   chats: Chat[];

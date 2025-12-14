@@ -1,4 +1,4 @@
-import OrderDeliverySecondStep from '../../screens/driver/deliveries/OrderDeliverySecondStep';
+import OrderDeliverySecondStep from '@/screens/tasker/deliveries/OrderDeliverySecondStep';
 
 export default function OrderDeliverySecondStepRoute(props: any) {
   return <OrderDeliverySecondStep {...props} />;

@@ -8,6 +8,7 @@
     "icon": "./assets/ntumai_logo.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
+    "scheme": "ntumai",
     "splash": {
       "image": "./assets/box1.png",
       "resizeMode": "contain",

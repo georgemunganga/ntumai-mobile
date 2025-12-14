@@ -6,7 +6,7 @@ export interface User {
   firstName: string;
   lastName: string;
   avatar?: string;
-  role: 'customer' | 'driver' | 'vendor' | 'admin';
+  role: 'customer' | 'tasker' | 'vendor' | 'admin';
   isVerified: boolean;
   createdAt: string;
   updatedAt: string;
@@ -107,8 +107,8 @@ export interface OrderState {
   error: string | null;
 }
 
-// Driver Types
-export interface DriverLocation {
+// Tasker Types (renamed from Driver)
+export interface TaskerLocation {
   latitude: number;
   longitude: number;
   heading?: number;
@@ -116,7 +116,7 @@ export interface DriverLocation {
   timestamp: string;
 }
 
-export interface DriverStats {
+export interface TaskerStats {
   totalDeliveries: number;
   totalEarnings: number;
   averageRating: number;
@@ -124,12 +124,12 @@ export interface DriverStats {
   onTimeRate: number;
 }
 
-export interface DriverState {
+export interface TaskerState {
   isOnline: boolean;
-  currentLocation: DriverLocation | null;
+  currentLocation: TaskerLocation | null;
   activeOrder: Order | null;
   availableOrders: Order[];
-  stats: DriverStats;
+  stats: TaskerStats;
   earnings: {
     today: number;
     week: number;
@@ -138,6 +138,11 @@ export interface DriverState {
   isLoading: boolean;
   error: string | null;
 }
+
+// Legacy aliases for backward compatibility (deprecated - use Tasker* instead)
+export type DriverLocation = TaskerLocation;
+export type DriverStats = TaskerStats;
+export type DriverState = TaskerState;
 
 // Vendor Types
 export interface VendorProfile {

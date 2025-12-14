@@ -1,7 +1,7 @@
 // Mock data generator for all API endpoints
 // This file generates realistic mock data for development and testing
 
-import { User, Product, Order, DeliveryAddress, DriverStats } from '../store/types';
+import { User, Product, Order, DeliveryAddress, DriverStats } from '@/src/store/types';
 
 // Mock users
 export const mockUsers: Record<string, User> = {

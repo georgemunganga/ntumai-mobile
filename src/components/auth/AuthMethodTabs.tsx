@@ -1,6 +1,6 @@
 import React from "react";
 import { Pressable, View, StyleSheet } from "react-native";
-import AppText from "../../../components/AppText";
+import AppText from "@/components/AppText";
 
 const styles = StyleSheet.create({
   container: {
@@ -34,11 +34,7 @@ const AuthMethodTabs: React.FC<AuthMethodTabsProps> = ({
         }`}
         onPress={() => onMethodChange('phone')}
       >
-        <AppText
-          className={`text-base  font-bold ${
-            selectedMethod === 'phone' ? 'text-[#3B3A3A]' : 'text-[#3B3A3A]'
-          }`}
-        >
+        <AppText variant="body" weight="bold" className='text-[#3B3A3A]'>
           Phone Number
         </AppText>
       </Pressable>
@@ -48,11 +44,7 @@ const AuthMethodTabs: React.FC<AuthMethodTabsProps> = ({
         }`}
         onPress={() => onMethodChange('email')}
       >
-        <AppText
-          className={`text-base font-bold ${
-            selectedMethod === 'email' ? 'text-[#3B3A3A]' : 'text-[#3B3A3A]'
-          }`}
-        >
+        <AppText variant="body" weight="bold" className='text-[#3B3A3A]'>
           Email
         </AppText>
       </Pressable>

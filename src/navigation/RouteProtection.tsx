@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useAuthStore } from '../store';
+import { useAuthStore } from '@/src/store';
 import { Feather } from '@expo/vector-icons';
 
 interface ProtectedRouteProps {
@@ -25,7 +25,7 @@ export function ProtectedRoute({
   // Check authentication
   if (requiredAuth && !isAuthenticated) {
     React.useEffect(() => {
-      router.replace('/(auth)/SplashScreen');
+      router.replace('/(auth)/Splash');
     }, []);
     return null;
   }
@@ -93,4 +93,3 @@ export function useFeatureAccess() {
     canWithdraw: user?.role === 'tasker' || user?.role === 'vendor',
   };
 }
-

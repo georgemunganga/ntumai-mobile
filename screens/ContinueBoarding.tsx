@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   View,
   Image,
@@ -7,8 +7,9 @@ import {
   ScrollView,
 } from "react-native";
 import { useRouter } from "expo-router";
-import AppText from "../components/AppText";
+import AppText from "@/components/AppText";
 import { Circle, CircleCheckBig } from "lucide-react-native";
+import { Button } from "@/src/components/ui";
 
 const ContinueBoardingScreen = () => {
   const router = useRouter();
@@ -17,7 +18,7 @@ const ContinueBoardingScreen = () => {
 
   return (
     <ImageBackground
-      source={require('../assets/splash_style.png')}
+      source={require('@/assets/splash_style.png')}
       className='flex-1'
       resizeMode='cover'
     >
@@ -30,7 +31,7 @@ const ContinueBoardingScreen = () => {
 
           <View className='items-center mt-2'>
             <Image
-              source={require('../assets/logo_green.png')}
+              source={require('@/assets/logo_green.png')}
               resizeMode='contain'
               className='w-100 h-50 mb-10 mt-10'
             />
@@ -55,7 +56,7 @@ const ContinueBoardingScreen = () => {
 
           <View className='mb-6 h-32 overflow-hidden'>
             <ImageBackground
-              source={require('../assets/splash_style.png')}
+              source={require('@/assets/splash_style.png')}
               className='h-full justify-center'
               resizeMode='cover'
             >
@@ -153,17 +154,10 @@ const ContinueBoardingScreen = () => {
 
 
         <View className='mx-6 mb-12'>
-          <TouchableOpacity
-            className='bg-primary rounded-xl py-4 items-center'
-            onPress={() => router.replace('/(tasker)/DriverHome')}
-          >
-            <AppText
-              className='text-white text-lg font-semibold'
-              style={{ fontFamily: 'Ubuntu-Bold' }}
-            >
-              Continue
-            </AppText>
-          </TouchableOpacity>
+          <Button
+            title="Continue"
+            onPress={() => router.replace('/(tasker)/(tabs)')}
+          />
         </View>
       </View>
     </ImageBackground>

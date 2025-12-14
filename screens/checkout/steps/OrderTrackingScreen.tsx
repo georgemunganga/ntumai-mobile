@@ -2,10 +2,9 @@
 import { useState, useEffect } from 'react';
 import { View, ScrollView, TouchableOpacity, Image } from 'react-native';
 
-import Text from '../../../components/Text';
-import AppText from '../../../components/AppText';
+import AppText from '@/components/AppText';
 import { Ionicons } from '@expo/vector-icons';
-import { OrderTrackingScreenProps } from '../CheckoutScreen';
+import { OrderTrackingScreenProps } from '@/CheckoutScreen';
 
 export function OrderTrackingScreen({
   route,
@@ -34,37 +33,37 @@ export function OrderTrackingScreen({
       </TouchableOpacity>
       <ScrollView className='flex-1 px-4 py-6'>
         <View className='mb-6'>
-          <Text className='text-gray-500 text-sm mb-2'>
+          <AppText className='text-gray-500 text-sm mb-2'>
             February 08, 2025 | 12:58PM
-          </Text>
+          </AppText>
           <View className='flex-row items-center justify-between'>
-            <Text
+            <AppText
               style={{ fontFamily: 'Ubuntu-Bold' }}
               className='text-gray-900 font-bold text-3xl'
             >
               Order: 19CDW9D
-            </Text>
+            </AppText>
             <View className='flex-row items-center'>
               <View
                 className='w-5 h-5 rounded-full bg-primary'
                 style={{ width: 10, height: 10 }}
               />
               <View className='px-2 py-1 rounded-full'>
-                <Text className='text-primary text-l font-medium'>
+                <AppText className='text-primary text-l font-medium'>
                   Delivered
-                </Text>
+                </AppText>
               </View>
             </View>
           </View>
         </View>
 
         <View className='rounded-2xl p-4 mb-6 '>
-          <Text
+          <AppText
             style={{ fontFamily: 'Ubuntu-Bold' }}
             className='text-gray-800 font-semibold text-lg mb-6'
           >
             Order Status
-          </Text>
+          </AppText>
 
           <View className='mb-6'>
             <View className='flex-row items-center justify-between mb-4 relative'>
@@ -107,15 +106,15 @@ export function OrderTrackingScreen({
             </View>
 
             <View className='flex-row justify-between'>
-              <Text className='text-gray-800 font-medium text-start flex-1 '>
+              <AppText className='text-gray-800 font-medium text-start flex-1 '>
                 Pending
-              </Text>
-              <Text className='text-gray-800 font-medium text-right flex-1'>
+              </AppText>
+              <AppText className='text-gray-800 font-medium text-right flex-1'>
                 On the Way
-              </Text>
-              <Text className='text-gray-800 font-medium text-right flex-1'>
+              </AppText>
+              <AppText className='text-gray-800 font-medium text-right flex-1'>
                 Delivered
-              </Text>
+              </AppText>
             </View>
           </View>
 
@@ -154,7 +153,7 @@ export function OrderTrackingScreen({
                 color='white'
                 style={{ marginRight: 8 }}
               />
-              <Text className='text-white font-medium'>Rate Us</Text>
+              <AppText className='text-white font-medium'>Rate Us</AppText>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -167,18 +166,18 @@ export function OrderTrackingScreen({
                 color='white'
                 style={{ marginRight: 8 }}
               />
-              <Text className='text-white font-medium'>Order Again</Text>
+              <AppText className='text-white font-medium'>Order Again</AppText>
             </TouchableOpacity>
           </View>
         </View>
 
         <View className='bg-white rounded-2xl p-4'>
-          <Text
+          <AppText
             style={{ fontFamily: 'Ubuntu-Bold' }}
             className='text-[#909191] font-semibold text-lg'
           >
             Driver's Information
-          </Text>
+          </AppText>
           <View className='flex-row items-center bg-[#eeefef] rounded-2xl px-6 py-4 mt-2'>
             <Image
               source={{
@@ -187,11 +186,11 @@ export function OrderTrackingScreen({
               className='w-16 h-16 rounded-full mr-4'
             />
             <View className='flex-1'>
-              <Text className='text-gray-800 font-bold text-l'>
+              <AppText className='text-gray-800 font-bold text-l'>
                 Alfred John
-              </Text>
-              <Text className='text-gray-500 text-sm'>+255746118766</Text>
-              <Text className='text-gray-500 text-sm'>4158 Lusaka Zambia</Text>
+              </AppText>
+              <AppText className='text-gray-500 text-sm'>+255746118766</AppText>
+              <AppText className='text-gray-500 text-sm'>4158 Lusaka Zambia</AppText>
             </View>
             <TouchableOpacity>
               <Ionicons name='chevron-down' size={20} color='#ec4876' />
@@ -200,12 +199,12 @@ export function OrderTrackingScreen({
         </View>
 
         <View className='bg-white rounded-2xl px-4'>
-          <Text
+          <AppText
             style={{ fontFamily: 'Ubuntu-Bold' }}
             className='text-[#909191] font-semibold text-lg '
           >
             Buyer's Information
-          </Text>
+          </AppText>
           <View className='flex-row items-center bg-[#eeefef] rounded-2xl px-6 py-4 mt-2'>
             <Image
               source={{
@@ -214,11 +213,11 @@ export function OrderTrackingScreen({
               className='w-16 h-16 rounded-full mr-4'
             />
             <View className='flex-1'>
-              <Text className='text-gray-800 font-bold text-l'>
+              <AppText className='text-gray-800 font-bold text-l'>
                 Alfred John
-              </Text>
-              <Text className='text-gray-500 text-sm'>+255746118766</Text>
-              <Text className='text-gray-500 text-sm'>4158 Lusaka Zambia</Text>
+              </AppText>
+              <AppText className='text-gray-500 text-sm'>+255746118766</AppText>
+              <AppText className='text-gray-500 text-sm'>4158 Lusaka Zambia</AppText>
             </View>
             <TouchableOpacity>
               <Ionicons name='chevron-down' size={20} color='#ec4876' />
@@ -227,12 +226,12 @@ export function OrderTrackingScreen({
         </View>
 
         <View className='bg-white rounded-2xl p-4 mb-6'>
-          <Text
+          <AppText
             style={{ fontFamily: 'Ubuntu-Bold' }}
             className='text-[#909191] font-semibold text-lg mb-4'
           >
             Store and Product Information
-          </Text>
+          </AppText>
 
           <View className='flex-row items-center mb-6'>
             <Image
@@ -241,12 +240,12 @@ export function OrderTrackingScreen({
               }}
               className='w-12 h-12 rounded-full mr-4'
             />
-            <Text
+            <AppText
               style={{ fontFamily: 'Ubuntu-Bold' }}
               className='text-gray-800 font-bold text-xl'
             >
               Devante Restaurant
-            </Text>
+            </AppText>
           </View>
 
           <View className='w-full flex-row justify-center'>
@@ -270,39 +269,39 @@ export function OrderTrackingScreen({
               </View>
 
               <View className='items-start'>
-                <Text
+                <AppText
                   style={{ fontFamily: 'Ubuntu-Bold' }}
                   className='text-gray-800 font-bold text-xl text-center'
                 >
                   Mixed Salad
-                </Text>
-                <Text
+                </AppText>
+                <AppText
                   className='text-gray-500 text-base text-center'
                   style={{ fontFamily: 'Ubuntu-Regular' }}
                 >
                   Comes with Mayonize
-                </Text>
-                <Text
+                </AppText>
+                <AppText
                   style={{ fontFamily: 'Ubuntu-Bold' }}
                   className='text-gray-800 font-bold text-2xl text-center'
                 >
                   K20
-                </Text>
+                </AppText>
               </View>
             </View>
           </View>
         </View>
 
         <View className='items-center mt-8 mb-12'>
-          <Text className='text-gray-400 text-base mb-2'>
+          <AppText className='text-gray-400 text-base mb-2'>
             App version 1.0.0
-          </Text>
-          <Text
+          </AppText>
+          <AppText
             className='text-primary text-base font-medium'
             style={{ color: '#08AF97' }}
           >
             Ntumai delivery express
-          </Text>
+          </AppText>
         </View>
       </ScrollView>
     </View>

@@ -1,31 +1,23 @@
+import AppText from '@/components/AppText';
 import { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  Keyboard,
-  TouchableWithoutFeedback,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  Image,
-  Alert,
-} from 'react-native';
+import { View, Keyboard, TouchableWithoutFeedback, KeyboardAvoidingView, Platform, ScrollView, Image, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 
 // Import auth provider and types
-import { useAuthContext } from '../src/providers';
-import type { LoginCredentials } from '../src/api/types';
+import { useAuthContext } from '@/src/providers';
+import type { LoginCredentials } from '@/src/api/types';
 
 // Import Zod validation
-import { validateLoginCredentials, validatePhone, validateEmail } from '../src/utils/authValidation';
+import { validateLoginCredentials, validatePhone, validateEmail } from '@/src/utils/authValidation';
 
-import AuthHeader from '../src/components/auth/AuthHeader';
-import AuthMethodTabs from '../src/components/auth/AuthMethodTabs';
-import AuthInput from '../src/components/auth/AuthInput';
-import AuthButton from '../src/components/auth/AuthButton';
-import SocialAuth from '../src/components/auth/SocialAuth';
-import AuthFooter from '../src/components/auth/AuthFooter';
+import AuthHeader from '@/src/components/auth/AuthHeader';
+import AuthMethodTabs from '@/src/components/auth/AuthMethodTabs';
+import AuthInput from '@/src/components/auth/AuthInput';
+import AuthButton from '@/src/components/auth/AuthButton';
+import SocialAuth from '@/src/components/auth/SocialAuth';
+import AuthFooter from '@/src/components/auth/AuthFooter';
+import DevResetAuthButton from '@/src/components/auth/DevResetAuthButton';
 
 const LoginScreen = () => {
   const router = useRouter();
@@ -34,14 +26,9 @@ const LoginScreen = () => {
     validateCredentials,
     isLoading,
     error,
-    isAuthenticated,
-    requiresVerification,
-    verificationMethod,
-    verificationValue,
-    handleAuthSuccess,
     clearError,
   } = useAuthContext();
-  
+
   // Form state
   const [selectedMethod, setSelectedMethod] = useState<'phone' | 'email'>('phone');
   const [email, setEmail] = useState('');
@@ -106,7 +93,7 @@ const LoginScreen = () => {
       // Final validation before sending OTP
       const currentValue = selectedMethod === 'email' ? email : phone;
       const finalValidation = validateForm(currentValue, selectedMethod);
-      
+
       if (!finalValidation.isValid) {
         setValidationErrors(finalValidation.errors);
         return;
@@ -126,9 +113,10 @@ const LoginScreen = () => {
 
       // Send OTP
       const result = await sendOtp(credentials);
-      
+
       // Handle OTP sending result
       if (result.success && result.requiresVerification) {
+        console.log('[LOGIN] Manual navigation to OTP after user clicked Send OTP');
         router.push({
           pathname: '/(auth)/Otp',
           params: {
@@ -169,22 +157,12 @@ const LoginScreen = () => {
     }
   }, [selectedMethod]);
 
-  // Handle navigation after successful authentication (only if no verification required)
-  useEffect(() => {
-    if (isAuthenticated && !requiresVerification) {
-      router.replace('/Home');
-    }
-  }, [isAuthenticated, requiresVerification, router]);
-
-  // Handle pending verification (e.g., after app restart)
-  useEffect(() => {
-    if (!isAuthenticated && requiresVerification && verificationMethod && verificationValue) {
-      router.push({
-        pathname: '/(auth)/Otp',
-        params: { method: verificationMethod, value: verificationValue },
-      });
-    }
-  }, [isAuthenticated, requiresVerification, verificationMethod, verificationValue, router]);
+  // REMOVED: Auto-navigation useEffects (lines 166-187)
+  // These violated architectural principles by auto-routing based on auth state changes.
+  // ALL routing now happens via:
+  // 1. User action: Manual navigation after clicking "Send OTP" button (line 124-131)
+  // 2. Routing layer: app/index.tsx routes authenticated users to /Home
+  // This prevents unwanted OTP routing on fresh devices with stale verification state.
 
   // Handle and display errors
   useEffect(() => {
@@ -199,7 +177,7 @@ const LoginScreen = () => {
         <StatusBar style='dark' />
         <View className='w-full flex justify-center items-center mt-12'>
           <Image
-            source={require('../assets/green-logo.png')}
+            source={require('@/assets/green-logo.png')}
             style={{ height: 44, width: 170 }}
           />
         </View>
@@ -238,9 +216,9 @@ const LoginScreen = () => {
                   {fieldErrors.email && fieldErrors.email.length > 0 && (
                     <View className="-mt-6 mb-4">
                       {fieldErrors.email.map((error, index) => (
-                        <Text key={index} className="text-red-500 text-sm mb-1">
+                        <AppText key={index} className="text-red-500 text-sm mb-1">
                           {error}
-                        </Text>
+                        </AppText>
                       ))}
                     </View>
                   )}
@@ -261,9 +239,9 @@ const LoginScreen = () => {
                   {fieldErrors.phone && fieldErrors.phone.length > 0 && (
                     <View className="-mt-6 mb-4">
                       {fieldErrors.phone.map((error, index) => (
-                        <Text key={index} className="text-red-500 text-sm mb-1">
+                        <AppText key={index} className="text-red-500 text-sm mb-1">
                           {error}
-                        </Text>
+                        </AppText>
                       ))}
                     </View>
                   )}
@@ -274,9 +252,9 @@ const LoginScreen = () => {
               {validationErrors.length > 0 && (
                 <View className="mt-2">
                   {validationErrors.map((error, index) => (
-                    <Text key={index} className="text-red-500 text-sm mb-1">
+                    <AppText key={index} className="text-red-500 text-sm mb-1">
                       {error}
-                    </Text>
+                    </AppText>
                   ))}
                 </View>
               )}
@@ -292,6 +270,7 @@ const LoginScreen = () => {
             className={`mb-4 ${isFormValid && !isLoading ? 'bg-primary' : 'bg-gray-400'}`}
           />
           <SocialAuth />
+          <DevResetAuthButton />
         </View>
 
         <AuthFooter

@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { create } from 'zustand';
-import { VendorState, VendorProfile, VendorStats, Product, Order } from '../types';
-import { createPersistentStore } from '../utils/persistentStore';
+import { VendorState, VendorProfile, VendorStats, Product, Order } from '@/types';
+import { createPersistentStore } from '@/src/store/utils/persistentStore';
 
 interface VendorStore extends VendorState {
   // Actions

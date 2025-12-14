@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { create } from 'zustand';
-import { mockNotificationService } from '../../api/mockServices';
-import { createPersistentStore } from '../utils/persistentStore';
+import { mockNotificationService } from '@/src/api/mockServices';
+import { createPersistentStore } from '@/src/store/utils/persistentStore';
 
 interface Notification {
   id: string;

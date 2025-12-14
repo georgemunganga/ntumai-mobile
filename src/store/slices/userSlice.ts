@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { create } from 'zustand';
-import { UserState, UserProfile, DeliveryAddress, Product, VendorProfile } from '../types';
-import { createPersistentStore } from '../utils/persistentStore';
+import { UserState, UserProfile, DeliveryAddress, Product, VendorProfile } from '@/types';
+import { createPersistentStore } from '@/src/store/utils/persistentStore';
 
 interface UserStore extends UserState {
   // Actions

@@ -1,9 +1,9 @@
 // @ts-nocheck
 import { create } from 'zustand';
-import { AuthState, User } from '../types';
-import { LoginCredentials, LoginResponse } from '../../api/types';
-import { AuthService } from '../../api/auth';
-import { createPersistentStore } from '../utils/persistentStore';
+import { AuthState, User } from '@/types';
+import { LoginCredentials, LoginResponse } from '@/src/api/types';
+import { AuthService } from '@/src/api/auth';
+import { createPersistentStore } from '@/src/store/utils/persistentStore';
 
 interface AuthStore extends AuthState {
   // Actions

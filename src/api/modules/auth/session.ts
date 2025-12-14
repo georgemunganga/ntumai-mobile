@@ -1,6 +1,6 @@
 // @ts-nocheck
-import { apiClient } from '../../client';
-import { ENDPOINTS } from '../../config';
+import { apiClient } from '@/src/api/client';
+import { ENDPOINTS } from '@/src/api/config';
 import {
   AuthSessionSchema,
   RefreshSessionRequestSchema,
@@ -8,7 +8,7 @@ import {
   AuthVerificationResultSchema,
 } from './schemas';
 import type { AuthSession, AuthVerificationResult, RefreshSessionRequest, RevokeSessionRequest } from './types';
-import type { LoginResponse } from '../../types';
+import type { LoginResponse } from '@/types';
 
 export const refreshSession = async (rawInput: RefreshSessionRequest): Promise<AuthSession> => {
   const input = RefreshSessionRequestSchema.parse(rawInput);

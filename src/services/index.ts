@@ -258,7 +258,7 @@ export { ContainerService, containerService } from './container';
 export { KubernetesService, kubernetesService } from './kubernetes';
 export { DockerService, dockerService } from './docker';
 export { MicroserviceService, microserviceService } from './microservice';
-export { APIService, apiService } from './api';
+export { APIService, apiService } from '@/src/api';
 export { GraphQLService, graphqlService } from './graphql';
 export { RESTService, restService } from './rest';
 export { gRPCService, grpcService } from './grpc';

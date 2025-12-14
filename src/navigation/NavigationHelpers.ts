@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import { useAuthStore } from '../store';
+import { useAuthStore } from '@/src/store';
 
 /**
  * Navigation Helper Hooks
@@ -64,9 +64,9 @@ export function useAuthNavigation() {
   const router = useRouter();
 
   return {
-    goSplash: () => router.replace('/(auth)/SplashScreen'),
+    goSplash: () => router.replace('/(auth)/Splash'),
     goPhoneLogin: () => router.push('/(auth)/PhoneLogin'),
-    goOtpVerification: (phone: string) => router.push(`/(auth)/OtpVerification?phone=${phone}`),
+    goOtpVerification: (phone: string) => router.push(`/(auth)/Otp?phone=${phone}`),
     goRoleSelection: () => router.push('/(auth)/RoleSelection'),
     goDriverOnboarding: () => router.push('/(auth)/DriverOnboarding'),
   };
@@ -135,4 +135,3 @@ export function useDeepLinkHandler() {
     },
   };
 }
-

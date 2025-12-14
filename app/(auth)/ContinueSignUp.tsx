@@ -1,5 +1,5 @@
-import ContinueSignUpScreen from '../../screens/ContinueSignUpScreen';
-import { AuthGuard } from '../../src/components/auth';
+import ContinueSignUpScreen from '@/screens/ContinueSignUpScreen';
+import { AuthGuard } from '@/src/components/auth';
 
 export default function ContinueSignUpRoute() {
   return (
@@ -8,3 +8,4 @@ export default function ContinueSignUpRoute() {
     </AuthGuard>
   );
 }
+

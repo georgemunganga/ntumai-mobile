@@ -1,5 +1,5 @@
-import { OrderTrackingScreen } from '../../screens/checkout/CheckoutScreen';
+import OrderTrackingScreen from './OrderTrackingScreen';
 
-export default function OrderTrackingRoute(props: any) {
-  return <OrderTrackingScreen {...props} />;
+export default function OrderTrackingRoute() {
+  return <OrderTrackingScreen />;
 }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   ScrollView,
   TouchableOpacity,
@@ -21,9 +21,9 @@ import {
   Trash2,
   Clock4,
 } from 'lucide-react-native';
-import Text from '../../components/Text';
+import AppText from '@/components/AppText';
 import { useRouter } from 'expo-router';
-import HeaderBar from '../../components/HeaderBar';
+import HeaderBar from '@/components/HeaderBar';
 
 interface Product {
   id: string;
@@ -379,15 +379,15 @@ export default function VenderProducts() {
             </View>
 
             <View className='flex-1'>
-              <Text className='font-semibold text-gray-900 text-lg mb-1'>
+              <AppText className='font-semibold text-gray-900 text-lg mb-1'>
                 {product.name}
-              </Text>
-              <Text className='text-gray-700 text-sm mb-1'>
+              </AppText>
+              <AppText className='text-gray-700 text-sm mb-1'>
                 Price K{product.price.toFixed(2)}
-              </Text>
-              <Text className='text-gray-700 text-sm'>
+              </AppText>
+              <AppText className='text-gray-700 text-sm'>
                 Rating: {product.rating}/5 ★
-              </Text>
+              </AppText>
             </View>
 
             <View className='items-end'>
@@ -395,7 +395,7 @@ export default function VenderProducts() {
                 className='p-2 mb-2'
                 onPress={() => openActionModal(product)}
               >
-                <Text className='text-[#43b7a2] text-2xl font-bold'>⋮</Text>
+                <AppText className='text-[#43b7a2] text-2xl font-bold'>⋮</AppText>
               </TouchableOpacity>
               <Switch
                 value={product.isActive}
@@ -431,28 +431,28 @@ export default function VenderProducts() {
                   promo.status === 'Active' ? 'bg-[#40af97]' : 'bg-gray-400'
                 }`}
               >
-                <Text className='text-white text-xl font-medium'>
+                <AppText className='text-white text-xl font-medium'>
                   {promo.status}
-                </Text>
+                </AppText>
               </View>
             </View>
 
             <View className='flex-1 h-full pt-2'>
-              <Text className='font-semibold text-gray-900 text-lg mb-1'>
+              <AppText className='font-semibold text-gray-900 text-lg mb-1'>
                 {promo.name}
-              </Text>
-              <Text className='text-gray-900text-sm mb-2'>
+              </AppText>
+              <AppText className='text-gray-900text-sm mb-2'>
                 Code: {promo.code}
-              </Text>
+              </AppText>
               <View className='bg-[#ed4877] rounded-full px-3 py-1 self-start mb-2'>
-                <Text className='text-white font-medium'>{promo.discount}</Text>
+                <AppText className='text-white font-medium'>{promo.discount}</AppText>
               </View>
-              <Text className='text-gray-500 text-sm'>
+              <AppText className='text-gray-500 text-sm'>
                 {promo.startDate} {promo.startTime}
-              </Text>
-              <Text className='text-gray-500 text-sm'>
+              </AppText>
+              <AppText className='text-gray-500 text-sm'>
                 {promo.endDate} {promo.endTime}
-              </Text>
+              </AppText>
             </View>
 
             <View className='h-full flex-col align-center justify-center pr-3'>
@@ -460,7 +460,7 @@ export default function VenderProducts() {
                 onPress={() => openActionModalPromotion(promo)}
                 className='p-2 items-center'
               >
-                <Text className='text-[#43b7a2] text-2xl font-bold'>⋮</Text>
+                <AppText className='text-[#43b7a2] text-2xl font-bold'>⋮</AppText>
               </TouchableOpacity>
             </View>
           </View>
@@ -483,16 +483,16 @@ export default function VenderProducts() {
                 category.status === 'Active' ? 'bg-[#0aaf97]' : 'bg-[#909090]'
               }`}
             >
-              <Text className='text-white text-xl font-medium'>
+              <AppText className='text-white text-xl font-medium'>
                 {category.status}
-              </Text>
+              </AppText>
             </View>
 
             <TouchableOpacity
               onPress={() => openActionModalCategory(category)}
               className='absolute top-2 right-2 p-1'
             >
-              <Text className='color-primary text-2xl font-bold'>⋮</Text>
+              <AppText className='color-primary text-2xl font-bold'>⋮</AppText>
             </TouchableOpacity>
             <View className='items-center mt-6 mb-3'>
               <View className='w-32 h-32 rounded-3xl overflow-hidden relative'>
@@ -504,9 +504,9 @@ export default function VenderProducts() {
                 <View className='w-full h-full absolute opacity-25 bg-green-500 bg-opacity-50'></View>
               </View>
             </View>
-            <Text className='text-center text-black font-medium text-base'>
+            <AppText className='text-center text-black font-medium text-base'>
               {category.name}
-            </Text>
+            </AppText>
           </TouchableOpacity>
         ))}
       </View>
@@ -525,7 +525,7 @@ export default function VenderProducts() {
               onPress={() => openActionModalBrand(brand)}
               className='absolute top-2 right-2 p-1'
             >
-              <Text className='color-primary text-2xl font-bold'>⋮</Text>
+              <AppText className='color-primary text-2xl font-bold'>⋮</AppText>
             </TouchableOpacity>
             <View className='items-center mt-6 mb-3'>
               <View className='w-32 h-32 rounded-3xl overflow-hidden relative'>
@@ -537,9 +537,9 @@ export default function VenderProducts() {
                 <View className='w-full h-full absolute opacity-25 bg-green-500 bg-opacity-50'></View>
               </View>
             </View>
-            <Text className='text-center text-black font-medium text-base'>
+            <AppText className='text-center text-black font-medium text-base'>
               {brand.name}
-            </Text>
+            </AppText>
           </TouchableOpacity>
         ))}
       </View>
@@ -566,13 +566,13 @@ export default function VenderProducts() {
                 activeTab === tab ? 'bg-[#08AF97]' : 'bg-white'
               }`}
             >
-              <Text
+              <AppText
                 className={`text-center font-medium ${
                   activeTab === tab ? 'text-white' : 'text-[#08AF97]'
                 }`}
               >
                 {tab}
-              </Text>
+              </AppText>
             </TouchableOpacity>
           )}
         />
@@ -580,7 +580,7 @@ export default function VenderProducts() {
         <View className='flex-row items-center mb-4'>
           <View className='flex-row items-center bg-gray-100 rounded-full px-3 py-2 flex-1 mr-2'>
             <Search size={20} color='#9CA3AF' />
-            <TextInput
+            <AppTextInput
               className='flex-1 ml-2 text-gray-700'
               placeholder='Search'
               value={searchQuery}
@@ -600,14 +600,14 @@ export default function VenderProducts() {
               className='bg-[#eeeeee] px-4 py-2 rounded-[20px] flex-row items-center mr-2'
             >
               <Plus size={20} color='#08AF97' />
-              <Text className='text-[#08AF97] font-medium ml-1'>
+              <AppText className='text-[#08AF97] font-medium ml-1'>
                 {getAddButtonText()}
-              </Text>
+              </AppText>
             </TouchableOpacity>
             {activeTab === 'Products' && (
               <TouchableOpacity className='bg-[#08AF97] flex gap-2 px-4 py-2 rounded-[20px] flex-row items-center'>
                 <SlidersHorizontal size={20} color='white' />
-                <Text className='text-white font-medium ml-1'>Reorder</Text>
+                <AppText className='text-white font-medium ml-1'>Reorder</AppText>
               </TouchableOpacity>
             )}
           </View>
@@ -640,7 +640,7 @@ export default function VenderProducts() {
                 }
               >
                 <Edit size={20} color='#6B7280' />
-                <Text className='text-gray-600 ml-3 flex-1'>Edit</Text>
+                <AppText className='text-gray-600 ml-3 flex-1'>Edit</AppText>
               </TouchableOpacity>
 
               {selectedPromotion || selectedCategory ? (
@@ -657,14 +657,14 @@ export default function VenderProducts() {
                   }}
                 >
                   <Clock4 size={20} color='#6B7280' />
-                  <Text className='text-gray-600 ml-3 flex-1'>
+                  <AppText className='text-gray-600 ml-3 flex-1'>
                     set {activeTab == 'promotions' ? 'expire' : ''} Time
-                  </Text>
+                  </AppText>
                 </TouchableOpacity>
               ) : (
                 <View className='flex-row items-center py-4 '>
                   <Globe size={20} color='#6B7280' />
-                  <Text className='text-gray-600 ml-3 flex-1'>Public</Text>
+                  <AppText className='text-gray-600 ml-3 flex-1'>Public</AppText>
                   <Switch
                     value={selectedProduct?.isActive || false}
                     onValueChange={() => {
@@ -693,7 +693,7 @@ export default function VenderProducts() {
                 }
               >
                 <Trash2 size={20} color='#EF4444' />
-                <Text className='text-red-500 ml-3 flex-1'>Delete</Text>
+                <AppText className='text-red-500 ml-3 flex-1'>Delete</AppText>
               </TouchableOpacity>
             </Pressable>
           </View>

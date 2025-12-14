@@ -1,6 +1,6 @@
-import React, { createContext, useContext, useCallback, useEffect, useState } from 'react';
+import { createContext, useContext, useCallback, useEffect, useState } from 'react';
 import { OtpContextType, OtpProviderProps } from './types';
-import { useAuthContext } from './AuthProvider';
+import { useAuthContext } from '@/src/providers/AuthProvider';
 
 const OtpContext = createContext<OtpContextType | undefined>(undefined);
 

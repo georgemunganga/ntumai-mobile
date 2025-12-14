@@ -1,14 +1,14 @@
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'expo-router';
-import { useAuthStore } from '../store';
-import type { User as StoreUser } from '../store/types';
-import type { User as ApiUser } from '../api/types';
+import { useAuthStore } from '@/src/store';
+import type { User as StoreUser } from '@/src/store/types';
+import type { User as ApiUser } from '@/src/apitypes';
 import type {
   AuthChallengeRequest,
   AuthChallengeResponse,
   AuthChallengeVerificationRequest,
-} from '../api/modules/auth';
-import { useAuthDomain } from '../domain/auth';
+} from '@/src/apimodules/auth';
+import { useAuthDomain } from '@/src/domain/auth';
 import {
   AuthContextType,
   AuthProviderProps,
@@ -17,6 +17,7 @@ import {
   RegisterData,
   VerificationResult,
 } from './types';
+import { validateLoginCredentials as validateLoginCredentialsUtil } from '@/src/utils/authValidation';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -25,7 +26,7 @@ const mapApiRoleToStoreRole = (role: ApiUser['role']): StoreUser['role'] => {
     case 'restaurant_owner':
       return 'vendor';
     case 'delivery_driver':
-      return 'driver';
+      return 'tasker';
     case 'admin':
       return 'admin';
     default:
@@ -155,11 +156,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setLoading,
     setError,
     clearError: clearStoreError,
-    validateLoginCredentials,
   } = useAuthStore();
 
   const { state: domainState, coordinator, isInitializing, initializationError, reinitialize } = useAuthDomain({
-    persistence: { enabled: true },
+    persistence: { enabled: false },
   });
 
   const [verificationState, setVerificationState] = useState(DEFAULT_VERIFICATION_STATE);
@@ -173,15 +173,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, [domainState, isAuthenticated, token, loginStore]);
 
+  // Sync verification state with domain state
+  // IMPORTANT: This clears stale state when NOT in active verification flow
   useEffect(() => {
     if (
       (domainState.status === 'challenge-sent' || domainState.status === 'verifying') &&
       domainState.request
     ) {
+      // Active verification flow - sync state
       const currentRequest = domainState.request;
       const displayValue = getVerificationDisplayValue(currentRequest);
 
       setVerificationState((prev) => {
+        // Only update if values actually changed
         if (
           prev.requiresVerification &&
           prev.method === currentRequest.method &&
@@ -196,6 +200,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           value: displayValue,
         };
       });
+    } else {
+      // NOT in verification flow - ensure state is clean
+      // This handles: fresh app launch, completed auth, errors, etc.
+      setVerificationState(DEFAULT_VERIFICATION_STATE);
     }
   }, [domainState.status, domainState.request]);
 
@@ -218,7 +226,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setError(null);
 
       try {
-        const validation = validateLoginCredentials(credentials);
+        const validation = validateLoginCredentialsUtil(credentials);
         if (!validation.isValid) {
           const message = validation.errors.join(', ');
           setError(message);
@@ -255,7 +263,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setLoading(false);
       }
     },
-    [coordinator, setError, setLoading, validateLoginCredentials]
+    [coordinator, setError, setLoading]
   );
 
   const sendOtp = useCallback(
@@ -361,6 +369,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const clearError = useCallback(() => {
     clearStoreError();
     coordinator.clearError();
+    // Also clear verification state when clearing errors
+    // This prevents stale OTP states from persisting
+    setVerificationState(DEFAULT_VERIFICATION_STATE);
   }, [clearStoreError, coordinator]);
 
   const retryInitialization = useCallback(async () => {
@@ -373,10 +384,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, [clearStoreError, coordinator, reinitialize]);
 
-  const validateCredentials = useCallback(
-    (credentials: LoginCredentials) => validateLoginCredentials(credentials),
-    [validateLoginCredentials]
-  );
+  const validateCredentials = useCallback((credentials: LoginCredentials) => validateLoginCredentialsUtil(credentials), []);
 
   const handleAuthSuccess = useCallback(
     (result: AuthResult) => {
@@ -465,5 +473,3 @@ export const useAuthContext = (): AuthContextType => {
   }
   return context;
 };
-
-

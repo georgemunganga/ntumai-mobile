@@ -1,5 +1,5 @@
-import SelectMethodScreen from '../../screens/SelectMethodScreen';
-import { AuthGuard } from '../../src/components/auth';
+import SelectMethodScreen from '@/screens/SelectMethodScreen';
+import { AuthGuard } from '@/src/components/auth';
 
 export default function SelectMethodRoute() {
   return (
@@ -8,3 +8,4 @@ export default function SelectMethodRoute() {
     </AuthGuard>
   );
 }
+

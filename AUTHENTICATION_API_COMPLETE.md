@@ -776,11 +776,11 @@ export const authService = {
 
 ```typescript
 // OtpVerification.tsx
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
-import { authService } from '../../src/api/auth';
-import { useAuthStore } from '../../src/store';
+import { authService } from '@/src/api/auth';
+import { useAuthStore } from '@/src/store';
 
 interface OtpVerificationProps {
   sessionId: string;
@@ -982,10 +982,10 @@ export default function OtpVerification({
 
 ```typescript
 // LoginScreen.tsx
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, Picker } from 'react-native';
 import { useRouter } from 'expo-router';
-import { authService } from '../../src/api/auth';
+import { authService } from '@/src/api/auth';
 
 const COUNTRY_CODES = [
   { label: '🇺🇸 USA/Canada (+1)', value: '+1' },

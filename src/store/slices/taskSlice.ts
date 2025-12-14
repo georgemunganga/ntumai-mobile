@@ -1,8 +1,8 @@
 // @ts-nocheck
 import { create } from 'zustand';
-import { DeliveryAddress } from '../types';
-import { mockTaskService } from '../../api/mockServices';
-import { createPersistentStore } from '../utils/persistentStore';
+import { DeliveryAddress } from '@/types';
+import { mockTaskService } from '@/src/api/mockServices';
+import { createPersistentStore } from '@/src/store/utils/persistentStore';
 
 interface Task {
   id: string;

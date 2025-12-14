@@ -16,7 +16,7 @@ export * from './utils';
 export * from './hooks';
 
 // API exports - Networking layer
-export * from './api';
+export * from '@/src/api';
 
 // Services exports - Cross-cutting utilities
 export * from './services';

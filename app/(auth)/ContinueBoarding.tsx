@@ -1,5 +1,5 @@
-import ContinueBoardingScreen from '../../screens/ContinueBoarding';
-import { AuthGuard } from '../../src/components/auth';
+import ContinueBoardingScreen from '@/screens/ContinueBoarding';
+import { AuthGuard } from '@/src/components/auth';
 
 export default function ContinueBoardingRoute() {
   return (
@@ -8,3 +8,4 @@ export default function ContinueBoardingRoute() {
     </AuthGuard>
   );
 }
+

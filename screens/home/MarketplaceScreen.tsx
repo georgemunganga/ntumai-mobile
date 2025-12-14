@@ -1,5 +1,5 @@
 // screens/marketplace/MarketplaceScreen.tsx
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   View,
   Text,
@@ -28,7 +28,7 @@ import {
   X,
 } from 'lucide-react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import AppText from '../../components/AppText';
+import AppText from '@/components/AppText';
 import { Ionicons } from '@expo/vector-icons';
 
 const { width } = Dimensions.get('window');
@@ -508,7 +508,7 @@ export default function MarketplaceScreen({
         <View className='bg-gray-50 flex-row items-center justify-between px-4 pt-2 mb-6 shadow-lg'>
           <View>
             <Image
-              source={require('../../assets/green-logo.png')}
+              source={require('@/assets/green-logo.png')}
               resizeMode='contain'
               style={{ width: 120, height: 100 }}
             />

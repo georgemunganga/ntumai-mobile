@@ -2,7 +2,7 @@
 // Form management hook
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { UseFormOptions, FormState, FormField } from './types';
-import { validationRules, validateForm } from '../utils/validation';
+import { validationRules, validateForm } from '@/src/utils/validation';
 
 export interface UseFormResult<T> {
   // Form state

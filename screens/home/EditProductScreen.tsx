@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   View,
   ScrollView,
@@ -23,7 +23,7 @@ import {
   Image as ImageIcon,
   Trash2,
 } from 'lucide-react-native';
-import Text from '../../components/Text';
+import AppText from '@/components/AppText';
 import { useRouter } from 'expo-router';
 
 interface Product {
@@ -80,12 +80,12 @@ export default function EditProductScreen() {
   const renderGeneralInfo = () => (
     <View className='space-y-4'>
       <View>
-        <Text
+        <AppText
           style={{ fontFamily: 'Ubuntu-Regular' }}
           className='text-gray-600 text-sm mb-2'
         >
           Product Name
-        </Text>
+        </AppText>
         <View className='bg-gray-100 rounded-lg px-3 py-3 flex-row items-center'>
           <Package size={20} color='#6B7280' />
           <TextInput
@@ -98,12 +98,12 @@ export default function EditProductScreen() {
       </View>
 
       <View>
-        <Text
+        <AppText
           style={{ fontFamily: 'Ubuntu-Regular' }}
           className='text-gray-600 text-sm mb-2'
         >
           Categories
-        </Text>
+        </AppText>
         <View className='bg-gray-100 rounded-lg px-3 py-3 flex-row items-center'>
           <Layers size={20} color='#6B7280' />
           <TextInput
@@ -116,12 +116,12 @@ export default function EditProductScreen() {
       </View>
 
       <View>
-        <Text
+        <AppText
           style={{ fontFamily: 'Ubuntu-Regular' }}
           className='text-gray-600 text-sm mb-2'
         >
           Brand
-        </Text>
+        </AppText>
         <View className='bg-gray-100 rounded-lg px-3 py-3 flex-row items-center'>
           <Settings size={20} color='#6B7280' />
           <TextInput
@@ -136,12 +136,12 @@ export default function EditProductScreen() {
       <View className='flex-row items-center justify-between'>
         <View className='flex-row items-center'>
           <Tag size={20} color='#6B7280' />
-          <Text
+          <AppText
             style={{ fontFamily: 'Ubuntu-Regular' }}
             className='text-gray-900 ml-2'
           >
             Warranty
-          </Text>
+          </AppText>
         </View>
         <Switch
           value={product.hasWarranty}
@@ -155,12 +155,12 @@ export default function EditProductScreen() {
       <View className='flex-row items-center justify-between'>
         <View className='flex-row items-center'>
           <CornerDownLeft size={20} color='#6B7280' />
-          <Text
+          <AppText
             style={{ fontFamily: 'Ubuntu-Regular' }}
             className='text-gray-900 ml-2'
           >
             Refundable
-          </Text>
+          </AppText>
         </View>
         <Switch
           value={product.isRefundable}
@@ -172,12 +172,12 @@ export default function EditProductScreen() {
       </View>
 
       <View>
-        <Text
+        <AppText
           style={{ fontFamily: 'Ubuntu-Regular' }}
           className='text-gray-600 text-sm mb-2'
         >
           Description
-        </Text>
+        </AppText>
         <TextInput
           className='bg-gray-100 rounded-lg px-3 py-3 text-gray-900 min-h-[100]'
           value={product.description}
@@ -189,12 +189,12 @@ export default function EditProductScreen() {
       </View>
 
       <View>
-        <Text
+        <AppText
           style={{ fontFamily: 'Ubuntu-Regular' }}
           className='text-gray-600 text-sm mb-2'
         >
           Price
-        </Text>
+        </AppText>
         <View className='bg-gray-100 rounded-lg px-3 py-3 flex-row items-center'>
           <DollarSign size={20} color='#6B7280' />
           <TextInput
@@ -215,18 +215,18 @@ export default function EditProductScreen() {
     <View className='space-y-4'>
       <View className='bg-gray-100 rounded-lg p-6 items-center'>
         <ImageIcon size={40} color='#08AF97' />
-        <Text className='text-gray-900 mt-2'>Add Cover</Text>
+        <AppText className='text-gray-900 mt-2'>Add Cover</AppText>
       </View>
 
       <View className='bg-gray-100 rounded-lg p-6 items-center'>
         <ImageIcon size={40} color='#08AF97' />
-        <Text className='text-gray-900 mt-2'>Add Product</Text>
-        <Text
+        <AppText className='text-gray-900 mt-2'>Add Product</AppText>
+        <AppText
           style={{ fontFamily: 'Ubuntu-Regular' }}
           className='text-gray-500 text-sm mt-1'
         >
           Please upload at least 8 images.
-        </Text>
+        </AppText>
       </View>
     </View>
   );
@@ -234,7 +234,7 @@ export default function EditProductScreen() {
   const renderVariant = () => (
     <View className='space-y-4'>
       <View>
-        <Text className='text-gray-600 text-sm'>Variant name</Text>
+        <AppText className='text-gray-600 text-sm'>Variant name</AppText>
         <View className='bg-[#f8f9fa] rounded-[40px] py-2 px-[9px] flex-row items-center justify-between'>
           <Package size={20} color='#6B7280' />
           <TextInput
@@ -243,13 +243,13 @@ export default function EditProductScreen() {
             placeholder='Enter variant name'
           />
           <TouchableOpacity className='w-8 h-8 rounded-full ml-2 border-2 border-[#40af97] flex items-center justify-center'>
-            <Text className='text-[#40af97] text-xl font-bold pb-1'>+</Text>
+            <AppText className='text-[#40af97] text-xl font-bold pb-1'>+</AppText>
           </TouchableOpacity>
         </View>
       </View>
 
       <View>
-        <Text className='text-gray-600 text-sm'>Fixed Price</Text>
+        <AppText className='text-gray-600 text-sm'>Fixed Price</AppText>
         <View className='bg-[#f8f9fa] rounded-[40px] py-2 px-[9px] flex-row items-center justify-between'>
           <DollarSign size={20} color='#6B7280' />
           <TextInput
@@ -262,9 +262,9 @@ export default function EditProductScreen() {
       </View>
 
       <View className='items-center pt-2'>
-        <Text className='text-gray-500 text-sm text-center'>
+        <AppText className='text-gray-500 text-sm text-center'>
           The product price will be the same for all variants
-        </Text>
+        </AppText>
       </View>
     </View>
   );
@@ -272,16 +272,16 @@ export default function EditProductScreen() {
   const renderOption = () => (
     <View className='space-y-4'>
       <TouchableOpacity className='bg-white border-2 border-[#40af97] rounded-full py-4 px-6 items-center'>
-        <Text className='text-[#40af97] text-lg'>Copy from other product</Text>
+        <AppText className='text-[#40af97] text-lg'>Copy from other product</AppText>
       </TouchableOpacity>
 
       <View className='mt-4'>
-        <Text
+        <AppText
           style={{ fontFamily: 'Ubuntu-Regular' }}
           className='text-[#909090] text-l pb-4'
         >
           Create New option
-        </Text>
+        </AppText>
       </View>
 
       <View>
@@ -293,7 +293,7 @@ export default function EditProductScreen() {
             placeholderTextColor='#9CA3AF'
           />
           <TouchableOpacity className='w-8 h-8 rounded-full ml-2 border-2 border-[#40af97] flex items-center justify-center'>
-            <Text className='text-[#40af97] text-xl font-bold pb-1'>+</Text>
+            <AppText className='text-[#40af97] text-xl font-bold pb-1'>+</AppText>
           </TouchableOpacity>
         </View>
       </View>
@@ -310,17 +310,17 @@ export default function EditProductScreen() {
           onPress={() => router.back()}
         >
           <ArrowLeft size={24} color='white' />
-          <Text className='text-white text-lg ml-2'>Back</Text>
+          <AppText className='text-white text-lg ml-2'>Back</AppText>
         </TouchableOpacity>
       </View>
 
       <ScrollView className='flex-1 px-4 py-6'>
-        <Text
+        <AppText
           style={{ fontFamily: 'Ubuntu-Bold' }}
           className='text-[#909090] text-2xl text-center mb-6'
         >
           Edit Product
-        </Text>
+        </AppText>
 
         <View className='bg-gray-100 rounded-xl p-6 space-y-4'>
           <View>
@@ -328,7 +328,7 @@ export default function EditProductScreen() {
               className='flex-row items-center justify-between py-3'
               onPress={() => toggleSection('generalInfo')}
             >
-              <Text className='text-gray-900 text-lg'>General Info</Text>
+              <AppText className='text-gray-900 text-lg'>General Info</AppText>
               {expandedSection === 'generalInfo' ? (
                 <ChevronUp size={20} color='#6B7280' />
               ) : (
@@ -347,7 +347,7 @@ export default function EditProductScreen() {
               className='flex-row items-center justify-between py-3'
               onPress={() => toggleSection('media')}
             >
-              <Text className='text-gray-900 text-lg'>Media</Text>
+              <AppText className='text-gray-900 text-lg'>Media</AppText>
               {expandedSection === 'media' ? (
                 <ChevronUp size={20} color='#6B7280' />
               ) : (
@@ -366,7 +366,7 @@ export default function EditProductScreen() {
               className='flex-row items-center justify-between py-3'
               onPress={() => toggleSection('variant')}
             >
-              <Text className='text-gray-900 text-lg'>Variant</Text>
+              <AppText className='text-gray-900 text-lg'>Variant</AppText>
               {expandedSection === 'variant' ? (
                 <ChevronUp size={20} color='#6B7280' />
               ) : (
@@ -385,7 +385,7 @@ export default function EditProductScreen() {
               className='flex-row items-center justify-between py-3'
               onPress={() => toggleSection('option')}
             >
-              <Text className='text-gray-900 text-lg'>Option</Text>
+              <AppText className='text-gray-900 text-lg'>Option</AppText>
               {expandedSection === 'option' ? (
                 <ChevronUp size={20} color='#6B7280' />
               ) : (
@@ -402,9 +402,9 @@ export default function EditProductScreen() {
               className='bg-gray-100 rounded-lg pt-4 flex-row items-center justify-between border-t border-gray-200'
               onPress={openDeleteModal}
             >
-              <Text className='text-[#ed4877] text-lg flex-1'>
+              <AppText className='text-[#ed4877] text-lg flex-1'>
                 Delete this item
-              </Text>
+              </AppText>
               <Trash2 size={20} color='#ed4877' />
             </TouchableOpacity>
           </View>
@@ -413,7 +413,7 @@ export default function EditProductScreen() {
 
       <View className='absolute bottom-4 right-4'>
         <TouchableOpacity className='bg-[#08AF97] rounded-full py-3 px-6 items-center'>
-          <Text className='text-white text-base font-medium'>Save</Text>
+          <AppText className='text-white text-base font-medium'>Save</AppText>
         </TouchableOpacity>
       </View>
 
@@ -428,22 +428,22 @@ export default function EditProductScreen() {
           onPress={() => setShowDeleteModal(false)}
         >
           <View className='bg-white rounded-xl p-6 w-80 mx-4'>
-            <Text className='text-gray-900 text-xl mb-4'>Delete Product</Text>
-            <Text className='text-gray-600 text-sm mb-6'>
+            <AppText className='text-gray-900 text-xl mb-4'>Delete Product</AppText>
+            <AppText className='text-gray-600 text-sm mb-6'>
               Are you sure you want to delete this product?
-            </Text>
+            </AppText>
             <View className='flex-row space-x-3 gap-6'>
               <TouchableOpacity
                 className='flex-1 bg-white border border-[#08AF97] rounded-full py-3 items-center'
                 onPress={() => setShowDeleteModal(false)}
               >
-                <Text className='text-[#08AF97] text-base'>Cancel</Text>
+                <AppText className='text-[#08AF97] text-base'>Cancel</AppText>
               </TouchableOpacity>
               <TouchableOpacity
                 className='flex-1 bg-[#08AF97] rounded-full py-3 items-center'
                 onPress={handleDeleteProduct}
               >
-                <Text className='text-white text-base'>Okay</Text>
+                <AppText className='text-white text-base'>Okay</AppText>
               </TouchableOpacity>
             </View>
           </View>

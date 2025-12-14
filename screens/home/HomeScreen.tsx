@@ -19,7 +19,7 @@ import {
   Wallet,
 } from "lucide-react-native";
 import { useRouter } from "expo-router";
-import AppText from "../../components/AppText";
+import AppText from "@/components/AppText";
 
 
 const { width } = Dimensions.get("window");
@@ -28,19 +28,19 @@ const cardWidth = (width - 36) / 2 - 4;
 const thinkingCards = [
   {
     title: "Last Delivery>",
-    image: require("../../assets/potatopie.jpg"),
+    image: require("@/assets/potatopie.jpg"),
   },
   {
     title: "Latest>",
-    image: require("../../assets/bakedpotato.jpg"),
+    image: require("@/assets/bakedpotato.jpg"),
   },
   {
     title: "Trending>",
-    image: require("../../assets/salad.jpg"),
+    image: require("@/assets/salad.jpg"),
   },
   {
     title: "New Stores>",
-    image: require("../../assets/cornmeal.jpg"),
+    image: require("@/assets/cornmeal.jpg"),
   },
 ];
 
@@ -125,7 +125,7 @@ const HomeScreen = () => {
           <View className='justify-between' style={{ flex: 0.7 }}>
             <View className='mb-4'>
               <Image
-                source={require('../../assets/otw.png')}
+                source={require('@/assets/otw.png')}
                 resizeMode='contain'
                 className='w-52 h-20'
               />
@@ -155,7 +155,7 @@ const HomeScreen = () => {
         </AppText>
         <View className='flex-row flex-wrap gap-2'>
           <Image
-            source={require('../../assets/home-categories.png')}
+            source={require('@/assets/home-categories.png')}
             className='w-full h-[210px]'
             resizeMode='cover'
           />
@@ -257,4 +257,3 @@ const HomeScreen = () => {
 };
 
 export default HomeScreen;
-

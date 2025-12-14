@@ -3,7 +3,7 @@ export { useAuthStore } from './slices/authSlice.improved';
 export { useUserStore } from './slices/userSlice';
 export { useCartStore } from './slices/cartSlice';
 export { useOrderStore } from './slices/orderSlice';
-export { useDriverStore } from './slices/driverSlice';
+export { useTaskerStore } from './slices/taskerSlice';
 export { useVendorStore } from './slices/vendorSlice';
 export { useMarketplaceStore } from './slices/marketplaceSlice';
 export { useDeliveryStore } from './slices/deliverySlice';

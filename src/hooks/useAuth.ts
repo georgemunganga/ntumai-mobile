@@ -1,9 +1,9 @@
 // @ts-nocheck
 // Authentication hook
 import { useCallback, useEffect, useMemo } from 'react';
-import { useAuthStore } from '../store';
-import { apiClient } from '../utils/api';
-import { User } from '../store/types';
+import { useAuthStore } from '@/src/store';
+import { apiClient } from '@/src/utils/api';
+import { User } from '@/src/store/types';
 
 export interface UseAuthResult {
   // State
