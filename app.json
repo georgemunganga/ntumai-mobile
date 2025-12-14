@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {
   "expo": {
     "name": "NTUMAI",
@@ -52,3 +53,61 @@
     }
   }
 }
+=======
+{
+  "expo": {
+    "name": "NTUMAI",
+    "slug": "NTUMAI",
+    "owner": "abdelkaderbzz",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "ntumai",
+    "icon": "./assets/ntumai_logo.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/box1.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "splash": {
+        "image": "./assets/splash_logo.png",
+        "resizeMode": "contain",
+        "backgroundColor": "#ffffff"
+      },
+      "bundleIdentifier": "com.dannydc.NTUMAI",
+      "scheme": "ntumai"
+    },
+    "android": {
+      "icon": "./assets/ntumai_logo.png",
+      "edgeToEdgeEnabled": true,
+      "versionCode": 1,
+      "splash": {
+        "image": "./assets/splash_logo.png",
+        "resizeMode": "contain",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.dannydc.NTUMAI",
+      "scheme": "ntumai"
+    },
+    "plugins": [
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "minSdkVersion": 21
+          }
+        }
+      ],
+      "expo-font"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "d06157d6-eb1c-4c48-8e70-468fd60f71f2"
+      }
+    }
+  }
+}
+>>>>>>> b5bd7e8ce7401f0a702627c938cac88d12ff171b

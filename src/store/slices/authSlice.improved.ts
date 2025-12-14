@@ -398,6 +398,7 @@ export const useAuthStore = create<AuthStore>()(
     {
       // Persistence configuration
       name: 'auth-store',
+      version: 1,
       storage: {
         getItem: async (name: string) => {
           const item = await AsyncStorage.getItem(name);
@@ -419,6 +420,11 @@ export const useAuthStore = create<AuthStore>()(
         isAuthenticated: state.isAuthenticated,
         hasRole: state.hasRole,
       }),
+      // Migration function to handle storage schema changes
+      migrate: (persistedState: any, version: number) => {
+        // Handle migration from previous versions if needed
+        return persistedState as AuthStore;
+      },
     }
   )
 );
